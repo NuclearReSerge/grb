@@ -11,7 +11,7 @@ class TimeModType : public NameMapper
 protected:
   TimeModType() = delete;
   TimeModType(const type::ColumnType columnType);
-  std::vector<std::string>& getNameList() const;
+  const VectorString& getNameList() const;
 };
 
 class Time50ModType : public TimeModType

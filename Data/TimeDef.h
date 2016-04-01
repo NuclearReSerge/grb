@@ -12,7 +12,7 @@ protected:
 
   friend class Singleton<TimeDefType>;
   TimeDefType();
-  std::vector<std::string>& getNameList() const;
+  const VectorString& getNameList() const;
 };
 
 typedef Singleton<TimeDefType> TimeDef;

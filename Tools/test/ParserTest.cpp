@@ -1,4 +1,6 @@
 #include "Tools/Parser.h"
+#include "test/DataBaseFormatMock.h"
+
 #include "gtest/gtest.h"
 #include <sstream>
 
@@ -15,39 +17,36 @@ namespace
 {
 const VecStr DEFAULT_ROW_REQUIRED
 {
-  "GRB 600101",
-  "1960-01-01 00:00:00.0",
-  "APEX",
-  "", "", "-1",
-  "",
-  "N", "N",
-  "0", "0",
-  "",
-  "BAT trigger",
-  "1974ApJ...188L...1S",
-  "", "", "", "", "", "",
-  "", "", "", "", "", "",
-  "", "",
-  "",
-  ""
+  "0", "0", // record,_number id
+  "GRB 600101", "", // name, alt_names
+  "99999.999999999999", "BAT trigger", //time (Modified Julian Date), time_def
+  "APEX", // observatory
+  "", "", "-1", "", // ra, dec, coord_flag, region
+  "N", // afterglow_flag
+  "1974ApJ...188L...1S", // reference
+  "", "", "", "", "", "", // t50_mod, t50, t50_error, t50_range, t50_emin, t50_emax
+  "", "", "", "", "", "", // t90_mod, t90, t90_error, t90_range, t90_emin, t90_emax
+  "", "N", "", "", // t_other, flux_flag, notes, flux_notes
+  "",// local_notes
+  "", //class
+  "" // DUMMY
 };
 const VecStr DEFAULT_ROW_ALL_VALUES
 {
-  "GRB 600101",
-  "1960-01-01 00:00:00.0",
-  "APEX",
-  "", "", "-1",
-  "",
-  "N", "N",
-  "0", "0",
-  "",
-  "BAT trigger",
-  "1974ApJ...188L...1S",
-  "", "", "", "", "", "",
-  "", "", "", "", "", "",
-  "", "",
-  "",
-  ""
+  "0", "0", // record,_number id
+  "GRB 600101", "", // name, alt_names
+  "99999.999999999999", "BAT trigger", //time (Modified Julian Date), time_def
+  "APEX", // observatory
+  "", "", "-1", // ra dec coord_flag
+  "", // region
+  "N", // afterglow_flag
+  "1974ApJ...188L...1S", // reference
+  "", "", "", "", "", "", // t50_mod t50 t50_error t50_range t50_emin t50_emax
+  "", "", "", "", "", "", // t90_mod t90 t90_error t90_range t90_emin t90_emax
+  "", "N", "", "", // t_other flux_flag notes flux_notes
+  "", // local_notes
+  "", //class
+  "" // DUMMY
 };
 }
 
@@ -58,6 +57,7 @@ protected:
   {
     _parser = nullptr;
     _catalog = new Catalog;
+    _format = new DataBaseFormatMock(type::DATABASE_TABLE_TYPE_UNDEFINED);
     _stream = new std::stringstream;
 
   }
@@ -65,6 +65,7 @@ protected:
   void TearDown()
   {
     delete _stream;
+    delete _format;
     delete _catalog;
     delete _parser;
   }
@@ -88,7 +89,7 @@ protected:
     bool isThrown = false;
     try
     {
-      _parser = new Parser(filename);
+      _parser = new Parser(filename, _format, _catalog);
     }
     catch (const Exception& exc)
     {
@@ -105,9 +106,8 @@ protected:
     bool isThrown = false;
     try
     {
-      _parser = new Parser(_stream);
-      linesParsed = _parser->parse(DataBaseFormats::instance()->getFormat(type::HEASARC_GRBCAT),
-                                   *_catalog);
+      _parser = new Parser(_stream, _format, _catalog);
+      linesParsed = _parser->parse();
     }
     catch (const Exception& exc)
     {
@@ -120,6 +120,7 @@ protected:
 
   std::stringstream* _stream;
   Catalog* _catalog;
+  DataBaseFormat* _format;
   Parser* _parser;
 };
 
@@ -411,21 +412,19 @@ TEST_F(ParserTest, parse_real_valid_entry)
 {
   VecStr line
   {
-    "GRB 930309A",
-    "1993-03-09 03:07:49.8",
-    "COMPTEL-CGRO",
-    "94.8903", "-1.4087", "0.2"
-    ,"irregular",
-    "N", "N",
-    "1528", "2759",
-    "PB930309",
-    "Earth Crossing Time",
-    "1998ApJ...492..246K",
-    "#", "#", "#", "#", "#", "#",
-    "#", "#", "#", "#", "#", "#",
-    "#", "#",
-    "#",
-    "Circular error region is approximation of irregular COMPTEL error region "
+    "10119", "5831",
+    "GRB 050309", "",
+    "53438.030104166697", "BAT trigger",
+    "SWIFT",
+    "182.62125", "77.617999999999995", "0", "",
+    "Y",
+    "2005GCN..3082....1B"
+    "", "", "", "", "", "", // t50_mod, t50, t50_error, t50_range, t50_emin, t50_emax
+    "", "", "", "", "", "", // t90_mod, t90, t90_error, t90_range, t90_emin, t90_emax
+    "", "N", "", "" // t_other, flux_flag, notes, flux_notes
+    "Position is from source 1 of XRT. See afterglow table." // local_notes
+    "1710", //class
+    "" // DUMMY
   };
   stringsToStream(line);
   tryToParseStream();

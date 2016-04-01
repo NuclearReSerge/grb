@@ -3,7 +3,7 @@
 namespace grb
 {
 
-std::string Exception::_prefix= "GRB exception: ";
+const std::string Exception::_prefix = "GRB exception: ";
 
 Exception::Exception(const std::string& message, const std::string& function)
 {
@@ -15,8 +15,7 @@ Exception::Exception(const std::string& message, const std::string& function)
   _message += message;
 }
 
-std::string
-Exception::getPrefix()
+const std::string& Exception::getPrefix()
 {
   return _prefix;
 }

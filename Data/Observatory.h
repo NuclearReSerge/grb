@@ -12,7 +12,7 @@ protected:
   friend class Singleton<ObservatoryType>;
 
   ObservatoryType();
-  std::vector<std::string>& getNameList() const;
+  const VectorString& getNameList() const;
 };
 
 typedef Singleton<ObservatoryType> Observatory;

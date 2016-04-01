@@ -60,24 +60,30 @@ enum ColumnType
   FLUX_NOTES,
   LOCAL_NOTES,
   CLASS,
+  DUMMY,
 
   // other
-  COORD_H,
   COORD_LONG,
-  COORD_V,
   COORD_LAT,
+  COORD_H,
+  COORD_V,
 
   COLUMN_TYPE_UNDEFINED
 };
 
 enum ValueType
 {
-  STRING,
-  DATE,
-  POSITION,
-  INTEGER,
   FLAG,
+  INTEGER,
+  INDEX,
+  INTEGER_RANGE,
+  INDEX_LIST,
   FLOAT,
+  TIMEPOINT,
+  COORDINATE,
+  STRING,
+  STRING_LIST,
+
   VALUE_TYPE_UNDEFINED
 };
 
@@ -98,20 +104,31 @@ enum CoordinateSystemType
   COORDINATE_SYSTEM_UNDEFINED
 };
 
+typedef bool Flag;
+typedef std::size_t Integer;
 typedef int Index;
-typedef std::chrono::system_clock::time_point Date;
+typedef std::size_t IntegerRange[2];
+typedef std::vector<type::Index> IndexList;
+typedef double Float;
+typedef std::chrono::system_clock::time_point TimePoint;
+typedef double Coordinate;
+typedef std::string String;
+typedef std::vector<std::string> StringList;
+
 typedef std::bitset<COLUMN_TYPE_UNDEFINED> ColumnFlags;
 
 } // namespace type
-
 
 class GlobalName
 {
 public:
   GlobalName() = delete;
+  GlobalName(const GlobalName& ) = delete;
+  GlobalName& operator= (const GlobalName&) = delete;
 
   static std::string& getDatabaseTable(type::DatabaseTableType dbType);
   static std::string& getColumn(type::ColumnType columnType);
+  static std::string& getColumnDescription(type::ColumnType columnType);
   static std::string& getValue(type::ValueType valueType);
   static std::string& getUnit(type::UnitType unitType);
   static std::string& getCoordinateSystem(type::CoordinateSystemType coordinateSystemType);
@@ -119,8 +136,14 @@ public:
 private:
   static std::string& getWithRangeCheck(std::vector<std::string>& nameList, std::size_t index);
 
+  struct Column
+  {
+    std::string name;
+    std::string description;
+  };
+
   static std::vector<std::string> _dbTableNames;
-  static std::vector<std::string> _columnNames;
+  static std::vector<Column> _columns;
   static std::vector<std::string> _valueNames;
   static std::vector<std::string> _unitNames;
   static std::vector<std::string> _coordinateSystemNames;

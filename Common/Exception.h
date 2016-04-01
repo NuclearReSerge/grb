@@ -6,6 +6,8 @@
 namespace grb
 {
 
+#define INCLUDE_FUNCTION_IN_EXC
+
 #ifdef INCLUDE_FUNCTION_IN_EXC
   #define PRETTY_FUNCTION __PRETTY_FUNCTION__
 #else
@@ -18,9 +20,9 @@ public:
   Exception(const std::string& message = "", const std::string& function = "");
   const char* what() const noexcept;
 
-  static std::string getPrefix();
+  static const std::string& getPrefix();
 private:
-  static std::string _prefix;
+  static const std::string _prefix;
   std::string _message;
 };
 

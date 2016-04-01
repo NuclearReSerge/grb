@@ -8,7 +8,7 @@ namespace
 
 // cat grbcatalog.dat | egrep -v "^#" | awk -F "|" '{print $3}' | sed "s/\s*$//g" | sort | uniq | sed "s/^/\ \ \"/g" | sed "s/$/\",/g"
 
-std::vector<std::string> NAME_LIST
+const NameMapper::VectorString NAME_LIST
 {
   "APEX",
   "BATSE-CGRO",
@@ -48,22 +48,20 @@ std::vector<std::string> NAME_LIST
   "WXM-HETE2"
 };
 
-std::string DESCRIPTION = "\
-Name of the observatory that detected the burst. If the observatory has more \
-than one instrument capable of detecting GRB, this is reported with the \
-following convention 'observatory-instrument'. If the detection of a GRB was \
-determined by the contribution of different observatories, this is reported \
-using the following convention 'observatory1/observatory2/...'.";
+const std::string DESCRIPTION = "\
+Name of the observatory that detected the burst. If the observatory has more than one instrument \
+capable of detecting GRB, this is reported with the following convention 'observatory-instrument'. \
+If the detection of a GRB was determined by the contribution of different observatories, this is \
+reported using the following convention 'observatory1/observatory2/...'.";
 }
 
 ObservatoryType::ObservatoryType()
-  : NameMapper(type::OBSERVATORY)
+  : NameMapper(type::OBSERVATORY, DESCRIPTION)
 {
-  _description = DESCRIPTION;
   initiate();
 }
 
-std::vector<std::string>&
+const NameMapper::VectorString&
 ObservatoryType::getNameList() const
 {
   return NAME_LIST;

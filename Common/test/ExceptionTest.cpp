@@ -1,6 +1,6 @@
 #include "Common/Exception.h"
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 using namespace ::testing;
 
@@ -8,6 +8,11 @@ namespace grb
 {
 namespace test
 {
+
+namespace
+{
+const std::string MESSAGE = "MESSAGE";
+}
 
 class ExceptionTest : public Test
 {
@@ -26,28 +31,26 @@ protected:
 
 TEST_F(ExceptionTest, no_Message_no_Function)
 {
-  const Exception exc;
+  Exception exc;
   ASSERT_STREQ(_what.c_str(), exc.what());
 }
 
 TEST_F(ExceptionTest, Message_no_Function)
 {
-  std::string mess("MESSAGE");
-  _what += mess;
+  _what += MESSAGE;
 
-  const Exception exc(mess);
+  Exception exc(MESSAGE);
   ASSERT_STREQ(_what.c_str(), exc.what());
 }
 
 TEST_F(ExceptionTest, Message_Function)
 {
-  std::string mess("MESSAGE");
   std::string func(__PRETTY_FUNCTION__);
-  _what += "[" + func + "] " + mess;
+  _what += "[" + func + "] " + MESSAGE;
 
-  const Exception exc(mess, func);
+  Exception exc(MESSAGE, func);
   ASSERT_STREQ(_what.c_str(), exc.what());
 }
 
-} // namespace test
-} // namespace grb
+}
+}

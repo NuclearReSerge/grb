@@ -8,7 +8,7 @@ namespace
 
 // cat grbcatalog.dat | egrep -v "^#" | awk -F "|" '{print $14}' | sed "s/,\s*/\n/g" | sed "s/\s*$//g" | sort | uniq | sed "s/^/\ \ \"/g" | sed "s/$/\",/g"
 
-std::vector<std::string> NAME_LIST
+const NameMapper::VectorString NAME_LIST
 {
   "1974ApJ...188L...1S",
   "1982ApJ...259L..51K",
@@ -342,19 +342,17 @@ std::vector<std::string> NAME_LIST
   "Mitrofanov et al. (1990)"
 };
 
-std::string DESCRIPTION = "\
-Report the reference that report the GRB information in the table. It is \
-given as ADS format.";
+const std::string DESCRIPTION = "\
+Report the reference that report the GRB information in the table. It is given as ADS format.";
 }
 
 ReferenceType::ReferenceType()
-  : NameMapper(type::REFERENCE)
+  : NameMapper(type::REFERENCE, DESCRIPTION)
 {
-  _description = DESCRIPTION;
   initiate();
 }
 
-std::vector<std::string>&
+const NameMapper::VectorString&
 ReferenceType::getNameList() const
 {
   return NAME_LIST;

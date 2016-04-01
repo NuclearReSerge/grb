@@ -12,26 +12,29 @@ class DataBaseFormat
 public:
   DataBaseFormat() = delete;
   DataBaseFormat(const type::DatabaseTableType dbType);
-  ~DataBaseFormat();
+  virtual ~DataBaseFormat();
 
   type::DatabaseTableType getType() const;
-  const DataType& getColumnFormat(const std::size_t column) const throw(Exception);
+  type::CoordinateSystemType getCoordinateSystem() const;
   std::size_t getSize() const;
   const type::ColumnFlags& getRequiredColumns() const;
+  const DataType& getColumnFormat(const std::size_t column) const throw(Exception);
 
 protected:
+  void initialize();
+  virtual void doInit();
   void initHEASARC_GRBCAT();
 
-private:
   const type::DatabaseTableType _type;
-  std::vector<DataType*> _format;
+  type::CoordinateSystemType _coordSys;
   type::ColumnFlags _requiredFlags;
+  std::vector<DataType*> _format;
 };
 
 class DataBaseFormatFactory
 {
 public:
-  const DataBaseFormat& getFormat(const type::DatabaseTableType dbType) throw(Exception);
+  const DataBaseFormat* getFormat(const type::DatabaseTableType dbType) throw(Exception);
 
 protected:
   friend class Singleton<DataBaseFormatFactory>;

@@ -8,6 +8,7 @@
 
 #include "Tools/Parser.h"
 
+#include <iostream>
 #include <sstream>
 #include <fstream>
 
@@ -16,23 +17,21 @@ namespace grb
 
 namespace
 {
-const char* WHITESPACE = " \t";
-const char COMMENT = '#';
-const char EMPTY_ELEMENT = '#';
-const char DELIM_COLUMN = '|';
-const char DELIM_LIST = ',';
-const char DELIM_RANGE = '-';
-
-
+const char* WHITESPACE   = " \t";
+const char  COMMENT      = '#';
+const char  DELIM_COLUMN = '|';
+const char  DELIM_LIST   = ',';
+const char  DELIM_RANGE  = '-';
 }
 
-Parser::Parser(const std::string& filename)
+Parser::Parser(const std::string& filename, const DataBaseFormat* format, Catalog* catalog)
+  : _format(format), _catalog(catalog)
 {
   openFileStream(filename);
 }
 
-Parser::Parser(std::istream* stream)
-  : _stream(stream)
+Parser::Parser(std::istream* stream, const DataBaseFormat* format, Catalog* catalog)
+  : _stream(stream), _format(format), _catalog(catalog)
 {
   if (!_stream)
   {
@@ -51,7 +50,7 @@ Parser::~Parser()
 }
 
 void
-Parser::openFileStream(const std::string& filename) throw(Exception)
+Parser::openFileStream(const std::string& filename)
 {
   _stream = new std::ifstream(filename);
   if(_stream->fail())
@@ -66,8 +65,10 @@ Parser::openFileStream(const std::string& filename) throw(Exception)
   _isSourceFile = true;
 }
 
-std::size_t Parser::parse(const DataBaseFormat& format, Catalog& catalog) throw(Exception)
+std::size_t
+Parser::parse() throw(Exception)
 {
+  const type::ColumnFlags& columnFlagsRequired = _format->getRequiredColumns();
 
   _row = 0;
   for (std::string line; std::getline(*_stream, line);)
@@ -79,24 +80,31 @@ std::size_t Parser::parse(const DataBaseFormat& format, Catalog& catalog) throw(
     CatalogEntry entry;
     std::stringstream ss(line);
     std::size_t col = 0;
+    std::cout << "COLUMNS REQUIRED: " << columnFlagsRequired << std::endl;
+
     for (std::string element; std::getline(ss, element, DELIM_COLUMN);)
     {
-      _column = (type::ColumnType) format.getColumnFormat(col).getColumnType();
+      _column = _format->getColumnFormat(col++).getColumnType();
+
       element.erase(0, element.find_first_not_of(WHITESPACE));
       element.erase(element.find_last_not_of(WHITESPACE) + 1);
-      //std::cout << "item[" << _column << "]=|" << element << "|"<< std::endl;
-
-      if (element.empty())
+      std::cout << "item[" << _column <<", " << GlobalName::getColumn(_column) << "]="
+                << element << ""<< std::endl;
+      try
       {
-        ++col;
-        continue;
+        columnFlags.set(_column, parseMapper(element, entry));
       }
-
-      parseMapper(entry, columnFlags, element);
-      ++col;
+      catch (Exception& exc)
+      {
+        std::cout << exc.what() << std::endl;
+        columnFlags.set(_column, false);
+        if (columnFlagsRequired.test(_column))
+        {
+          std::cout << "COLUMN REQUIRED" << std::endl;
+          throw;
+        }
+      }
     }
-
-    const type::ColumnFlags& columnFlagsRequired = format.getRequiredColumns();
 
     columnFlags = (columnFlags & columnFlagsRequired) ^ columnFlagsRequired;
     if (columnFlags.any())
@@ -112,11 +120,11 @@ std::size_t Parser::parse(const DataBaseFormat& format, Catalog& catalog) throw(
       Exception exc(ss.str(), PRETTY_FUNCTION);
       throw exc;
     }
-    catalog.get().push_back(entry);
+    _catalog->get().push_back(entry);
     ++_row;
   }
 
-  if (_row == 0 || catalog.get().empty())
+  if (_row == 0 || _catalog->get().empty())
   {
     Exception exc("Parsing failed, stream is empty", PRETTY_FUNCTION);
     throw exc;
@@ -124,226 +132,303 @@ std::size_t Parser::parse(const DataBaseFormat& format, Catalog& catalog) throw(
   return _row;
 }
 
-void
-Parser::parseMapper(CatalogEntry& entry, type::ColumnFlags& columnFlags,
-                    const std::string& item) throw(Exception)
+bool
+Parser::parseMapper(const std::string& raw, CatalogEntry& entry)
+{
+  type::ValueType valueType = _format->getColumnFormat(_column).getValueType();
+
+  switch (valueType)
+  {
+    case type::FLAG:
+      return parseValue(raw, mapFlag(entry));
+    case type::INTEGER:
+      return parseValue(raw, mapInteger(entry));
+    case type::INDEX:
+      return parseValue(raw, mapIndex(entry));
+    case type::INTEGER_RANGE:
+      return parseValue(raw, mapIntegerRange(entry));
+    case type::INDEX_LIST:
+      return parseValue(raw, mapIndexList(entry));
+    case type::FLOAT:
+      return parseValue(raw, mapFloat(entry));
+    case type::TIMEPOINT:
+      return parseValue(raw, mapTimePoint(entry));
+    case type::COORDINATE:
+      return parseValue(raw, mapFloat(entry));
+    case type::STRING:
+      return parseValue(raw, mapString(entry));
+    case type::STRING_LIST:
+      return parseValue(raw, mapStringList(entry));
+    default:
+      break;
+  }
+  std::stringstream ss;
+  ss << "Parsing failed at row=" << _row+1 << ", column="<< _column+1
+     << " [" << GlobalName::getColumn(_column) << "] value type="
+     << valueType << " [" << GlobalName::getValue(valueType) << "] is not supported.";
+  Exception exc(ss.str(), PRETTY_FUNCTION);
+  throw exc;
+}
+
+type::Flag*
+Parser::mapFlag(CatalogEntry& entry)
+{
+  switch (_column)
+  {
+    case type::AFTERGLOW_FLAG:
+      return &entry.afterglow_flag;
+    case type::FLUX_FLAG:
+      return &entry.flux_flag;
+    default:
+      break;
+  }
+  throwException(type::FLAG);
+  return nullptr;
+}
+
+type::Integer*
+Parser::mapInteger(CatalogEntry& entry)
+{
+  switch (_column)
+  {
+    case type::RECORD_NUMBER:
+      return &entry.record_number;
+    case type::ID:
+      return &entry.id;
+    case type::T50_EMIN:
+      return &entry.t50.emin;
+    case type::T50_EMAX:
+      return &entry.t50.emax;
+    case type::T90_EMIN:
+      return &entry.t90.emin;
+    case type::T90_EMAX:
+      return &entry.t90.emax;
+    case type::CLASS:
+      return &entry.class_id;
+    default:
+      break;
+  }
+  throwException(type::INTEGER);
+  return nullptr;
+}
+
+type::Index*
+Parser::mapIndex(CatalogEntry& entry)
+{
+  switch (_column)
+  {
+    case type::TIME_DEF:
+      return &entry.time_def;
+    case type::OBSERVATORY:
+      return &entry.observatory;
+    case type::REGION:
+      return &entry.region;
+    case type::T50_MOD:
+      return &entry.t50.mod;
+    case type::T90_MOD:
+      return &entry.t90.mod;
+    default:
+      break;
+  }
+  throwException(type::INDEX);
+  return nullptr;
+}
+
+type::IntegerRange*
+Parser::mapIntegerRange(CatalogEntry& entry)
+{
+  switch (_column)
+  {
+    case type::T50:
+      return &entry.t50.range;
+    case type::T90:
+      return &entry.t90.range;
+    default:
+      break;
+  }
+  throwException(type::INTEGER_RANGE);
+  return nullptr;
+}
+
+type::IndexList*
+Parser::mapIndexList(CatalogEntry& entry)
+{
+  switch (_column)
+  {
+    case type::REFERENCE:
+      return &entry.reference;
+    default:
+      break;
+  }
+  throwException(type::INDEX_LIST);
+  return nullptr;
+}
+
+type::Float*
+Parser::mapFloat(CatalogEntry& entry)
+{
+  switch (_column)
+  {
+    case type::COORD_RA:
+      return &entry.coordinates.u.j2000.rightAscension;
+    case type::COORD_DEC:
+      return &entry.coordinates.u.j2000.declination;
+    case type::COORD_FLAG:
+      return &entry.coordinates.coord_flag;
+    case type::T50:
+      return &entry.t50.value;
+    case type::T50_ERROR:
+      return &entry.t50.error;
+    case type::T90:
+      return &entry.t90.value;
+    case type::T90_ERROR:
+      return &entry.t90.error;
+    case type::T_OTHER:
+      return &entry.t_other.value;
+    default:
+      break;
+  }
+  throwException(type::FLOAT);
+  return nullptr;
+}
+
+type::TimePoint*
+Parser::mapTimePoint(CatalogEntry& entry)
+{
+  switch (_column)
+  {
+    case type::TIME:
+      return &entry.time;
+    default:
+      break;
+  }
+  throwException(type::TIMEPOINT);
+  return nullptr;
+}
+
+type::String*
+Parser::mapString(CatalogEntry& entry)
 {
   switch (_column)
   {
     case type::NAME:
-    {
-      columnFlags.set(_column, parseString(item, entry.name));
-      break;
-    }
-    case type::TIME:
-    {
-      columnFlags.set(_column, parseTimePoint(item, entry.time));
-      break;
-    }
-    case type::OBSERVATORY:
-    {
-      columnFlags.set(_column, parseIndex(item, Observatory::instance(), entry.observatory));
-      break;
-    }
-    case type::COORD_H:
-    {
-      columnFlags.set(_column, parseDouble(item, entry.coordinates.u.undefined.horizontal));
-      break;
-    }
-    case type::COORD_V:
-    {
-      columnFlags.set(_column, parseDouble(item, entry.coordinates.u.undefined.vertical));
-      break;
-    }
-    case type::COORD_FLAG:
-    {
-      columnFlags.set(_column, parseDouble(item, entry.coordinates.coord_flag));
-      break;
-    }
-    case type::REGION:
-    {
-      columnFlags.set(_column, parseIndex(item, Region::instance(), entry.region));
-      break;
-    }
-    case type::AFTERGLOW_FLAG:
-    {
-      columnFlags.set(_column, parseFlag(item, entry.afterglow_flag));
-      break;
-    }
-    case type::FLUX_FLAG:
-    {
-      columnFlags.set(_column, parseFlag(item, entry.flux_flag));
-      break;
-    }
-    case type::ID:
-    {
-      columnFlags.set(_column, parseInteger(item, entry.id));
-      break;
-    }
-    case type::RECORD_NUMBER:
-    {
-      columnFlags.set(_column, parseInteger(item, entry.record_number));
-      break;
-    }
-    case type::ALT_NAMES:
-    {
-      columnFlags.set(_column, parseVectorOfStrings(item, entry.alt_names));
-      break;
-    }
-    case type::TIME_DEF:
-    {
-      columnFlags.set(_column, parseIndex(item, TimeDef::instance(), entry.time_def));
-      break;
-    }
-    case type::REFERENCE:
-    {
-      columnFlags.set(_column, parseVectorOfIndexes(item, Reference::instance(), entry.reference));
-      break;
-    }
-    case type::T50_MOD:
-    {
-      columnFlags.set(_column, parseIndex(item, Time50Mod::instance(), entry.t50.mod));
-      break;
-    }
-    case type::T50:
-    {
-      columnFlags.set(_column, parseDouble(item, entry.t50.value));
-      break;
-    }
-    case type::T50_ERROR:
-    {
-      columnFlags.set(_column, parseDouble(item, entry.t50.error));
-      break;
-    }
-    case type::T50_RANGE:
-    {
-      columnFlags.set(_column, parseIntegerRange(item, entry.t50.range));
-      break;
-    }
-    case type::T50_EMIN:
-    {
-      columnFlags.set(_column, parseInteger(item, entry.t50.emin));
-      break;
-    }
-    case type::T50_EMAX:
-    {
-      columnFlags.set(_column, parseInteger(item, entry.t50.emax));
-      break;
-    }
-    case type::T90_MOD:
-    {
-      columnFlags.set(_column, parseIndex(item, Time90Mod::instance(), entry.t90.mod));
-      break;
-    }
-    case type::T90:
-    {
-      columnFlags.set(_column, parseDouble(item, entry.t90.value));
-      break;
-    }
-    case type::T90_ERROR:
-    {
-      columnFlags.set(_column, parseDouble(item, entry.t90.error));
-      break;
-    }
-    case type::T90_RANGE:
-    {
-      columnFlags.set(_column, parseIntegerRange(item, entry.t90.range));
-      break;
-    }
-    case type::T90_EMIN:
-    {
-      columnFlags.set(_column, parseInteger(item, entry.t90.emin));
-      break;
-    }
-    case type::T90_EMAX:
-    {
-      columnFlags.set(_column, parseInteger(item, entry.t90.emax));
-      break;
-    }
-    case type::T_OTHER:
-    {
-      columnFlags.set(_column, parseDouble(item, entry.t_other.value));
-      break;
-    }
+      return &entry.name;
     case type::NOTES:
-    {
-      columnFlags.set(_column, parseString(item, entry.t_other.notes));
-      break;
-    }
+      return &entry.t_other.notes;
     case type::FLUX_NOTES:
+      return &entry.flux_notes;
+    case type::LOCAL_NOTES:
+      return &entry.local_notes;
+    default:
+      break;
+  }
+  throwException(type::STRING);
+  return nullptr;
+}
+
+type::StringList*
+Parser::mapStringList(CatalogEntry& entry)
+{
+  switch (_column)
+  {
+    case type::ALT_NAMES:
+      return &entry.alt_names;
+    default:
+      break;
+  }
+  throwException(type::STRING_LIST);
+  return nullptr;
+}
+
+NameMapper*
+Parser::getMapper()
+{
+  switch (_column)
+  {
+    case type::OBSERVATORY:
+      return Observatory::instance();
+    case type::REFERENCE:
+      return Reference::instance();
+    case type::REGION:
+      return Region::instance();
+    case type::TIME_DEF:
+      return TimeDef::instance();
+    case type::T50_MOD:
+      return Time50Mod::instance();
+    case type::T90_MOD:
+      return Time90Mod::instance();
+    default:
+      break;
+  }
+  std::stringstream ss;
+  ss << "Parsing failed at row=" << _row+1 << ", column="<< _column+1
+     << " [" << GlobalName::getColumn(_column) << "] unable to select a Name Mapper.";
+  Exception exc(ss.str(), PRETTY_FUNCTION);
+  throw exc;
+}
+
+void
+Parser::throwException(type::ValueType valueType)
+{
+  std::stringstream ss;
+  ss << "Parsing failed at row=" << _row+1 << ", column="<< _column+1
+     << " [" << GlobalName::getColumn(_column) << "] value type="
+     << valueType << " [" << GlobalName::getValue(valueType) << "] does not match the column.";
+  Exception exc(ss.str(), PRETTY_FUNCTION);
+  throw exc;
+}
+
+bool
+Parser::parseValue(const std::string& raw, type::Flag* value)
+{
+  if (raw.empty())
+    return false;
+
+  switch (raw[0])
+  {
+    case 'N':
     {
-      columnFlags.set(_column, parseString(item, entry.flux_notes));
+      *value = false;
       break;
     }
-    case type::LOCAL_NOTES:
+    case 'Y':
     {
-      columnFlags.set(_column, parseString(item, entry.local_notes));
+      *value = true;
       break;
     }
     default:
     {
       std::stringstream ss;
-      ss << "Parsing failed at row=" << _row+1 << ", column="<< _column+1
-         << " [" << GlobalName::getColumn(_column) << "] is out of range.";
+      ss << "Parsing failed at row:column=" << _row+1 << ":" << _column+1
+         << " [" << GlobalName::getColumn(_column) << "] for bool=" << raw;
       Exception exc(ss.str(), PRETTY_FUNCTION);
       throw exc;
     }
   }
-}
-
-bool
-Parser::parseVectorOfStrings(const std::string& raw, std::vector<std::string>& valueVector)
-{
-  std::stringstream ss(raw);
-  for (std::string item; std::getline(ss, item, DELIM_LIST);)
-  {
-    valueVector.push_back(item);
-  }
-  return !valueVector.empty();
-}
-
-bool
-Parser::parseVectorOfIndexes(const std::string& raw, NameMapper* mapper,
-                             std::vector<type::Index>& valueVector)
-{
-  std::stringstream ss(raw);
-  for (std::string item; std::getline(ss, item, DELIM_LIST);)
-  {
-    int index;
-    parseIndex(item, mapper, index);
-    valueVector.push_back(index);
-  }
-  return !valueVector.empty();
-}
-
-bool
-Parser::parseTimePoint(const std::string& raw, type::Date& value)
-{
-  if (raw.empty())
-  {
-    return false;
-  }
-  value = std::chrono::system_clock::now();
   return true;
 }
 
 bool
-Parser::parseString(const std::string& raw, std::string& value)
+Parser::parseValue(const std::string& raw, type::Integer* value)
 {
-  value = std::move(raw);
-  return !value.empty();
-}
+  if (raw.empty())
+    return false;
 
-bool
-Parser::parseIndex(const std::string& raw, NameMapper* mapper, type::Index& value)
-{
-  value = mapper->getIndex(raw);
-  if (value == -1)
+  try
+  {
+    int res = std::stoi(raw);
+    if (res < 0)
+    {
+      return false;
+    }
+    *value = (std::size_t) res;
+  }
+  catch (std::exception& sysExc)
   {
     std::stringstream ss;
     ss << "Parsing failed at row:column=" << _row+1 << ":" << _column+1
-       << " [" << GlobalName::getColumn(_column) << "] for string=" << raw << " and mapper="
-       << mapper->getColumnName();
+       << " [" << GlobalName::getColumn(_column) << "] for int=" << raw
+       << ", exc.what()=" << sysExc.what();
     Exception exc(ss.str(), PRETTY_FUNCTION);
     throw exc;
   }
@@ -351,13 +436,35 @@ Parser::parseIndex(const std::string& raw, NameMapper* mapper, type::Index& valu
 }
 
 bool
-Parser::parseIntegerRange(const std::string& raw, std::size_t (& value)[2])
+Parser::parseValue(const std::string& raw, type::Index* value)
+{
+  NameMapper* mapper = getMapper();
+  try
+  {
+    *value = mapper->getIndex(raw);
+  }
+  catch (Exception& mapExc)
+  {
+    std::stringstream ss;
+    ss << "Parsing failed at row:column=" << _row+1 << ":" << _column+1
+       << " [" << GlobalName::getColumn(_column) << "] for string=" << raw << " and mapper="
+       << mapper->getColumnType() << " [" << GlobalName::getColumn(mapper->getColumnType())
+       << "], mapperExc.what()\n" << mapExc.what();
+    Exception exc(ss.str(), PRETTY_FUNCTION);
+    throw exc;
+  }
+  return true;
+}
+
+bool
+Parser::parseValue(const std::string& raw, type::IntegerRange* value)
 {
   int i = 0;
   std::stringstream ss(raw);
   for (std::string item; std::getline(ss, item, DELIM_RANGE);)
   {
-    parseInteger(item, value[i++]);
+    if (!parseValue(item, value + i++))
+      return false;
   }
   if (i != 2)
   {
@@ -371,42 +478,37 @@ Parser::parseIntegerRange(const std::string& raw, std::size_t (& value)[2])
 }
 
 bool
-Parser::parseInteger(const std::string& raw, std::size_t& value)
+Parser::parseValue(const std::string& raw, type::IndexList* valueList)
 {
-  try
-  { 
-    int res = std::stoi(raw);
-    if (res < 0)
+  std::stringstream ss(raw);
+  for (std::string item; std::getline(ss, item, DELIM_LIST);)
+  {
+    int index;
+    if (!parseValue(item, &index))
     {
       return false;
     }
-    value = (std::size_t) res;
+    valueList->push_back(index);
   }
-  catch (std::exception& sysExc)
-  {
-    std::stringstream ss;
-    ss << "Parsing failed at row:column=" << _row+1 << ":" << _column+1
-       << " [" << GlobalName::getColumn(_column) << "] for int=" << raw
-       << ". exc.what()=" << sysExc.what();
-    Exception exc(ss.str(), PRETTY_FUNCTION);
-    throw exc;
-  }
-  return true;
+  return !valueList->empty();
 }
 
 bool
-Parser::parseDouble(const std::string& raw, double& value)
+Parser::parseValue(const std::string& raw, type::Float* value)
 {
+  if (raw.empty())
+    return false;
+
   try
   {
-    value = std::stod(raw);
+    *value = std::stod(raw);
   }
   catch (std::exception& sysExc)
   {
     std::stringstream ss;
     ss << "Parsing failed at row:column=" << _row+1 << ":" << _column+1
        << " [" << GlobalName::getColumn(_column) << "] for double=" << raw
-       << ". exc.what()=" << sysExc.what();
+       << ", exc.what()=" << sysExc.what();
     Exception exc(ss.str(), PRETTY_FUNCTION);
     throw exc;
   }
@@ -414,30 +516,33 @@ Parser::parseDouble(const std::string& raw, double& value)
 }
 
 bool
-Parser::parseFlag(const std::string& raw, bool& value)
+Parser::parseValue(const std::string& raw, type::TimePoint* value)
 {
-  switch (raw[0])
+  if (raw.empty())
   {
-    case 'N':
-    {
-      value = false;
-      break;
-    }
-    case 'Y':
-    {
-      value = true;
-      break;
-    }
-    default:
-    {
-      std::stringstream ss;
-      ss << "Parsing failed at row:column=" << _row+1 << ":" << _column+1
-         << " [" << GlobalName::getColumn(_column) << "] for bool=" << raw;
-      Exception exc(ss.str(), PRETTY_FUNCTION);
-      throw exc;
-    }
+    return false;
   }
+
+  *value = std::chrono::system_clock::now();
   return true;
+}
+
+bool
+Parser::parseValue(const std::string& raw, type::String* value)
+{
+  *value = std::move(raw);
+  return !value->empty();
+}
+
+bool
+Parser::parseValue(const std::string& raw, type::StringList* valueList)
+{
+  std::stringstream ss(raw);
+  for (std::string item; std::getline(ss, item, DELIM_LIST);)
+  {
+    valueList->push_back(item);
+  }
+  return !valueList->empty();
 }
 
 }

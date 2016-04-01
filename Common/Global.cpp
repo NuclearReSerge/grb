@@ -12,8 +12,21 @@ GlobalName::getDatabaseTable(type::DatabaseTableType dbType)
 std::string&
 GlobalName::getColumn(type::ColumnType columnType)
 {
-  return getWithRangeCheck(_columnNames, columnType);
+  if (columnType >= _columns.size())
+    return _columns[_columns.size()-1].name;
+
+  return _columns[columnType].name;
 }
+
+std::string&
+GlobalName::getColumnDescription(type::ColumnType columnType)
+{
+  if (columnType >= _columns.size())
+    return _columns[_columns.size()-1].description;
+
+  return _columns[columnType].description;
+}
+
 
 std::string&
 GlobalName::getValue(type::ValueType valueType)
@@ -55,59 +68,66 @@ std::vector<std::string> GlobalName::_dbTableNames
   "heasarc_grbcatint",
   "heasarc_grbcatinta",
   "heasarc_grbcatirr",
-  "unknown databese table type"
+
+  "unknown database table type"
 };
 
-std::vector<std::string> GlobalName::_columnNames
+std::vector<GlobalName::Column> GlobalName::_columns
 {
-  "record_number",
-  "id",
-  "name",
-  "alt_names",
-  "time",
-  "time_def",
-  "observatory",
-  "ra",
-  "dec",
-  "coord_flag",
-  "region",
-  "afterglow_flag",
-  "reference",
-  "t50_mod",
-  "t50",
-  "t50_error",
-  "t50_range",
-  "t50_emin",
-  "t50_emax",
-  "t90_mod",
-  "t90",
-  "t90_error",
-  "t90_range",
-  "t90_emin",
-  "t90_emax",
-  "t_other",
-  "flux_flag",
-  "notes",
-  "flux_notes",
-  "local_notes",
-  "class",
+  { "record_number", "Sequential Identification Number for Each Entry in Catalog" },
+  { "id", "Sequential Identification Number for Each Source in Catalog" },
+  { "name", "Burst Designation as GRB YYMMDD" },
+  { "alt_names", "Other Designations for Burst" },
+  { "time", "Time of Burst (UT)" },
+  { "time_def", "Definition of Burst Time" },
+  { "observatory", "Detecting Observatory" },
+  { "ra", "Right Ascension" },
+  { "dec", "Declination" },
+  { "coord_flag", "Quality Flag for RA and Dec" },
+  { "region", "Region" },
+  { "afterglow_flag", "Afterglow Flag" },
+  { "reference", " Reference" },
+  { "t50_mod", "Modifier for t50 (<, >, ~, etc.)" },
+  { "t50", "T_50 (s)" },
+  { "t50_error", "T_50 Error (s)" },
+  { "t50_range", "Energy Range for t50 (keV)" },
+  { "t50_emin", "Minimum of Energy Range for t50 (keV)" },
+  { "t50_emax", "Maximum of Energy Range for t50 (keV)" },
+  { "t90_mod", "Modifier for t90 (<, >, ~, etc.)" },
+  { "t90", "// T_90 (s)" },
+  { "t90_error", "// T_90 Error (s)" },
+  { "t90_range", "Energy Range for t90 (keV)" },
+  { "t90_emin", "Minimum of Energy Range for t90 (keV)" },
+  { "t90_emax", "Maximum of Energy Range for t90 (keV)" },
+  { "t_other", "A Different Duration Measure or duration not specified (s)" },
+  { "flux_flag", "Flux Flag" },
+  { "notes", "Notes" },
+  { "flux_notes", "Flux Notes" },
+  { "local_notes", "Localization Notes" },
+  { "class", "Browse Object Classification" },
+  { "DUMMY", "dummy column; usually after the last delimiter" },
 
-  "horizontal coordinate",
-  "Lii",
-  "vertical coordinate",
-  "Bii",
+  { "Lii", "" },
+  { "Bii", "" },
+  { "horizontal coordinate", "" },
+  { "vertical coordinate", "" },
 
-  "unknown column type"
+  { "unknown column type", "" }
 };
 
 std::vector<std::string> GlobalName::_valueNames
 {
-  "string",
-  "date",
-  "position",
-  "integer",
   "flag",
-  "value",
+  "integer",
+  "index",
+  "integer range",
+  "index list",
+  "float",
+  "time point",
+  "coordinate",
+  "string",
+  "string list",
+
   "unknown value type"
 };
 
@@ -117,6 +137,7 @@ std::vector<std::string> GlobalName::_unitNames
   "deg",
   "s",
   "keV",
+
   "unknown unit type"
 };
 
@@ -125,6 +146,7 @@ std::vector<std::string> GlobalName::_coordinateSystemNames
   "J2000",
   "B1950",
   "galactic",
+
   "unknown coordinate system"
 };
 

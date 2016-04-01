@@ -1,10 +1,11 @@
-#include "Common/Exception.h"
+﻿#include "Common/Exception.h"
 #include "Data/Catalog.h"
 #include "Data/DataBaseFormat.h"
 #include "Tools/NameMapper.h"
 
 #include <istream>
 #include <string>
+#include <map>
 
 #pragma once
 
@@ -15,33 +16,49 @@ class Parser
 {
 public:
   Parser() = delete;
-  Parser(const std::string& filename);
-  Parser(std::istream* stream);
+  Parser(const std::string& filename, const DataBaseFormat* format, Catalog* catalog);
+  Parser(std::istream* stream, const DataBaseFormat* format, Catalog* catalog);
   ~Parser();
 
-  std::size_t parse(const DataBaseFormat& format, Catalog& catalog) throw(Exception);
+  std::size_t parse() throw(Exception);
 
 protected:
-  void openFileStream(const std::string& filename) throw(Exception);
+  void openFileStream(const std::string& filename);
 
-  void parseMapper(CatalogEntry& entry, type::ColumnFlags& columnFlags, const std::string& item) throw(Exception);
-  bool parseVectorOfStrings(const std::string& raw, std::vector<std::string>& valueVector);
-  bool parseVectorOfIndexes(const std::string& raw, NameMapper* mapper,
-                            std::vector<type::Index>& valueVector);
-  bool parseTimePoint(const std::string& raw, type::Date& value);
-  bool parseString(const std::string& raw, std::string& value);
-  bool parseIndex(const std::string& raw, NameMapper* mapper, type::Index& value);
-  bool parseIntegerRange(const std::string& raw, std::size_t (& value)[2]);
-  bool parseInteger(const std::string& raw, std::size_t& value);
-  bool parseDouble(const std::string& raw, double& value);
-  bool parseFlag(const std::string& raw, bool& value);
+  bool parseMapper(const std::string& raw, CatalogEntry& entry);
 
-  // time_point
+  type::Flag* mapFlag(CatalogEntry& entry);
+  type::Integer* mapInteger(CatalogEntry& entry);
+  type::Index* mapIndex(CatalogEntry& entry);
+  type::IntegerRange* mapIntegerRange(CatalogEntry& entry);
+  type::IndexList* mapIndexList(CatalogEntry& entry);
+  type::Float* mapFloat(CatalogEntry& entry);
+  type::TimePoint* mapTimePoint(CatalogEntry& entry);
+  type::String* mapString(CatalogEntry& entry);
+  type::StringList* mapStringList(CatalogEntry& entry);
+
+  NameMapper* getMapper();
+  void throwException(type::ValueType valueType);
+
+  bool parseValue(const std::string& raw, type::Flag* value);
+  bool parseValue(const std::string& raw, type::Integer* value);
+  bool parseValue(const std::string& raw, type::Index* value);
+  bool parseValue(const std::string& raw, type::IntegerRange* value);
+  bool parseValue(const std::string& raw, type::IndexList* valueList);
+  bool parseValue(const std::string& raw, type::Float* value);
+  bool parseValue(const std::string& raw, type::TimePoint* value);
+  bool parseValue(const std::string& raw, type::String* value);
+  bool parseValue(const std::string& raw, type::StringList* valueList);
+
 private:
   bool _isSourceFile {false};
-  std::istream* _stream;
-  std::size_t _row;
-  type::ColumnType _column;
+  std::istream* _stream {nullptr};
+  std::size_t _row {0};
+  type::ColumnType _column {type::COLUMN_TYPE_UNDEFINED};
+
+  const DataBaseFormat* _format;
+  Catalog* _catalog;
 };
+
 
 }

@@ -8,7 +8,7 @@ namespace
 
 // cat grbcatalog.dat | egrep -v "^#" | awk -F "|" '{print $13}' | sed "s/\s*$//g" | sed "s/-/\ /g" | sed "s/\.$//g" | sed "s/r\ T/r\ t/g" | sed "s/t\ S/t\ s/g" |sort | uniq | sed "s/^/\ \ \"/g"| sed "s/$/\",/g"
 
-std::vector<std::string> NAME_LIST
+const NameMapper::VectorString NAME_LIST
 {
   "BAT trigger",
   "Earth Crossing Time",
@@ -19,24 +19,21 @@ std::vector<std::string> NAME_LIST
   "Trigger time"
 };
 
-std::string DESCRIPTION = "\
-The time of a GRB occurrence has different definition depending on how has \
-been detected. This field records a string related to the method of detection.";
+const std::string DESCRIPTION = "\
+The time of a GRB occurrence has different definition depending on how has been detected. This \
+field records a string related to the method of detection.";
 }
 
 TimeDefType::TimeDefType()
-  : NameMapper(type::TIME_DEF)
+  : NameMapper(type::TIME_DEF, DESCRIPTION)
 {
-  _description = DESCRIPTION;
   initiate();
 }
 
-std::vector<std::string>&
+const NameMapper::VectorString&
 TimeDefType::getNameList() const
 {
   return NAME_LIST;
 }
 
 } // namespace grb
-
-

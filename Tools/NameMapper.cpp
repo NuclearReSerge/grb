@@ -1,19 +1,13 @@
 #include "Tools/NameMapper.h"
 
+#include <sstream>
 #include <algorithm>
 
 namespace grb
 {
 
-const std::string NAME_NA = "N/A";
-
-namespace
-{
-  std::string DESCRIPTION;
-}
-
-NameMapper::NameMapper(const type::ColumnType columnType)
-  : _columnType(columnType), _description(DESCRIPTION)
+NameMapper::NameMapper(const type::ColumnType columnType, const std::string& description)
+  : _columnType(columnType), _description(description)
 {
 }
 
@@ -25,7 +19,7 @@ NameMapper::~NameMapper()
 void NameMapper::initiate()
 {
   type::Index i = 0;
-  for (std::string& name : getNameList())
+  for (const std::string& name : getNameList())
   {
     _map.insert({name, i++});
   }
@@ -38,34 +32,44 @@ NameMapper::isPresent(const std::string& name) const
 }
 
 type::Index
-NameMapper::getIndex(const std::string& name) const
+NameMapper::getIndex(const std::string& name) const  throw(Exception)
 {
   try
   {
     return _map.at(name);
   }
-  catch (std::out_of_range& exc)
+  catch (std::out_of_range& sysExc)
   {
-    return -1;
+    std::stringstream ss;
+    ss << "NameMapper did not find index for name=" << name << " in column type=" << _columnType
+       << " [" << GlobalName::getColumn(_columnType) << "], exc.what()=" << sysExc.what();
+    Exception exc(ss.str(), PRETTY_FUNCTION);
+    throw exc;
   }
 }
 
 const std::string&
-NameMapper::getName(const type::Index& index) const
+NameMapper::getName(const type::Index& index) const  throw(Exception)
 {
-  auto iter = std::find_if(_map.begin(), _map.end(),
-                [index](const std::pair<const std::string, type::Index>& item)
+  const auto iter = std::find_if(_map.begin(), _map.end(),
+                [index](const std::pair<std::string, type::Index>& item)
                 { return item.second == index; });
   if (iter == _map.end())
-    return NAME_NA;
+  {
+    std::stringstream ss;
+    ss << "NameMapper did not find name for index=" << index << " in column type=" << _columnType
+       << " [" << GlobalName::getColumn(_columnType) << "]";
+    Exception exc(ss.str(), PRETTY_FUNCTION);
+    throw exc;
+  }
 
   return iter->first;
 }
 
-const std::string&
-NameMapper::getColumnName() const
+type::ColumnType
+NameMapper::getColumnType() const
 {
-  return GlobalName::getColumn(_columnType);
+  return _columnType;
 }
 
 const std::string&
@@ -74,4 +78,4 @@ NameMapper::getDescription() const
   return _description;
 }
 
-} // namespace grb
+}
