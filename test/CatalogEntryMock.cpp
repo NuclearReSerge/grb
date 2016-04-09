@@ -89,6 +89,8 @@ CatalogEntryMock::getFloat(type::ColumnType column)
   {
     case type::COLUMN_TEST_FLOAT:
       return &_float;
+    case type::COLUMN_TEST_COORDINATE:
+      return &_coordinate;
     default:
       break;
   }

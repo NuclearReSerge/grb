@@ -15,7 +15,6 @@ namespace grb
 class Parser
 {
 public:
-  Parser() = delete;
   Parser(const std::string& filename, const DataBaseFormat* format, Catalog* catalog);
   Parser(std::istream* stream, const DataBaseFormat* format, Catalog* catalog);
   ~Parser();
@@ -23,6 +22,7 @@ public:
   std::size_t parse() throw(Exception);
 
 protected:
+  Parser();
   void openFileStream(const std::string& filename);
 
   bool parseMapper(const std::string& raw, CatalogEntry* entry);
@@ -38,10 +38,11 @@ protected:
 
   void throwException(type::ValueType valueType);
 private:
-  bool _isSourceFile {false};
-  std::istream* _stream {nullptr};
-  std::size_t _row {0};
-  type::ColumnType _column {type::COLUMN_TYPE_UNDEFINED};
+  bool _isSourceFile;
+  std::istream* _stream;
+  std::size_t _row;
+  std::size_t _column;
+  type::ColumnType _columnType;
 
   const DataBaseFormat* _format;
   Catalog* _catalog;

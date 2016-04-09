@@ -9,10 +9,10 @@ namespace grb
 class DataBaseFormatGrbcat : public DataBaseFormat
 {
 public:
-  DataBaseFormatGrbcat();
+  DataBaseFormatGrbcat() = delete;
+  DataBaseFormatGrbcat(const type::DatabaseTableType dbType);
 
-protected:
-  void initialize();
+  void initialize() throw(Exception);
 };
 
 }

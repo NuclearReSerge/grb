@@ -10,26 +10,42 @@ namespace grb
 
 DataBaseFormatFactoryType::DataBaseFormatFactoryType()
 {
-  _HEASARC_GRBCAT = new DataBaseFormatGrbcat();
+  initialize();
+}
+
+DataBaseFormatFactoryType::~DataBaseFormatFactoryType()
+{
+  for (const auto& format : _formatMap)
+  {
+    delete format.second;
+  }
 }
 
 const DataBaseFormat*
 DataBaseFormatFactoryType::getFormat(const type::DatabaseTableType dbType) throw(Exception)
 {
-  switch (dbType)
+  try
   {
-    case type::HEASARC_GRBCAT:
-    {
-      return _HEASARC_GRBCAT;
-    }
-    default:
-    {
-      std::stringstream ss;
-      ss << "Database format of type=" << dbType << "[" << GlobalName::getDatabaseTable(dbType)
-         << "] does not exist.";
-      Exception exc(ss.str(), PRETTY_FUNCTION);
-      throw exc;
-    }
+    return _formatMap.at(dbType);
+  }
+  catch (std::out_of_range& sysExc)
+  {
+    std::stringstream ss;
+    ss << "Database format of type=" << dbType << "[" << GlobalName::getDatabaseTable(dbType)
+       << "] does not exist, exc.what()=" << sysExc.what();
+    Exception exc(ss.str(), PRETTY_FUNCTION);
+    throw exc;
+  }
+}
+
+void
+DataBaseFormatFactoryType::initialize()
+{
+  _formatMap.insert({type::HEASARC_GRBCAT, new DataBaseFormatGrbcat(type::HEASARC_GRBCAT)});
+
+  for (const auto& format : _formatMap)
+  {
+    format.second->initialize();
   }
 }
 

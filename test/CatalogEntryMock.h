@@ -33,6 +33,7 @@ protected:
   type::IndexList _indexList;
   type::Float _float;
   type::TimePoint _timepoint;
+  type::Coordinate _coordinate;
   type::String _string;
   type::StringList _stringList;
 

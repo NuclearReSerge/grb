@@ -2,6 +2,7 @@
 
 #include "Common/Global.h"
 #include "Common/GlobalName.h"
+
 #include <sstream>
 
 namespace grb
@@ -10,7 +11,6 @@ namespace grb
 DataBaseFormat::DataBaseFormat(const type::DatabaseTableType dbType)
   : _coordSys(type::COORDINATE_SYSTEM_UNDEFINED), _type(dbType)
 {
-  initialize();
 }
 
 DataBaseFormat::~DataBaseFormat()
@@ -20,6 +20,16 @@ DataBaseFormat::~DataBaseFormat()
     delete item;
   }
   _format.clear();
+}
+
+void
+DataBaseFormat::initialize() throw(Exception)
+{
+  std::stringstream ss;
+  ss << "Database format of type=" << _type << "[" << GlobalName::getDatabaseTable(_type)
+     << "] was not initialized.";
+  Exception exc(ss.str(), PRETTY_FUNCTION);
+  throw exc;
 }
 
 type::DatabaseTableType
@@ -67,16 +77,6 @@ DataBaseFormat::setupRequiredColumns()
   {
     _requiredFlags.set(item->getColumnType(), item->isColumnRequired());
   }
-}
-
-void
-DataBaseFormat::initialize()
-{
-  std::stringstream ss;
-  ss << "Database format of type=" << _type << "[" << GlobalName::getDatabaseTable(_type)
-     << "] was not initialized.";
-  Exception exc(ss.str(), PRETTY_FUNCTION);
-  throw exc;
 }
 
 }

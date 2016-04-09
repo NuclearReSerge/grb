@@ -12,12 +12,12 @@ class DataBaseFormatMock : public DataBaseFormat
 public:
   DataBaseFormatMock();
 
+  void initialize() throw(Exception);
+
   std::vector<DataType*>& getFormatVector();
   void setCoordinateSystem(type::CoordinateSystemType coordSys);
-  void resetRequiredColumns();
+  void setColumnRequired(std::size_t pos, bool val);
 
-protected:
-  void initializeTest();
 };
 
 }

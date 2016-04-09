@@ -139,8 +139,8 @@ enum CoordinateSystemType
 typedef bool Flag;
 typedef std::size_t Integer;
 typedef int Index;
-typedef std::size_t IntegerRange[2];
-typedef std::vector<type::Index> IndexList;
+typedef std::vector<Integer> IntegerRange;
+typedef std::vector<Index> IndexList;
 typedef double Float;
 typedef std::chrono::system_clock::time_point TimePoint;
 typedef double Coordinate;

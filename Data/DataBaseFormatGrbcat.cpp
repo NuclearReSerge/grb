@@ -3,12 +3,10 @@
 namespace grb
 {
 
-DataBaseFormatGrbcat::DataBaseFormatGrbcat()
-  : DataBaseFormat(type::HEASARC_GRBCAT)
+DataBaseFormatGrbcat::DataBaseFormatGrbcat(const type::DatabaseTableType dbType)
+  : DataBaseFormat(dbType)
 {
   _coordSys = type::J2000;
-  initialize();
-  setupRequiredColumns();
 }
 
 /***************************************************************************************************
@@ -18,9 +16,8 @@ DataBaseFormatGrbcat::DataBaseFormatGrbcat()
  *
  **************************************************************************************************/
 void
-DataBaseFormatGrbcat::initialize()
+DataBaseFormatGrbcat::initialize() throw(Exception)
 {
-
   _format.push_back(new DataType(type::RECORD_NUMBER,  true,  type::NO_UNIT, type::INTEGER));
   _format.push_back(new DataType(type::ID,             true,  type::NO_UNIT, type::INTEGER));
   _format.push_back(new DataType(type::NAME,           true,  type::NO_UNIT, type::STRING));
@@ -53,6 +50,8 @@ DataBaseFormatGrbcat::initialize()
   _format.push_back(new DataType(type::LOCAL_NOTES,    false, type::NO_UNIT, type::STRING));
   _format.push_back(new DataType(type::CLASS,          false, type::NO_UNIT, type::INTEGER));
   _format.push_back(new DataType(type::DUMMY,          false, type::NO_UNIT, type::STRING));
+
+  setupRequiredColumns();
 }
 
 }

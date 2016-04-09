@@ -13,6 +13,7 @@ public:
   DataBaseFormat(const type::DatabaseTableType dbType);
   virtual ~DataBaseFormat();
 
+  virtual void initialize() throw(Exception);
   type::DatabaseTableType getType() const;
   type::CoordinateSystemType getCoordinateSystem() const;
   std::size_t getSize() const;
@@ -24,10 +25,6 @@ protected:
 
   type::CoordinateSystemType _coordSys;
   std::vector<DataType*> _format;
-
-private:
-  void initialize();
-
   const type::DatabaseTableType _type;
   type::ColumnFlags _requiredFlags;
 };

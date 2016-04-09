@@ -12,6 +12,32 @@ namespace grb
 CatalogEntryGRBCAT::CatalogEntryGRBCAT()
   : CatalogEntry(type::GRBCAT)
 {
+  _record_number = 0;
+  _id = 0;
+  _time_def = 0;
+  _observatory = 0;
+  _coordinates.coord_flag = false;
+  _coordinates.systemType = type::COORDINATE_SYSTEM_UNDEFINED;
+  _coordinates.u.undefined.horizontal = 0.0;
+  _coordinates.u.undefined.vertical = 0.0;
+  _region = 0;
+  _afterglow_flag = false;
+  _t50.isPresent = false;
+  _t50.mod = 0;
+  _t50.value = 0.0;
+  _t50.error = 0.0;
+  _t50.emin = 0;
+  _t50.emax = 0.0;
+  _t90.isPresent = false;
+  _t90.mod = 0;
+  _t90.value = 0.0;
+  _t90.error = 0.0;
+  _t90.emin = 0;
+  _t90.emax = 0.0;
+  _t_other.isPresent = false;
+  _t_other.value = 0.0;
+  _flux_flag = false;
+  _class_id = 0;
 }
 
 type::Flag*
