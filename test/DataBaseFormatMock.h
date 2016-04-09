@@ -10,15 +10,14 @@ namespace test
 class DataBaseFormatMock : public DataBaseFormat
 {
 public:
-  DataBaseFormatMock() = delete;
-  DataBaseFormatMock(const type::DatabaseTableType dbType);
+  DataBaseFormatMock();
 
   std::vector<DataType*>& getFormatVector();
+  void setCoordinateSystem(type::CoordinateSystemType coordSys);
+  void resetRequiredColumns();
 
 protected:
-  void doInit();
-
-
+  void initializeTest();
 };
 
 }

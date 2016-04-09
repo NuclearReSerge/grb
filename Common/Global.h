@@ -13,6 +13,7 @@ namespace type
 // http://heasarc.gsfc.nasa.gov/FTP/heasarc/dbase/dump/
 enum DatabaseTableType
 {
+  // HEASARC
   HEASARC_GRBCAT,
   HEASARC_GRBCATAG,
   HEASARC_GRBCATANN,
@@ -23,7 +24,21 @@ enum DatabaseTableType
   HEASARC_GRBCATINT,
   HEASARC_GRBCATINTA,
   HEASARC_GRBCATIRR,
+
+  // TEST
+  DATABASE_TABLE_TEST,
+  // LAST
   DATABASE_TABLE_TYPE_UNDEFINED
+};
+
+enum CatalogType
+{
+  GRBCAT,
+
+  // TEST
+  CATALOG_TEST,
+  // LAST
+  CATALOG_TYPE_UNDEFINED
 };
 
 enum ColumnType
@@ -68,6 +83,18 @@ enum ColumnType
   COORD_H,
   COORD_V,
 
+  // TEST
+  COLUMN_TEST_FLAG,
+  COLUMN_TEST_INTEGER,
+  COLUMN_TEST_INDEX,
+  COLUMN_TEST_INTEGER_RANGE,
+  COLUMN_TEST_INDEX_LIST,
+  COLUMN_TEST_FLOAT,
+  COLUMN_TEST_TIMEPOINT,
+  COLUMN_TEST_COORDINATE,
+  COLUMN_TEST_STRING,
+  COLUMN_TEST_STRING_LIST,
+  // LAST
   COLUMN_TYPE_UNDEFINED
 };
 
@@ -84,6 +111,7 @@ enum ValueType
   STRING,
   STRING_LIST,
 
+  // LAST
   VALUE_TYPE_UNDEFINED
 };
 
@@ -93,6 +121,8 @@ enum UnitType
   DEGREE,
   SECOND,
   KILO_EV,
+
+  // LAST
   UNIT_TYPE_UNDEFINED
 };
 
@@ -101,6 +131,8 @@ enum CoordinateSystemType
   J2000,
   B1950,
   GALACTIC,
+
+  // LAST
   COORDINATE_SYSTEM_UNDEFINED
 };
 
@@ -118,35 +150,5 @@ typedef std::vector<std::string> StringList;
 typedef std::bitset<COLUMN_TYPE_UNDEFINED> ColumnFlags;
 
 } // namespace type
-
-class GlobalName
-{
-public:
-  GlobalName() = delete;
-  GlobalName(const GlobalName& ) = delete;
-  GlobalName& operator= (const GlobalName&) = delete;
-
-  static std::string& getDatabaseTable(type::DatabaseTableType dbType);
-  static std::string& getColumn(type::ColumnType columnType);
-  static std::string& getColumnDescription(type::ColumnType columnType);
-  static std::string& getValue(type::ValueType valueType);
-  static std::string& getUnit(type::UnitType unitType);
-  static std::string& getCoordinateSystem(type::CoordinateSystemType coordinateSystemType);
-
-private:
-  static std::string& getWithRangeCheck(std::vector<std::string>& nameList, std::size_t index);
-
-  struct Column
-  {
-    std::string name;
-    std::string description;
-  };
-
-  static std::vector<std::string> _dbTableNames;
-  static std::vector<Column> _columns;
-  static std::vector<std::string> _valueNames;
-  static std::vector<std::string> _unitNames;
-  static std::vector<std::string> _coordinateSystemNames;
-};
 
 }

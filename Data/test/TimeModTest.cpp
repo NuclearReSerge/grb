@@ -1,6 +1,7 @@
 #include "Data/TimeMod.h"
 
-#include "Tools/test/NameMapperTest.h"
+#include "test/NameMapperCommon.h"
+
 #include <gtest/gtest.h>
 
 using namespace ::testing;
@@ -10,7 +11,7 @@ namespace grb
 namespace test
 {
 
-class Time50ModTest : public NameMapperTest
+class Time50ModTest : public NameMapperCommon
 {
   void SetUp()
   {
@@ -23,7 +24,9 @@ class Time50ModTest : public NameMapperTest
   }
 };
 
-class Time90ModTest : public NameMapperTest
+NAME_MAPPER_TESTS(Time50ModTest)
+
+class Time90ModTest : public NameMapperCommon
 {
   void SetUp()
   {
@@ -35,9 +38,6 @@ class Time90ModTest : public NameMapperTest
     _lastIdx = 2;
   }
 };
-
-
-NAME_MAPPER_TESTS(Time50ModTest)
 
 NAME_MAPPER_TESTS(Time90ModTest)
 

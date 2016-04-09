@@ -1,6 +1,7 @@
 #include "Data/Region.h"
 
-#include "Tools/test/NameMapperTest.h"
+#include "test/NameMapperCommon.h"
+
 #include <gtest/gtest.h>
 
 using namespace ::testing;
@@ -10,7 +11,7 @@ namespace grb
 namespace test
 {
 
-class RegionTest : public NameMapperTest
+class RegionTest : public NameMapperCommon
 {
   void SetUp()
   {

@@ -8,7 +8,7 @@ namespace grb
 namespace test
 {
 
-class NameMapperTest : public ::testing::Test
+class NameMapperCommon : public ::testing::Test
 {
 public:
   bool tryToGetIndex(const std::string& name);

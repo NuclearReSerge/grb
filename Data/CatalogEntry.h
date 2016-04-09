@@ -1,5 +1,5 @@
 #include "Common/Global.h"
-
+#include "Tools/NameMapper.h"
 
 #include <string>
 #include <vector>
@@ -9,75 +9,29 @@
 namespace grb
 {
 
-struct CoordinateSystemUndefined
+class CatalogEntry
 {
-  type::Coordinate horizontal;
-  type::Coordinate vertical;
-};
+public:
+  CatalogEntry() = delete;
+  CatalogEntry(type::CatalogType type);
+  virtual ~CatalogEntry();
 
-struct CoordinateSystemEquinox
-{
-  type::Coordinate rightAscension;
-  type::Coordinate declination;
-};
+  type::CatalogType getType() const;
 
-struct CoordinateSystemGalactic
-{
-  type::Coordinate latitude;
-  type::Coordinate longitude;
-};
+  virtual type::Flag* getFlag(type::ColumnType column) = 0;
+  virtual type::Integer* getInteger(type::ColumnType column) = 0;
+  virtual type::Index* getIndex(type::ColumnType column) = 0;
+  virtual type::IntegerRange* getIntegerRange(type::ColumnType column) = 0;
+  virtual type::IndexList* getIndexList(type::ColumnType column) = 0;
+  virtual type::Float* getFloat(type::ColumnType column) = 0;
+  virtual type::TimePoint* getTimePoint(type::ColumnType column) = 0;
+  virtual type::String* getString(type::ColumnType column) = 0;
+  virtual type::StringList* getStringList(type::ColumnType column) = 0;
 
-struct Coordinates
-{
-  type::CoordinateSystemType systemType;
-  union
-  {
-    CoordinateSystemUndefined undefined;
-    CoordinateSystemEquinox b1950;
-    CoordinateSystemEquinox j2000;
-    CoordinateSystemGalactic galactic;
-  } u;
-  type::Float coord_flag;
-};
+  virtual NameMapper* getMapper(type::ColumnType column) = 0;
 
-struct Duration
-{
-  bool isPresent;
-  type::Index mod;
-  type::Float value;
-  type::Float error;
-  type::IntegerRange range;
-  type::Integer emin;
-  type::Integer emax;
-};
-
-struct DurationOther
-{
-  bool isPresent;
-  type::Float value;
-  type::String notes;
-};
-
-struct CatalogEntry
-{
-  type::Integer record_number;
-  type::Integer id;
-  type::String name;
-  type::StringList alt_names;
-  type::TimePoint time;
-  type::Index time_def; // TimeDef::instance()
-  type::Index observatory; // Observatory::instance()
-  Coordinates coordinates;
-  type::Index region;   // Region::instance()
-  type::Flag afterglow_flag;
-  type::IndexList reference; // Reference::instance()
-  Duration t50;
-  Duration t90;
-  DurationOther t_other;
-  type::Flag flux_flag;
-  type::String flux_notes;
-  type::String local_notes;
-  type::Integer class_id;
+private:
+  type::CatalogType _type;
 };
 
 }

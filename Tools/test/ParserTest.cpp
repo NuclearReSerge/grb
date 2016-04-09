@@ -15,38 +15,18 @@ typedef std::vector<std::string> VecStr;
 
 namespace
 {
-const VecStr DEFAULT_ROW_REQUIRED
+const VecStr DEFAULT_ROW
 {
-  "0", "0", // record,_number id
-  "GRB 600101", "", // name, alt_names
-  "99999.999999999999", "BAT trigger", //time (Modified Julian Date), time_def
-  "APEX", // observatory
-  "", "", "-1", "", // ra, dec, coord_flag, region
-  "N", // afterglow_flag
-  "1974ApJ...188L...1S", // reference
-  "", "", "", "", "", "", // t50_mod, t50, t50_error, t50_range, t50_emin, t50_emax
-  "", "", "", "", "", "", // t90_mod, t90, t90_error, t90_range, t90_emin, t90_emax
-  "", "N", "", "", // t_other, flux_flag, notes, flux_notes
-  "",// local_notes
-  "", //class
-  "" // DUMMY
-};
-const VecStr DEFAULT_ROW_ALL_VALUES
-{
-  "0", "0", // record,_number id
-  "GRB 600101", "", // name, alt_names
-  "99999.999999999999", "BAT trigger", //time (Modified Julian Date), time_def
-  "APEX", // observatory
-  "", "", "-1", // ra dec coord_flag
-  "", // region
-  "N", // afterglow_flag
-  "1974ApJ...188L...1S", // reference
-  "", "", "", "", "", "", // t50_mod t50 t50_error t50_range t50_emin t50_emax
-  "", "", "", "", "", "", // t90_mod t90 t90_error t90_range t90_emin t90_emax
-  "", "N", "", "", // t_other flux_flag notes flux_notes
-  "", // local_notes
-  "", //class
-  "" // DUMMY
+  "N",
+  "9999",
+  "INDEX",
+  "9999-9999",
+  "INDEX1,INDEX2",
+  "9999.9999",
+  "0.0", // Julian
+  "0.0",
+  "STRING",
+  "STRING1,STRING2"
 };
 }
 
@@ -57,7 +37,7 @@ protected:
   {
     _parser = nullptr;
     _catalog = new Catalog;
-    _format = new DataBaseFormatMock(type::DATABASE_TABLE_TYPE_UNDEFINED);
+    _format = new DataBaseFormatMock;
     _stream = new std::stringstream;
 
   }
@@ -120,7 +100,7 @@ protected:
 
   std::stringstream* _stream;
   Catalog* _catalog;
-  DataBaseFormat* _format;
+  DataBaseFormatMock* _format;
   Parser* _parser;
 };
 
@@ -156,7 +136,7 @@ TEST_F(ParserTest, parse_EmptyLine)
 
 TEST_F(ParserTest, parse_DelimitersOnly)
 {
-  VecStr line = DEFAULT_ROW_REQUIRED;
+  VecStr line = DEFAULT_ROW;
   for (auto& str : line)
     str.clear();
   stringsToStream(line);
@@ -166,7 +146,7 @@ TEST_F(ParserTest, parse_DelimitersOnly)
 
 TEST_F(ParserTest, parse_DelimitersWhitespaceOnly)
 {
-  VecStr line = DEFAULT_ROW_REQUIRED;
+  VecStr line = DEFAULT_ROW;
   for (auto& str : line)
     str = "  ";
   stringsToStream(line);
@@ -175,7 +155,7 @@ TEST_F(ParserTest, parse_DelimitersWhitespaceOnly)
 
 TEST_F(ParserTest, parse_DelimitersWhitespaceAndHashOnly)
 {
-  VecStr line = DEFAULT_ROW_REQUIRED;
+  VecStr line = DEFAULT_ROW;
   for (auto& str : line)
     str = " # ";
   stringsToStream(line);
@@ -184,14 +164,14 @@ TEST_F(ParserTest, parse_DelimitersWhitespaceAndHashOnly)
 
 TEST_F(ParserTest, parse_DefaultRow)
 {
-  VecStr line = DEFAULT_ROW_REQUIRED;
+  VecStr line = DEFAULT_ROW;
   stringsToStream(line);
   tryToParseStream();
 }
 
 TEST_F(ParserTest, parse_DefaultRow_InvalidName)
 {
-  VecStr line = DEFAULT_ROW_REQUIRED;
+  VecStr line = DEFAULT_ROW;
   line[type::NAME].clear();
   stringsToStream(line);
   tryToParseStream(0, true);
@@ -199,7 +179,7 @@ TEST_F(ParserTest, parse_DefaultRow_InvalidName)
 
 TEST_F(ParserTest, parse_DefaultRow_InvalidTime)
 {
-  VecStr line = DEFAULT_ROW_REQUIRED;
+  VecStr line = DEFAULT_ROW;
   line[type::TIME].clear();
   stringsToStream(line);
   tryToParseStream(0, true);
@@ -207,7 +187,7 @@ TEST_F(ParserTest, parse_DefaultRow_InvalidTime)
 
 TEST_F(ParserTest, parse_DefaultRow_InvalidObservatory_Empty)
 {
-  VecStr line = DEFAULT_ROW_REQUIRED;
+  VecStr line = DEFAULT_ROW;
   line[type::OBSERVATORY].clear();
   stringsToStream(line);
   tryToParseStream(0, true);
@@ -215,7 +195,7 @@ TEST_F(ParserTest, parse_DefaultRow_InvalidObservatory_Empty)
 
 TEST_F(ParserTest, parse_DefaultRow_InvalidObservatory_Mapper)
 {
-  VecStr line = DEFAULT_ROW_REQUIRED;
+  VecStr line = DEFAULT_ROW;
   line[type::OBSERVATORY] = "UNKNOWN";
   stringsToStream(line);
   tryToParseStream(0, true);
@@ -223,7 +203,7 @@ TEST_F(ParserTest, parse_DefaultRow_InvalidObservatory_Mapper)
 
 TEST_F(ParserTest, parse_DefaultRow_InvalidCoordH_Empty)
 {
-  VecStr line = DEFAULT_ROW_REQUIRED;
+  VecStr line = DEFAULT_ROW;
   line[type::COORD_H].clear();
   stringsToStream(line);
   tryToParseStream(0, true);
@@ -231,7 +211,7 @@ TEST_F(ParserTest, parse_DefaultRow_InvalidCoordH_Empty)
 
 TEST_F(ParserTest, parse_DefaultRow_InvalidCoordH_NotReal)
 {
-  VecStr line = DEFAULT_ROW_REQUIRED;
+  VecStr line = DEFAULT_ROW;
   line[type::COORD_H] = "FF";
   stringsToStream(line);
   tryToParseStream(0, true);
@@ -239,7 +219,7 @@ TEST_F(ParserTest, parse_DefaultRow_InvalidCoordH_NotReal)
 
 TEST_F(ParserTest, parse_DefaultRow_InvalidCoordV_Empty)
 {
-  VecStr line = DEFAULT_ROW_REQUIRED;
+  VecStr line = DEFAULT_ROW;
   line[type::COORD_V].clear();
   stringsToStream(line);
   tryToParseStream(0, true);
@@ -247,7 +227,7 @@ TEST_F(ParserTest, parse_DefaultRow_InvalidCoordV_Empty)
 
 TEST_F(ParserTest, parse_DefaultRow_InvalidCoordV_NotReal)
 {
-  VecStr line = DEFAULT_ROW_REQUIRED;
+  VecStr line = DEFAULT_ROW;
   line[type::COORD_V] = "FF";
   stringsToStream(line);
   tryToParseStream(0, true);
@@ -255,7 +235,7 @@ TEST_F(ParserTest, parse_DefaultRow_InvalidCoordV_NotReal)
 
 TEST_F(ParserTest, parse_DefaultRow_InvalidCoordFlag_Empty)
 {
-  VecStr line = DEFAULT_ROW_REQUIRED;
+  VecStr line = DEFAULT_ROW;
   line[type::COORD_FLAG].clear();
   stringsToStream(line);
   tryToParseStream(0, true);
@@ -263,7 +243,7 @@ TEST_F(ParserTest, parse_DefaultRow_InvalidCoordFlag_Empty)
 
 TEST_F(ParserTest, parse_DefaultRow_InvalidCoordFlag_NotReal)
 {
-  VecStr line = DEFAULT_ROW_REQUIRED;
+  VecStr line = DEFAULT_ROW;
   line[type::COORD_FLAG] = "FF";
   stringsToStream(line);
   tryToParseStream(0, true);
@@ -271,7 +251,7 @@ TEST_F(ParserTest, parse_DefaultRow_InvalidCoordFlag_NotReal)
 
 TEST_F(ParserTest, parse_DefaultRow_InvalidRegion_Empty)
 {
-  VecStr line = DEFAULT_ROW_REQUIRED;
+  VecStr line = DEFAULT_ROW;
   line[type::REGION].clear();
   stringsToStream(line);
   tryToParseStream(0, true);
@@ -279,7 +259,7 @@ TEST_F(ParserTest, parse_DefaultRow_InvalidRegion_Empty)
 
 TEST_F(ParserTest, parse_DefaultRow_InvalidRegion_Mapper)
 {
-  VecStr line = DEFAULT_ROW_REQUIRED;
+  VecStr line = DEFAULT_ROW;
   line[type::REGION] = "UNKNOWN";
   stringsToStream(line);
   tryToParseStream(0, true);
@@ -287,7 +267,7 @@ TEST_F(ParserTest, parse_DefaultRow_InvalidRegion_Mapper)
 
 TEST_F(ParserTest, parse_DefaultRow_InvalidAfterglowFlag_Empty)
 {
-  VecStr line = DEFAULT_ROW_REQUIRED;
+  VecStr line = DEFAULT_ROW;
   line[type::AFTERGLOW_FLAG].clear();
   stringsToStream(line);
   tryToParseStream(0, true);
@@ -295,7 +275,7 @@ TEST_F(ParserTest, parse_DefaultRow_InvalidAfterglowFlag_Empty)
 
 TEST_F(ParserTest, parse_DefaultRow_InvalidAfterglowFlag_NotYN)
 {
-  VecStr line = DEFAULT_ROW_REQUIRED;
+  VecStr line = DEFAULT_ROW;
   line[type::AFTERGLOW_FLAG] = "T";
   stringsToStream(line);
   tryToParseStream(0, true);
@@ -303,7 +283,7 @@ TEST_F(ParserTest, parse_DefaultRow_InvalidAfterglowFlag_NotYN)
 
 TEST_F(ParserTest, parse_DefaultRow_InvalidFluxFlag_Empty)
 {
-  VecStr line = DEFAULT_ROW_REQUIRED;
+  VecStr line = DEFAULT_ROW;
   line[type::FLUX_FLAG].clear();
   stringsToStream(line);
   tryToParseStream(0, true);
@@ -311,7 +291,7 @@ TEST_F(ParserTest, parse_DefaultRow_InvalidFluxFlag_Empty)
 
 TEST_F(ParserTest, parse_DefaultRow_InvalidFluxFlag_NotYN)
 {
-  VecStr line = DEFAULT_ROW_REQUIRED;
+  VecStr line = DEFAULT_ROW;
   line[type::FLUX_FLAG] = "T";
   stringsToStream(line);
   tryToParseStream(0, true);
@@ -319,7 +299,7 @@ TEST_F(ParserTest, parse_DefaultRow_InvalidFluxFlag_NotYN)
 
 TEST_F(ParserTest, parse_DefaultRow_InvalidId_Empty)
 {
-  VecStr line = DEFAULT_ROW_REQUIRED;
+  VecStr line = DEFAULT_ROW;
   line[type::ID].clear();
   stringsToStream(line);
   tryToParseStream(0, true);
@@ -327,7 +307,7 @@ TEST_F(ParserTest, parse_DefaultRow_InvalidId_Empty)
 
 TEST_F(ParserTest, parse_DefaultRow_InvalidId_NotInteger)
 {
-  VecStr line = DEFAULT_ROW_REQUIRED;
+  VecStr line = DEFAULT_ROW;
   line[type::ID] = "FF";
   stringsToStream(line);
   tryToParseStream(0, true);
@@ -335,7 +315,7 @@ TEST_F(ParserTest, parse_DefaultRow_InvalidId_NotInteger)
 
 TEST_F(ParserTest, parse_DefaultRow_InvalidRecordNumber_Empty)
 {
-  VecStr line = DEFAULT_ROW_REQUIRED;
+  VecStr line = DEFAULT_ROW;
   line[type::RECORD_NUMBER].clear();
   stringsToStream(line);
   tryToParseStream(0, true);
@@ -343,7 +323,7 @@ TEST_F(ParserTest, parse_DefaultRow_InvalidRecordNumber_Empty)
 
 TEST_F(ParserTest, parse_DefaultRow_InvalidRecordNumber_NotInteger)
 {
-  VecStr line = DEFAULT_ROW_REQUIRED;
+  VecStr line = DEFAULT_ROW;
   line[type::RECORD_NUMBER] = "FF";
   stringsToStream(line);
   tryToParseStream(0, true);
@@ -353,7 +333,7 @@ TEST_F(ParserTest, parse_DefaultRow_InvalidRecordNumber_NotInteger)
 
 TEST_F(ParserTest, parse_DefaultRow_InvalidTimeDef_Empty)
 {
-  VecStr line = DEFAULT_ROW_REQUIRED;
+  VecStr line = DEFAULT_ROW;
   line[type::TIME_DEF].clear();
   stringsToStream(line);
   tryToParseStream(0, true);
@@ -361,7 +341,7 @@ TEST_F(ParserTest, parse_DefaultRow_InvalidTimeDef_Empty)
 
 TEST_F(ParserTest, parse_DefaultRow_InvalidTimeDef_Mapper)
 {
-  VecStr line = DEFAULT_ROW_REQUIRED;
+  VecStr line = DEFAULT_ROW;
   line[type::TIME_DEF] = "UNKNOWN";
   stringsToStream(line);
   tryToParseStream(0, true);
@@ -369,7 +349,7 @@ TEST_F(ParserTest, parse_DefaultRow_InvalidTimeDef_Mapper)
 
 TEST_F(ParserTest, parse_DefaultRow_InvalidReference_Empty)
 {
-  VecStr line = DEFAULT_ROW_REQUIRED;
+  VecStr line = DEFAULT_ROW;
   line[type::REFERENCE].clear();
   stringsToStream(line);
   tryToParseStream(0, true);
@@ -377,7 +357,7 @@ TEST_F(ParserTest, parse_DefaultRow_InvalidReference_Empty)
 
 TEST_F(ParserTest, parse_DefaultRow_InvalidReference_Mapper)
 {
-  VecStr line = DEFAULT_ROW_REQUIRED;
+  VecStr line = DEFAULT_ROW;
   line[type::REFERENCE] = "UNKNOWN";
   stringsToStream(line);
   tryToParseStream(0, true);
@@ -385,7 +365,7 @@ TEST_F(ParserTest, parse_DefaultRow_InvalidReference_Mapper)
 
 TEST_F(ParserTest, parse_DefaultRow_InvalidReferenceList_SecondMapper)
 {
-  VecStr line = DEFAULT_ROW_REQUIRED;
+  VecStr line = DEFAULT_ROW;
   line[type::REFERENCE] = "1974ApJ...188L...1S,UNKNOWN";
   stringsToStream(line);
   tryToParseStream(0, true);
@@ -393,7 +373,7 @@ TEST_F(ParserTest, parse_DefaultRow_InvalidReferenceList_SecondMapper)
 
 TEST_F(ParserTest, parse_DefaultRow_InvalidT50Mod_Empty)
 {
-  VecStr line = DEFAULT_ROW_REQUIRED;
+  VecStr line = DEFAULT_ROW;
   line[type::T50_MOD].clear();
   stringsToStream(line);
   tryToParseStream(0, true);
@@ -401,7 +381,7 @@ TEST_F(ParserTest, parse_DefaultRow_InvalidT50Mod_Empty)
 
 TEST_F(ParserTest, parse_DefaultRow_InvalidT50Mod_Mapper)
 {
-  VecStr line = DEFAULT_ROW_REQUIRED;
+  VecStr line = DEFAULT_ROW;
   line[type::T50_MOD] = "!";
   stringsToStream(line);
   tryToParseStream(0, true);

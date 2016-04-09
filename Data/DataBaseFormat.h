@@ -1,6 +1,5 @@
-#include "Data/DataType.h"
 #include "Common/Exception.h"
-#include "Common/Singleton.h"
+#include "Data/DataType.h"
 
 #pragma once
 
@@ -21,29 +20,16 @@ public:
   const DataType& getColumnFormat(const std::size_t column) const throw(Exception);
 
 protected:
-  void initialize();
-  virtual void doInit();
-  void initHEASARC_GRBCAT();
+  void setupRequiredColumns();
 
-  const type::DatabaseTableType _type;
   type::CoordinateSystemType _coordSys;
-  type::ColumnFlags _requiredFlags;
   std::vector<DataType*> _format;
-};
-
-class DataBaseFormatFactory
-{
-public:
-  const DataBaseFormat* getFormat(const type::DatabaseTableType dbType) throw(Exception);
-
-protected:
-  friend class Singleton<DataBaseFormatFactory>;
-  DataBaseFormatFactory();
 
 private:
-  DataBaseFormat _HEASARC_GRBCAT;
-};
+  void initialize();
 
-typedef Singleton<DataBaseFormatFactory> DataBaseFormats;
+  const type::DatabaseTableType _type;
+  type::ColumnFlags _requiredFlags;
+};
 
 }

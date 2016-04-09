@@ -1,5 +1,7 @@
 #include "Tools/NameMapper.h"
 
+#include "Common/GlobalName.h"
+
 #include <sstream>
 #include <algorithm>
 

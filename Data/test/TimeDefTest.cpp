@@ -1,6 +1,7 @@
 #include "Data/TimeDef.h"
 
-#include "Tools/test/NameMapperTest.h"
+#include "test/NameMapperCommon.h"
+
 #include <gtest/gtest.h>
 
 using namespace ::testing;
@@ -10,7 +11,7 @@ namespace grb
 namespace test
 {
 
-class TimeDefTest : public NameMapperTest
+class TimeDefTest : public NameMapperCommon
 {
   void SetUp()
   {

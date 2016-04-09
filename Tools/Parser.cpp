@@ -1,12 +1,11 @@
-#include "Common/Global.h"
-#include "Data/DataBaseFormat.h"
-#include "Data/Observatory.h"
-#include "Data/Reference.h"
-#include "Data/Region.h"
-#include "Data/TimeDef.h"
-#include "Data/TimeMod.h"
-
 #include "Tools/Parser.h"
+
+#include "Common/Global.h"
+#include "Common/GlobalName.h"
+#include "Data/CatalogEntry.h"
+#include "Data/CatalogEntryFactory.h"
+#include "Data/DataBaseFormat.h"
+
 
 #include <iostream>
 #include <sstream>
@@ -77,7 +76,8 @@ Parser::parse() throw(Exception)
       continue;
 
     type::ColumnFlags columnFlags;
-    CatalogEntry entry;
+    CatalogEntry* entry = CatalogEntryFactory::instance()->create(_catalog->getType());
+
     std::stringstream ss(line);
     std::size_t col = 0;
     std::cout << "COLUMNS REQUIRED: " << columnFlagsRequired << std::endl;
@@ -96,6 +96,7 @@ Parser::parse() throw(Exception)
       }
       catch (Exception& exc)
       {
+        delete entry;
         std::cout << exc.what() << std::endl;
         columnFlags.set(_column, false);
         if (columnFlagsRequired.test(_column))
@@ -109,6 +110,8 @@ Parser::parse() throw(Exception)
     columnFlags = (columnFlags & columnFlagsRequired) ^ columnFlagsRequired;
     if (columnFlags.any())
     {
+      delete entry;
+
       std::stringstream ss;
       ss << "Parsing failed at row=" << _row+1 << " columns={";
       for (std::size_t i = 0; i < columnFlags.size(); ++i)
@@ -133,35 +136,36 @@ Parser::parse() throw(Exception)
 }
 
 bool
-Parser::parseMapper(const std::string& raw, CatalogEntry& entry)
+Parser::parseMapper(const std::string& raw, CatalogEntry* entry)
 {
   type::ValueType valueType = _format->getColumnFormat(_column).getValueType();
 
   switch (valueType)
   {
     case type::FLAG:
-      return parseValue(raw, mapFlag(entry));
+      return parseValue(raw, entry->getFlag(_column));
     case type::INTEGER:
-      return parseValue(raw, mapInteger(entry));
+      return parseValue(raw, entry->getInteger(_column));
     case type::INDEX:
-      return parseValue(raw, mapIndex(entry));
+      return parseValue(raw, entry->getMapper(_column), entry->getIndex(_column));
     case type::INTEGER_RANGE:
-      return parseValue(raw, mapIntegerRange(entry));
+      return parseValue(raw, entry->getIntegerRange(_column));
     case type::INDEX_LIST:
-      return parseValue(raw, mapIndexList(entry));
+      return parseValue(raw, entry->getMapper(_column), entry->getIndexList(_column));
     case type::FLOAT:
-      return parseValue(raw, mapFloat(entry));
+      return parseValue(raw, entry->getFloat(_column));
     case type::TIMEPOINT:
-      return parseValue(raw, mapTimePoint(entry));
+      return parseValue(raw, entry->getTimePoint(_column));
     case type::COORDINATE:
-      return parseValue(raw, mapFloat(entry));
+      return parseValue(raw, entry->getFloat(_column));
     case type::STRING:
-      return parseValue(raw, mapString(entry));
+      return parseValue(raw, entry->getString(_column));
     case type::STRING_LIST:
-      return parseValue(raw, mapStringList(entry));
+      return parseValue(raw, entry->getStringList(_column));
     default:
       break;
   }
+
   std::stringstream ss;
   ss << "Parsing failed at row=" << _row+1 << ", column="<< _column+1
      << " [" << GlobalName::getColumn(_column) << "] value type="
@@ -170,249 +174,39 @@ Parser::parseMapper(const std::string& raw, CatalogEntry& entry)
   throw exc;
 }
 
-type::Flag*
-Parser::mapFlag(CatalogEntry& entry)
-{
-  switch (_column)
-  {
-    case type::AFTERGLOW_FLAG:
-      return &entry.afterglow_flag;
-    case type::FLUX_FLAG:
-      return &entry.flux_flag;
-    default:
-      break;
-  }
-  throwException(type::FLAG);
-  return nullptr;
-}
-
-type::Integer*
-Parser::mapInteger(CatalogEntry& entry)
-{
-  switch (_column)
-  {
-    case type::RECORD_NUMBER:
-      return &entry.record_number;
-    case type::ID:
-      return &entry.id;
-    case type::T50_EMIN:
-      return &entry.t50.emin;
-    case type::T50_EMAX:
-      return &entry.t50.emax;
-    case type::T90_EMIN:
-      return &entry.t90.emin;
-    case type::T90_EMAX:
-      return &entry.t90.emax;
-    case type::CLASS:
-      return &entry.class_id;
-    default:
-      break;
-  }
-  throwException(type::INTEGER);
-  return nullptr;
-}
-
-type::Index*
-Parser::mapIndex(CatalogEntry& entry)
-{
-  switch (_column)
-  {
-    case type::TIME_DEF:
-      return &entry.time_def;
-    case type::OBSERVATORY:
-      return &entry.observatory;
-    case type::REGION:
-      return &entry.region;
-    case type::T50_MOD:
-      return &entry.t50.mod;
-    case type::T90_MOD:
-      return &entry.t90.mod;
-    default:
-      break;
-  }
-  throwException(type::INDEX);
-  return nullptr;
-}
-
-type::IntegerRange*
-Parser::mapIntegerRange(CatalogEntry& entry)
-{
-  switch (_column)
-  {
-    case type::T50:
-      return &entry.t50.range;
-    case type::T90:
-      return &entry.t90.range;
-    default:
-      break;
-  }
-  throwException(type::INTEGER_RANGE);
-  return nullptr;
-}
-
-type::IndexList*
-Parser::mapIndexList(CatalogEntry& entry)
-{
-  switch (_column)
-  {
-    case type::REFERENCE:
-      return &entry.reference;
-    default:
-      break;
-  }
-  throwException(type::INDEX_LIST);
-  return nullptr;
-}
-
-type::Float*
-Parser::mapFloat(CatalogEntry& entry)
-{
-  switch (_column)
-  {
-    case type::COORD_RA:
-      return &entry.coordinates.u.j2000.rightAscension;
-    case type::COORD_DEC:
-      return &entry.coordinates.u.j2000.declination;
-    case type::COORD_FLAG:
-      return &entry.coordinates.coord_flag;
-    case type::T50:
-      return &entry.t50.value;
-    case type::T50_ERROR:
-      return &entry.t50.error;
-    case type::T90:
-      return &entry.t90.value;
-    case type::T90_ERROR:
-      return &entry.t90.error;
-    case type::T_OTHER:
-      return &entry.t_other.value;
-    default:
-      break;
-  }
-  throwException(type::FLOAT);
-  return nullptr;
-}
-
-type::TimePoint*
-Parser::mapTimePoint(CatalogEntry& entry)
-{
-  switch (_column)
-  {
-    case type::TIME:
-      return &entry.time;
-    default:
-      break;
-  }
-  throwException(type::TIMEPOINT);
-  return nullptr;
-}
-
-type::String*
-Parser::mapString(CatalogEntry& entry)
-{
-  switch (_column)
-  {
-    case type::NAME:
-      return &entry.name;
-    case type::NOTES:
-      return &entry.t_other.notes;
-    case type::FLUX_NOTES:
-      return &entry.flux_notes;
-    case type::LOCAL_NOTES:
-      return &entry.local_notes;
-    default:
-      break;
-  }
-  throwException(type::STRING);
-  return nullptr;
-}
-
-type::StringList*
-Parser::mapStringList(CatalogEntry& entry)
-{
-  switch (_column)
-  {
-    case type::ALT_NAMES:
-      return &entry.alt_names;
-    default:
-      break;
-  }
-  throwException(type::STRING_LIST);
-  return nullptr;
-}
-
-NameMapper*
-Parser::getMapper()
-{
-  switch (_column)
-  {
-    case type::OBSERVATORY:
-      return Observatory::instance();
-    case type::REFERENCE:
-      return Reference::instance();
-    case type::REGION:
-      return Region::instance();
-    case type::TIME_DEF:
-      return TimeDef::instance();
-    case type::T50_MOD:
-      return Time50Mod::instance();
-    case type::T90_MOD:
-      return Time90Mod::instance();
-    default:
-      break;
-  }
-  std::stringstream ss;
-  ss << "Parsing failed at row=" << _row+1 << ", column="<< _column+1
-     << " [" << GlobalName::getColumn(_column) << "] unable to select a Name Mapper.";
-  Exception exc(ss.str(), PRETTY_FUNCTION);
-  throw exc;
-}
-
-void
-Parser::throwException(type::ValueType valueType)
-{
-  std::stringstream ss;
-  ss << "Parsing failed at row=" << _row+1 << ", column="<< _column+1
-     << " [" << GlobalName::getColumn(_column) << "] value type="
-     << valueType << " [" << GlobalName::getValue(valueType) << "] does not match the column.";
-  Exception exc(ss.str(), PRETTY_FUNCTION);
-  throw exc;
-}
-
 bool
 Parser::parseValue(const std::string& raw, type::Flag* value)
-{
-  if (raw.empty())
-    return false;
+{ 
+  if (!value)
+    throwException(type::FLAG);
 
   switch (raw[0])
   {
     case 'N':
     {
       *value = false;
-      break;
+      return true;
     }
     case 'Y':
     {
       *value = true;
-      break;
+      return true;
     }
     default:
-    {
-      std::stringstream ss;
-      ss << "Parsing failed at row:column=" << _row+1 << ":" << _column+1
-         << " [" << GlobalName::getColumn(_column) << "] for bool=" << raw;
-      Exception exc(ss.str(), PRETTY_FUNCTION);
-      throw exc;
-    }
+      break;
   }
-  return true;
+  std::stringstream ss;
+  ss << "Parsing failed at row:column=" << _row+1 << ":" << _column+1
+     << " [" << GlobalName::getColumn(_column) << "] for bool=" << raw;
+  Exception exc(ss.str(), PRETTY_FUNCTION);
+  throw exc;
 }
 
 bool
 Parser::parseValue(const std::string& raw, type::Integer* value)
 {
-  if (raw.empty())
-    return false;
+  if (!value)
+    throwException(type::INTEGER);
 
   try
   {
@@ -436,9 +230,11 @@ Parser::parseValue(const std::string& raw, type::Integer* value)
 }
 
 bool
-Parser::parseValue(const std::string& raw, type::Index* value)
+Parser::parseValue(const std::string& raw, const NameMapper* mapper, type::Index* value)
 {
-  NameMapper* mapper = getMapper();
+  if (!mapper || !value)
+    throwException(type::INDEX);
+
   try
   {
     *value = mapper->getIndex(raw);
@@ -459,6 +255,9 @@ Parser::parseValue(const std::string& raw, type::Index* value)
 bool
 Parser::parseValue(const std::string& raw, type::IntegerRange* value)
 {
+  if (!value)
+    throwException(type::INTEGER_RANGE);
+
   int i = 0;
   std::stringstream ss(raw);
   for (std::string item; std::getline(ss, item, DELIM_RANGE);)
@@ -478,13 +277,16 @@ Parser::parseValue(const std::string& raw, type::IntegerRange* value)
 }
 
 bool
-Parser::parseValue(const std::string& raw, type::IndexList* valueList)
+Parser::parseValue(const std::string& raw, const NameMapper* mapper, type::IndexList* valueList)
 {
+  if (!valueList)
+    throwException(type::INDEX_LIST);
+
   std::stringstream ss(raw);
   for (std::string item; std::getline(ss, item, DELIM_LIST);)
   {
     int index;
-    if (!parseValue(item, &index))
+    if (!parseValue(item, mapper, &index))
     {
       return false;
     }
@@ -496,8 +298,8 @@ Parser::parseValue(const std::string& raw, type::IndexList* valueList)
 bool
 Parser::parseValue(const std::string& raw, type::Float* value)
 {
-  if (raw.empty())
-    return false;
+  if (!value)
+    throwException(type::FLOAT);
 
   try
   {
@@ -518,6 +320,10 @@ Parser::parseValue(const std::string& raw, type::Float* value)
 bool
 Parser::parseValue(const std::string& raw, type::TimePoint* value)
 {
+  if (!value)
+    throwException(type::TIMEPOINT);
+
+
   if (raw.empty())
   {
     return false;
@@ -530,6 +336,9 @@ Parser::parseValue(const std::string& raw, type::TimePoint* value)
 bool
 Parser::parseValue(const std::string& raw, type::String* value)
 {
+  if (!value)
+    throwException(type::STRING);
+
   *value = std::move(raw);
   return !value->empty();
 }
@@ -537,12 +346,26 @@ Parser::parseValue(const std::string& raw, type::String* value)
 bool
 Parser::parseValue(const std::string& raw, type::StringList* valueList)
 {
+  if (!valueList)
+    throwException(type::STRING_LIST);
+
   std::stringstream ss(raw);
   for (std::string item; std::getline(ss, item, DELIM_LIST);)
   {
     valueList->push_back(item);
   }
   return !valueList->empty();
+}
+
+void
+Parser::throwException(type::ValueType valueType)
+{
+  std::stringstream ss;
+  ss << "Parsing failed at row=" << _row+1 << ", column="<< _column+1
+     << " [" << GlobalName::getColumn(_column) << "] value type="
+     << valueType << " [" << GlobalName::getValue(valueType) << "] does not match the column.";
+  Exception exc(ss.str(), PRETTY_FUNCTION);
+  throw exc;
 }
 
 }
