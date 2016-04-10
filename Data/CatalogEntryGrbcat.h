@@ -11,6 +11,25 @@ class CatalogEntryGRBCAT : public CatalogEntry
 public:
   CatalogEntryGRBCAT();
 
+  const type::Integer& getRecordNumber() const { return _record_number; }
+  const type::Integer& getId() const { return _id; }
+  const type::String& getName() const { return _name; }
+  const type::StringList& getAltNames() const { return _alt_names; }
+  const TimePoint& getTime() const { return _time; }
+  const type::Index& getTimeDef() const { return _time_def; }
+  const type::Index& getObservatory() const { return _observatory; }
+  const Coordinates& getCoodinates() const { return _coordinates; }
+  const type::Index& getRegion() const { return _region; }
+  const type::Flag& getAfterglowFlag() const { return _afterglow_flag; }
+  const type::IndexList& getReference() const { return _reference; }
+  const Duration& getT50() const { return _t50; }
+  const Duration& getT90() const { return _t90; }
+  const DurationOther& getTOther() const { return _t_other; }
+  const type::Flag& getFluxFlag() const { return _flux_flag; }
+  const type::String& getFluxNotes() const { return _flux_notes; }
+  const type::String& getLocalNotes() const { return _local_notes; }
+  const type::Integer& getClassId() const { return _class_id; }
+
   type::Flag* getFlag(type::ColumnType column);
   type::Integer* getInteger(type::ColumnType column);
   type::Index* getIndex(type::ColumnType column);
@@ -21,6 +40,8 @@ public:
   type::StringList* getStringList(type::ColumnType column);
 
   NameMapper* getMapper(type::ColumnType column);
+
+  bool isValid();
 
 protected:
   type::Integer _record_number;

@@ -101,52 +101,52 @@ protected:
     }
     ASSERT_EQ(isThrowExpected, isThrown);
     ASSERT_EQ((std::size_t) linesExpected, (std::size_t) linesParsed);
-    ASSERT_EQ((std::size_t) linesExpected, _catalog.get().size());
+    ASSERT_EQ((std::size_t) linesExpected, _catalog.getSize());
   }
 
-  CatalogEntry* getCatalogEntry()
+  const CatalogEntryMock& getCatalogEntry() const
   {
-    return *_catalog.get().begin();
+    return static_cast<const CatalogEntryMock&>(_catalog.getEntry(0));
   }
 
-  type::Flag& getCatalogFlag(type::ColumnType column)
+  const type::Flag& getCatalogFlag() const
   {
-    return *getCatalogEntry()->getFlag(column);
+    return getCatalogEntry().getFlag();
   }
 
-  type::Integer& getCatalogInteger(type::ColumnType column)
+  const type::Integer& getCatalogInteger() const
   {
-    return *getCatalogEntry()->getInteger(column);
+    return getCatalogEntry().getInteger();
   }
 
-  type::Index& getCatalogIndex(type::ColumnType column)
+  const type::Index& getCatalogIndex() const
   {
-    return *getCatalogEntry()->getIndex(column);
+    return getCatalogEntry().getIndex();
   }
 
-  type::IntegerRange& getCatalogIntegerRange(type::ColumnType column)
+  const type::IntegerRange& getCatalogIntegerRange() const
   {
-    return *getCatalogEntry()->getIntegerRange(column);
+    return getCatalogEntry().getIntegerRange();
   }
 
-  type::IndexList& getCatalogIndexList(type::ColumnType column)
+  const type::IndexList& getCatalogIndexList() const
   {
-    return *getCatalogEntry()->getIndexList(column);
+    return getCatalogEntry().getIndexList();
   }
 
-  type::Float& getCatalogFloat(type::ColumnType column)
+  const type::Float& getCatalogFloat() const
   {
-    return *getCatalogEntry()->getFloat(column);
+    return getCatalogEntry().getFloat();
   }
 
-  type::String& getCatalogString(type::ColumnType column)
+  const type::String& getCatalogString() const
   {
-    return *getCatalogEntry()->getString(column);
+    return getCatalogEntry().getString();
   }
 
-  type::StringList& getCatalogStringList(type::ColumnType column)
+  const type::StringList& getCatalogStringList() const
   {
-    return *getCatalogEntry()->getStringList(column);
+    return getCatalogEntry().getStringList();
   }
 
   std::stringstream* _stream;
@@ -279,7 +279,7 @@ TEST_F(ParserTest, parse_Flag_Yes)
   stringsToStream(line);
 
   tryToParseStream();
-  ASSERT_EQ(true, getCatalogFlag(line[col].column));
+  ASSERT_EQ(true, getCatalogFlag());
 }
 
 TEST_F(ParserTest, parse_Flag_No)
@@ -290,7 +290,7 @@ TEST_F(ParserTest, parse_Flag_No)
   stringsToStream(line);
 
   tryToParseStream();
-  ASSERT_EQ(false, getCatalogFlag(line[col].column));
+  ASSERT_EQ(false, getCatalogFlag());
 }
 
 TEST_F(ParserTest, parse_Flag_Invalid)
@@ -312,7 +312,7 @@ TEST_F(ParserTest, parse_Flag_Invalid_Optional)
   stringsToStream(line);
 
   tryToParseStream();
-  ASSERT_EQ(false, getCatalogFlag(line[col].column));
+  ASSERT_EQ(false, getCatalogFlag());
 }
 
 TEST_F(ParserTest, parse_Flag_Empty)
@@ -338,7 +338,7 @@ TEST_F(ParserTest, parse_Integer_Min)
   stringsToStream(line);
 
   tryToParseStream();
-  ASSERT_EQ(0, getCatalogInteger(line[col].column));
+  ASSERT_EQ(0, getCatalogInteger());
 }
 
 TEST_F(ParserTest, parse_Integer_Max)
@@ -349,7 +349,7 @@ TEST_F(ParserTest, parse_Integer_Max)
   stringsToStream(line);
 
   tryToParseStream();
-  ASSERT_EQ(4294967295, getCatalogInteger(line[col].column));
+  ASSERT_EQ(4294967295, getCatalogInteger());
 }
 
 TEST_F(ParserTest, parse_Integer_Invalid)
@@ -371,7 +371,7 @@ TEST_F(ParserTest, parse_Integer_Invalid_Optional)
   stringsToStream(line);
 
   tryToParseStream();
-  ASSERT_EQ(0, getCatalogInteger(line[col].column));
+  ASSERT_EQ(0, getCatalogInteger());
 }
 
 TEST_F(ParserTest, parse_Integer_Invalid_Negative)
@@ -393,7 +393,7 @@ TEST_F(ParserTest, parse_Integer_Invalid_Negative_Optional)
   stringsToStream(line);
 
   tryToParseStream();
-  ASSERT_EQ(0, getCatalogInteger(line[col].column));
+  ASSERT_EQ(0, getCatalogInteger());
 }
 
 TEST_F(ParserTest, parse_Integer_Empty)
@@ -419,7 +419,7 @@ TEST_F(ParserTest, parse_Index)
   stringsToStream(line);
 
   tryToParseStream();
-  ASSERT_EQ(1, getCatalogIndex(line[col].column));
+  ASSERT_EQ(1, getCatalogIndex());
 }
 
 TEST_F(ParserTest, parse_Index_Invalid)
@@ -441,7 +441,7 @@ TEST_F(ParserTest, parse_Index_Invalid_Optional)
   stringsToStream(line);
 
   tryToParseStream();
-  ASSERT_EQ(0, getCatalogIndex(line[col].column));
+  ASSERT_EQ(-1, getCatalogIndex());
 }
 
 TEST_F(ParserTest, parse_Index_Empty)
@@ -467,7 +467,7 @@ TEST_F(ParserTest, parse_IntegerRange_Min)
   stringsToStream(line);
 
   tryToParseStream();
-  type::IntegerRange& range = getCatalogIntegerRange(line[col].column);
+  const type::IntegerRange& range = getCatalogIntegerRange();
   ASSERT_EQ(2, range.size());
   ASSERT_EQ(0, range[0]);
   ASSERT_EQ(1, range[1]);
@@ -481,7 +481,7 @@ TEST_F(ParserTest, parse_IntegerRange_Max)
   stringsToStream(line);
 
   tryToParseStream();
-  type::IntegerRange& range = getCatalogIntegerRange(line[col].column);
+  const type::IntegerRange& range = getCatalogIntegerRange();
   ASSERT_EQ(2, range.size());
   ASSERT_EQ(4294967294, range[0]);
   ASSERT_EQ(4294967295, range[1]);
@@ -506,7 +506,7 @@ TEST_F(ParserTest, parse_IntegerRange_Invalid_Optional)
   stringsToStream(line);
 
   tryToParseStream();
-  type::IntegerRange& range = getCatalogIntegerRange(line[col].column);
+  const type::IntegerRange& range = getCatalogIntegerRange();
   ASSERT_EQ(0, range.size());
 }
 
@@ -563,7 +563,7 @@ TEST_F(ParserTest, parse_IndexList)
   stringsToStream(line);
 
   tryToParseStream();
-  type::IndexList& list = getCatalogIndexList(line[col].column);
+  const type::IndexList& list = getCatalogIndexList();
   ASSERT_EQ(4, list.size());
   ASSERT_EQ(0, list[0]);
   ASSERT_EQ(1, list[1]);
@@ -601,7 +601,7 @@ TEST_F(ParserTest, parse_IndexList_Invalid_Optional)
   stringsToStream(line);
 
   tryToParseStream();
-  type::IndexList& list = getCatalogIndexList(line[col].column);
+  const type::IndexList& list = getCatalogIndexList();
   ASSERT_EQ(0, list.size());
 }
 
@@ -628,7 +628,7 @@ TEST_F(ParserTest, parse_Float_Min)
   stringsToStream(line);
 
   tryToParseStream();
-  ASSERT_FLOAT_EQ(-9876543210.0123456789, getCatalogFloat(line[col].column));
+  ASSERT_FLOAT_EQ(-9876543210.0123456789, getCatalogFloat());
 }
 
 TEST_F(ParserTest, parse_Float_Zero)
@@ -639,7 +639,7 @@ TEST_F(ParserTest, parse_Float_Zero)
   stringsToStream(line);
 
   tryToParseStream();
-  ASSERT_FLOAT_EQ(0.0, getCatalogFloat(line[col].column));
+  ASSERT_FLOAT_EQ(0.0, getCatalogFloat());
 }
 
 TEST_F(ParserTest, parse_Float_Max)
@@ -650,7 +650,7 @@ TEST_F(ParserTest, parse_Float_Max)
   stringsToStream(line);
 
   tryToParseStream();
-  ASSERT_FLOAT_EQ(9876543210.0123456789, getCatalogFloat(line[col].column));
+  ASSERT_FLOAT_EQ(9876543210.0123456789, getCatalogFloat());
 }
 
 TEST_F(ParserTest, parse_Float_Invalid)
@@ -672,7 +672,7 @@ TEST_F(ParserTest, parse_Float_Invalid_Optional)
   stringsToStream(line);
 
   tryToParseStream();
-  ASSERT_FLOAT_EQ(0.0, getCatalogFloat(line[col].column));
+  ASSERT_FLOAT_EQ(0.0, getCatalogFloat());
 }
 
 TEST_F(ParserTest, parse_Float_Empty)
@@ -698,7 +698,7 @@ TEST_F(ParserTest, parse_String)
   stringsToStream(line);
 
   tryToParseStream();
-  ASSERT_STREQ("JUST A STRING", getCatalogString(line[col].column).c_str());
+  ASSERT_STREQ("JUST A STRING", getCatalogString().c_str());
 }
 
 TEST_F(ParserTest, parse_String_Empty)
@@ -720,7 +720,7 @@ TEST_F(ParserTest, parse_String_Empty_Optional)
   stringsToStream(line);
 
   tryToParseStream();
-  ASSERT_STREQ("", getCatalogString(line[col].column).c_str());
+  ASSERT_STREQ("", getCatalogString().c_str());
 }
 
 }
@@ -736,7 +736,7 @@ TEST_F(ParserTest, parse_StringList_One)
   stringsToStream(line);
 
   tryToParseStream();
-  type::StringList& list = getCatalogStringList(line[col].column);
+  const type::StringList& list = getCatalogStringList();
   ASSERT_EQ(1, list.size());
   ASSERT_STREQ("JUST A STRING", list[0].c_str());
 }
@@ -749,7 +749,7 @@ TEST_F(ParserTest, parse_StringList_Two)
   stringsToStream(line);
 
   tryToParseStream();
-  type::StringList& list = getCatalogStringList(line[col].column);
+  const type::StringList& list = getCatalogStringList();
   ASSERT_EQ(2, list.size());
   ASSERT_STREQ("One", list[0].c_str());
   ASSERT_STREQ("Two", list[1].c_str());
@@ -773,7 +773,7 @@ TEST_F(ParserTest, parse_StringList_Two_SecondEmpty)
   stringsToStream(line);
 
   tryToParseStream();
-  type::StringList& list = getCatalogStringList(line[col].column);
+  const type::StringList& list = getCatalogStringList();
   ASSERT_EQ(1, list.size());
   ASSERT_STREQ("One", list[0].c_str());
 }
@@ -808,7 +808,7 @@ TEST_F(ParserTest, parse_StringList_Empty_Optional)
   stringsToStream(line);
 
   tryToParseStream();
-  type::StringList& list = getCatalogStringList(line[col].column);
+  const type::StringList& list = getCatalogStringList();
   ASSERT_EQ(0, list.size());
 }
 

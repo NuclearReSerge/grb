@@ -1,0 +1,80 @@
+# <HEADER>
+#
+#         TABLE: heasarc_grbcat
+#      LOCATION: dbms1.gsfc.nasa.gov
+#    TOTAL ROWS: 10119
+#
+# CREATION DATE: 2008-06-18 10:28:29
+# LAST MODIFIED: 2008-06-18 10:28:29
+#   EXGEST DATE: 2008-06-18 14:30:07
+#
+# table_name = heasarc_grbcat
+# table_description = "Catalog of Gamma-Ray Bursts"
+# table_document_url = http://heasarc.gsfc.nasa.gov/W3Browse/gamma-ray-bursts/grbcat.html
+# table_security = public
+#
+# Table Parameters
+#
+# field[record_number] = int4  (index) // Sequential Identification Number for Each Entry in Catalog
+# field[id] = int4  [meta.id;src] (index) // Sequential Identification Number for Each Source in Catalog
+# field[name] = char12  [meta.id;meta.main] (index) // Burst Designation as GRB YYMMDD
+# field[alt_names] = char60  [meta.id]  // Other Designations for Burst
+# field[time] = float8_mjd (index) // Time of Burst (UT)
+# field[time_def] = char30   // Definition of Burst Time
+# field[observatory] = char30  (index) // Detecting Observatory
+# field[ra] = float8:.4f_degree [pos.eq.ra;meta.main] (key) // Right Ascension
+# field[dec] = float8:.4f_degree [pos.eq.dec;meta.main] (key) // Declination
+# field[coord_flag] = char3   // Quality Flag for RA and Dec
+# field[region] = char20   // Region
+# field[afterglow_flag] = char1   // Afterglow Flag
+# field[reference] = char100   // Reference
+# field[t50_mod] = char1   // Modifier for t50 (<, >, ~, etc.)
+# field[t50] = float8:.4f_s  // T_50 (s)
+# field[t50_error] = float8:.4f_s  // T_50 Error (s)
+# field[t50_range] = char20   // Energy Range for t50 (keV)
+# field[t50_emin] = int2_keV  // Minimum of Energy Range for t50 (keV)
+# field[t50_emax] = int2_keV  // Maximum of Energy Range for t50 (keV)
+# field[t90_mod] = char1   // Modifier for t90 (<, >, ~, etc.)
+# field[t90] = float8:.4f_s  // T_90 (s)
+# field[t90_error] = float8:.4f_s  // T_90 Error (s)
+# field[t90_range] = char10   // Energy Range for t90 (keV)
+# field[t90_emin] = int2_keV  // Minimum of Energy Range for t90 (keV)
+# field[t90_emax] = int2_keV  // Maximum of Energy Range for t90 (keV)
+# field[t_other] = float8:.4f_s  // A Different Duration Measure or duration not specified (s)
+# field[flux_flag] = char1   // Flux Flag
+# field[notes] = char200   // Notes
+# field[flux_notes] = char150   // Flux Notes
+# field[local_notes] = char150   // Localization Notes
+# field[class] = int2  [src.class] (index) // Browse Object Classification
+#
+# parameter_defaults = name time observatory ra dec coord_flag region afterglow_flag flux_flag id
+#
+# Virtual Parameters
+#
+# declination = @dec
+# default_search_radius = 60
+# equinox = 2000
+# frequency_regime = Gamma-ray
+# observatory_name = GAMMA-RAY BURSTS
+# right_ascension = @ra
+# row_type = GRB
+# start_time = @time
+# table_author = Angelini et al.
+# table_priority = 3.001
+# table_type = Observation
+# target_name = @name
+# unique_key = record_number
+#
+# Relationship Definitions
+#
+# relate[class] = heasarc_class(class_id)
+#
+# Data Format Specification
+#
+# line[1] = record_number id name alt_names time time_def observatory ra dec coord_flag region afterglow_flag reference t50_mod t50 t50_error t50_range t50_emin t50_emax t90_mod t90 t90_error t90_range t90_emin t90_emax t_other flux_flag notes flux_notes local_notes class
+#
+# <DATA>
+1|1|GRB 670702||39673.596851851798|Earth Crossing Time|VELA|||-1||N|1974ApJ...188L...1S||||||||||||||N||||1710|
+# ...
+10119|5831|GRB 050309||53438.030104166697|BAT trigger|SWIFT|182.62125|77.617999999999995|0||Y|2005GCN..3082....1B||||||||||||||N|||Position is from source 1 of XRT. See afterglow table.|1710|
+#<END>

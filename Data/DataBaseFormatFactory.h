@@ -16,7 +16,7 @@ class DataBaseFormatFactoryType
 public:
   ~DataBaseFormatFactoryType();
 
-  const DataBaseFormat* getFormat(const type::DatabaseTableType dbType) throw(Exception);
+  const DataBaseFormat& getFormat(const type::DatabaseTableType dbType) throw(Exception);
 
 protected:
   friend class Singleton<DataBaseFormatFactoryType>;

@@ -74,7 +74,6 @@ enum ColumnType
   FLUX_NOTES,
   LOCAL_NOTES,
   CLASS,
-  DUMMY,
 
   // other
   COORD_LONG,

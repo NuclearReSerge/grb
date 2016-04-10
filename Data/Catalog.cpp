@@ -1,6 +1,10 @@
 #include "Data/Catalog.h"
+
+#include "Common/GlobalName.h"
 #include "Data/CatalogEntry.h"
 #include "Data/CatalogEntryFactory.h"
+
+#include <sstream>
 
 namespace grb
 {
@@ -31,6 +35,12 @@ Catalog::isEmpty() const
   return _catalog.empty();
 }
 
+std::size_t
+Catalog::getSize() const
+{
+  return _catalog.size();
+}
+
 CatalogEntry*
 Catalog::createEntry()
 {
@@ -44,9 +54,17 @@ Catalog::addEntry(CatalogEntry* entry)
     _catalog.push_back(entry);
 }
 
-std::vector<CatalogEntry*>& Catalog::get()
+const CatalogEntry&
+Catalog::getEntry(std::size_t index) const throw(Exception)
 {
-  return _catalog;
+  if (index < _catalog.size())
+    return *_catalog[index];
+
+  std::stringstream ss;
+  ss << "Catalog of type=" << _type << "[" << GlobalName::getCatalog(_type)
+     << "] does not have an entry of index=" << index;
+  Exception exc(type::EXCEPTION_WARNING, ss.str(), PRETTY_FUNCTION);
+  throw exc;
 }
 
 }

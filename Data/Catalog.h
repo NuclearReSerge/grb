@@ -1,3 +1,4 @@
+#include "Common/Exception.h"
 #include "Common/Global.h"
 
 #include <vector>
@@ -17,10 +18,11 @@ public:
 
   type::CatalogType getType() const;
   bool isEmpty() const;
+  std::size_t getSize() const;
 
   virtual CatalogEntry* createEntry();
   void addEntry(CatalogEntry* entry);
-  std::vector<CatalogEntry*>& get();
+  const CatalogEntry& getEntry(std::size_t index) const throw(Exception);
 
 protected:
   type::CatalogType _type;

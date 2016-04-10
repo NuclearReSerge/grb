@@ -120,7 +120,16 @@ Parser::parseLine(std::string& line, CatalogEntry* entry)
     }
     ++_column;
   }
+
   checkColumns(columnFlags);
+
+  if (!entry->isValid())
+  {
+    std::stringstream ss;
+    ss << "Parsing failed at row=" << _row+1 << " data not valid.";
+    Exception exc(type::EXCEPTION_WARNING, ss.str(), PRETTY_FUNCTION);
+    throw exc;
+  }
 }
 
 void

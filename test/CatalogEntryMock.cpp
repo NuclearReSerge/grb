@@ -9,7 +9,7 @@ namespace test
 
 CatalogEntryMock::CatalogEntryMock()
   : CatalogEntry(type::CATALOG_TEST),
-    _flag(false), _integer(0), _index(0), _float(0.0)
+    _flag(false), _integer(0), _index(-1), _float(0.0)
 {
   _mapper = new NameMapperMock;
 }
@@ -137,6 +137,13 @@ CatalogEntryMock::getMapper(type::ColumnType column)
   }
   return nullptr;
 }
+
+bool
+CatalogEntryMock::isValid()
+{
+  return true;
+}
+
 
 }
 }

@@ -71,7 +71,6 @@ static std::vector<Column> COLUMN_NAMES
   { "flux_notes", "Flux Notes" },
   { "local_notes", "Localization Notes" },
   { "class", "Browse Object Classification" },
-  { "DUMMY", "dummy column; usually after the last delimiter" },
 
   { "Lii", "" },
   { "Bii", "" },

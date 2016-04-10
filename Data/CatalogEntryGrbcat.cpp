@@ -11,7 +11,7 @@ namespace grb
 
 CatalogEntryGRBCAT::CatalogEntryGRBCAT()
   : CatalogEntry(type::GRBCAT),
-    _record_number(0), _id(0), _time(), _time_def(0), _observatory(0), _coordinates(), _region(0),
+    _record_number(0), _id(0), _time(), _time_def(-1), _observatory(-1), _coordinates(), _region(-1),
     _afterglow_flag(false), _t50(), _t90(), _t_other(), _flux_flag(false), _class_id(0)
 {
 }
@@ -187,6 +187,12 @@ CatalogEntryGRBCAT::getMapper(type::ColumnType column)
       break;
   }
   return nullptr;
+}
+
+bool
+CatalogEntryGRBCAT::isValid()
+{
+  return true;
 }
 
 }

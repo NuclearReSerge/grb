@@ -5,76 +5,31 @@
 namespace grb
 {
 
-struct CoordinateSystemUndefined
-{
-  type::Float horizontal;
-  type::Float vertical;
-};
-
-struct CoordinateSystemEquinox
-{
-  type::Float rightAscension;
-  type::Float declination;
-};
-
-struct CoordinateSystemGalactic
-{
-  type::Float latitude;
-  type::Float longitude;
-};
 
 class Coordinates
 {
 public:
   Coordinates(type::CoordinateSystemType type = type::COORDINATE_SYSTEM_UNDEFINED)
-    : _type(type), _coord_flag(0.0)
+    : _type(type), _coord_flag(0.0), _horizontal(0.0), _vertical(0.0)
   {
-    _u.undefined.horizontal = 0.0;
-    _u.undefined.vertical = 0.0;
   }
 
   type::CoordinateSystemType getType() const { return _type; }
   void setType(type::CoordinateSystemType type) { _type = type; }
+
+  const type::Float& getCoordFlag() const { return _coord_flag; }
+  const type::Float& getH() const { return _horizontal; }
+  const type::Float& getV() const { return _vertical; }
+
   type::Float& getCoordFlag() { return _coord_flag; }
-  type::Float& getH()
-  {
-    switch (_type)
-    {
-      case type::J2000:
-        return _u.j2000.rightAscension;
-      case type::B1950:
-        return _u.b1950.rightAscension;
-      case type::GALACTIC:
-        return _u.galactic.longitude;
-      default:
-        return _u.undefined.horizontal;
-    }
-  }
-  type::Float& getV()
-  {
-    switch (_type)
-    {
-      case type::J2000:
-        return _u.j2000.declination;
-      case type::B1950:
-        return _u.b1950.declination;
-      case type::GALACTIC:
-        return _u.galactic.latitude;
-      default:
-        return _u.undefined.vertical;
-    }
-  }
+  type::Float& getH() { return _horizontal; }
+  type::Float& getV() { return _vertical; }
 
 private:
   type::CoordinateSystemType _type;
   type::Float _coord_flag;
-  union
-  {
-    CoordinateSystemUndefined undefined;
-    CoordinateSystemEquinox b1950;
-    CoordinateSystemEquinox j2000;
-    CoordinateSystemGalactic galactic;
-  } _u;
+  type::Float _horizontal;
+  type::Float _vertical;
 };
 
 //typedef std::chrono::time_point<std::chrono::high_resolution_clock> TimePoint;
@@ -95,6 +50,7 @@ public:
   { }
 
   type::Float& getMJD() { return _mjd; }
+  const type::Float& getMJD() const { return _mjd; }
 private:
   type::Float _mjd;
 };
@@ -103,13 +59,21 @@ class Duration
 {
 public:
   Duration()
-    : _isPresent(false), _mod(), _duration(0.0), _error(0.0), _emin(0), _emax(0)
+    : _isPresent(false), _mod(-1), _duration(0.0), _error(0.0), _emin(0), _emax(0)
   { }
   ~Duration()
   { _range.clear(); }
 
   bool isPresent() const { return _isPresent; }
   void setPresent(bool val = true) { _isPresent = val; }
+
+  const type::Index& getMod() const { return _mod; }
+  const type::Float& getDuration() const { return _duration; }
+  const type::Float& getError() const { return _error; }
+  const type::IntegerRange& getRange() const { return _range; }
+  const type::Integer& getEmin() const { return _emin; }
+  const type::Integer& getEmax() const { return _emax; }
+
   type::Index& getMod() { return _mod; }
   type::Float& getDuration() { return _duration; }
   type::Float& getError() { return _error; }
@@ -138,6 +102,10 @@ public:
 
   bool isPresent() const { return _isPresent; }
   void setPresent(bool val = true) { _isPresent = val; }
+
+  const type::Float& getDuration() const { return _duration; }
+  const type::String& getNotes() const { return _notes; }
+
   type::Float& getDuration() { return _duration; }
   type::String& getNotes() { return _notes; }
 

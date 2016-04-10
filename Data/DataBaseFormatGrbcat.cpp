@@ -51,7 +51,6 @@ DataBaseFormatGrbcat::initialize() throw(Exception)
   _format.push_back(new DataType(type::FLUX_NOTES,     false, type::NO_UNIT, type::STRING));
   _format.push_back(new DataType(type::LOCAL_NOTES,    false, type::NO_UNIT, type::STRING));
   _format.push_back(new DataType(type::CLASS,          false, type::NO_UNIT, type::INTEGER));
-  _format.push_back(new DataType(type::DUMMY,          false, type::NO_UNIT, type::STRING));
 
   setupRequiredColumns();
 }

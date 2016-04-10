@@ -27,6 +27,8 @@ public:
 
   virtual NameMapper* getMapper(type::ColumnType column) = 0;
 
+  virtual bool isValid() = 0;
+
 private:
   type::CatalogType _type;
 };

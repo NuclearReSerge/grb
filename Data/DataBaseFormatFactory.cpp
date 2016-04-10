@@ -21,12 +21,12 @@ DataBaseFormatFactoryType::~DataBaseFormatFactoryType()
   }
 }
 
-const DataBaseFormat*
+const DataBaseFormat&
 DataBaseFormatFactoryType::getFormat(const type::DatabaseTableType dbType) throw(Exception)
 {
   try
   {
-    return _formatMap.at(dbType);
+    return *_formatMap.at(dbType);
   }
   catch (std::out_of_range& sysExc)
   {
