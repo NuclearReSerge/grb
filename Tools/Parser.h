@@ -26,7 +26,8 @@ public:
 protected:
   void openFileStream(const std::string& filename);
 
-  bool checkRequiredColumns(type::ColumnFlags& columnFlags);
+  void parseLine(std::string& line, CatalogEntry* entry);
+  void checkColumns(type::ColumnFlags& columnFlags);
 
   bool parseMapper(const std::string& raw, CatalogEntry* entry);
 

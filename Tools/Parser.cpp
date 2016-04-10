@@ -75,55 +75,75 @@ Parser::parse() throw(Exception)
   {
     if (line.empty() || line[0] == COMMENT)
       continue;
-
     CatalogEntry* entry = _catalog.createEntry();
-    type::ColumnFlags columnFlags;
-    std::stringstream ss(line);
-    _column = 0;
-    for (std::string element; std::getline(ss, element, DELIM_COLUMN);)
+    try
     {
-      _columnType = _format.getColumnFormat(_column).getColumnType();
-
-      element.erase(0, element.find_first_not_of(WHITESPACE));
-      element.erase(element.find_last_not_of(WHITESPACE) + 1);
-      try
-      {
-        columnFlags.set(_columnType, parseMapper(element, entry));
-      }
-      catch (Exception& exc)
-      {
-        columnFlags.set(_columnType, false);
-        if (_columnsRequired.test(_columnType))
-        {
-          delete entry;
-          throw;
-        }
-      }
-      ++_column;
+      parseLine(line, entry);
     }
-
-    if (_column != _format.getSize())
+    catch (Exception& exc)
     {
       delete entry;
+      throw;
+    }
+    _catalog.addEntry(entry);
+    ++_row;
+  }
+  if (_row == 0 || _catalog.isEmpty())
+  {
+    Exception exc(type::EXCEPTION_CRITICAL,
+                  "Parsing failed, stream or Catalog is empty",
+                  PRETTY_FUNCTION);
+    throw exc;
+  }
+  return _row;
+}
 
-      std::stringstream ss;
-      ss << "Parsing failed at row=" << _row+1 << " columns={";
+void
+Parser::parseLine(std::string& line, CatalogEntry* entry)
+{
+  type::ColumnFlags columnFlags;
+  std::stringstream ss(line);
+  _column = 0;
+  for (std::string element; std::getline(ss, element, DELIM_COLUMN);)
+  {
+    _columnType = _format.getColumnFormat(_column).getColumnType();
+    element.erase(0, element.find_first_not_of(WHITESPACE));
+    element.erase(element.find_last_not_of(WHITESPACE) + 1);
+    try
+    {
+      columnFlags.set(_columnType, parseMapper(element, entry));
+    }
+    catch (Exception& exc)
+    {
+      if (_columnsRequired.test(_columnType))
+        throw;
+    }
+    ++_column;
+  }
+  checkColumns(columnFlags);
+}
+
+void
+Parser::checkColumns(type::ColumnFlags& columnFlags)
+{
+  const bool allReqired = ((columnFlags & _columnsRequired) ^ _columnsRequired).none();
+  const bool allProcessed = _column == _format.getSize();
+
+  if (!allProcessed || !allReqired)
+  {
+    std::stringstream ss;
+    ss << "Parsing failed at row=" << _row+1 << " columns={";
+    if (!allProcessed)
+    {
       for (std::size_t i = _column; i < _format.getSize(); ++i)
       {
-        _columnType = _format.getColumnFormat(_column).getColumnType();
+        _columnType = _format.getColumnFormat(i).getColumnType();
         ss << i << " [" << GlobalName::getColumn(_columnType) << "] ";
       }
-      ss << "} not processed.";
-      Exception exc(type::EXCEPTION_WARNING, ss.str(), PRETTY_FUNCTION);
-      throw exc;
+      ss << " } not processed.";
     }
-
-    if (checkRequiredColumns(columnFlags))
+    else
     {
-      delete entry;
-
-      std::stringstream ss;
-      ss << "Parsing failed at row=" << _row+1 << " columns={";
       for (std::size_t i = 0; i < _format.getSize(); ++i)
       {
         _columnType = _format.getColumnFormat(i).getColumnType();
@@ -131,26 +151,10 @@ Parser::parse() throw(Exception)
           ss << i << " [" << GlobalName::getColumn(_columnType) << "] ";
       }
       ss << "} require valid values.";
-      Exception exc(type::EXCEPTION_WARNING, ss.str(), PRETTY_FUNCTION);
-      throw exc;
     }
-    _catalog.addEntry(entry);
-    ++_row;
-  }
-
-  if (_row == 0 || _catalog.isEmpty())
-  {
-    Exception exc(type::EXCEPTION_CRITICAL, "Parsing failed, stream is empty", PRETTY_FUNCTION);
+    Exception exc(type::EXCEPTION_WARNING, ss.str(), PRETTY_FUNCTION);
     throw exc;
   }
-  return _row;
-}
-
-bool
-Parser::checkRequiredColumns(type::ColumnFlags& columnFlags)
-{
-  columnFlags = (columnFlags & _columnsRequired) ^ _columnsRequired;
-  return columnFlags.any();
 }
 
 bool
