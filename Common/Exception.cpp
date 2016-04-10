@@ -5,7 +5,9 @@ namespace grb
 
 const std::string Exception::_prefix = "GRB exception: ";
 
-Exception::Exception(const std::string& message, const std::string& function)
+Exception::Exception(type::ExceptionLevel level, const std::string& message,
+                     const std::string& function)
+  : _level(level)
 {
   _message = _prefix;
   if (!function.empty())
@@ -15,15 +17,22 @@ Exception::Exception(const std::string& message, const std::string& function)
   _message += message;
 }
 
-const std::string& Exception::getPrefix()
-{
-  return _prefix;
-}
-
 const char*
 Exception::what() const noexcept
 {
   return _message.c_str();
 }
+
+type::ExceptionLevel
+Exception::getLevel() const
+{
+  return _level;
+}
+
+const std::string& Exception::getPrefix()
+{
+  return _prefix;
+}
+
 
 }

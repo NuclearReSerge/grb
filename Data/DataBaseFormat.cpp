@@ -28,7 +28,7 @@ DataBaseFormat::initialize() throw(Exception)
   std::stringstream ss;
   ss << "Database format of type=" << _type << "[" << GlobalName::getDatabaseTable(_type)
      << "] was not initialized.";
-  Exception exc(ss.str(), PRETTY_FUNCTION);
+  Exception exc(type::EXCEPTION_HIGH, ss.str(), PRETTY_FUNCTION);
   throw exc;
 }
 
@@ -62,9 +62,8 @@ DataBaseFormat::getColumnFormat(std::size_t column) const throw(Exception)
   if (column >= _format.size())
   {
     std::stringstream ss;
-    ss << "Column format of type=" << column << "["
-       << GlobalName::getColumn((type::ColumnType) column) << "] does not exist.";
-    Exception exc(ss.str(), PRETTY_FUNCTION);
+    ss << "Column format for column index = " << column << " does not exist.";
+    Exception exc(type::EXCEPTION_LOW, ss.str(), PRETTY_FUNCTION);
     throw exc;
   }
   return *_format[column];

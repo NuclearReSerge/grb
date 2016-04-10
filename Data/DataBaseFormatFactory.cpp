@@ -33,7 +33,7 @@ DataBaseFormatFactoryType::getFormat(const type::DatabaseTableType dbType) throw
     std::stringstream ss;
     ss << "Database format of type=" << dbType << "[" << GlobalName::getDatabaseTable(dbType)
        << "] does not exist, exc.what()=" << sysExc.what();
-    Exception exc(ss.str(), PRETTY_FUNCTION);
+    Exception exc(type::EXCEPTION_CRITICAL, ss.str(), PRETTY_FUNCTION);
     throw exc;
   }
 }

@@ -234,6 +234,40 @@ TEST_F(ParserTest, parse_DefaultRow)
 
 }
 
+namespace formats
+{
+
+TEST_F(ParserTest, parse_Format_OneColumn)
+{
+  TypeValueVector line;
+  TypeAndValue column { type::COLUMN_TEST_FLAG, true, type::FLAG, "N" };
+  line.push_back(column);
+  stringsToStream(line);
+
+  tryToParseStream(0, true);
+}
+
+TEST_F(ParserTest, parse_Format_OneLessColumn)
+{
+  TypeValueVector line = DEFAULT_ROW;
+  line.pop_back();
+  stringsToStream(line);
+
+  tryToParseStream(0, true);
+}
+
+TEST_F(ParserTest, parse_Format_OneMoreColumn)
+{
+  TypeValueVector line = DEFAULT_ROW;
+  TypeAndValue column { type::COLUMN_TEST_FLAG, true, type::FLAG, "N" };
+  line.push_back(column);
+  stringsToStream(line);
+
+  tryToParseStream(0, true);
+}
+
+}
+
 namespace typeflag
 {
 
