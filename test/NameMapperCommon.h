@@ -1,4 +1,5 @@
 #include "Tools/NameMapper.h"
+
 #include <gtest/gtest.h>
 
 #pragma once

@@ -8,7 +8,7 @@ namespace
 
 // cat grbcatalog.dat | egrep -v "^#" | awk -F "|" '{print $14}' | sed "s/,\s*/\n/g" | sed "s/\s*$//g" | sort | uniq | sed "s/^/\ \ \"/g" | sed "s/$/\",/g"
 
-const NameMapper::VectorString NAME_LIST
+const std::vector<std::string> NAME_LIST
 {
   "1974ApJ...188L...1S",
   "1982ApJ...259L..51K",
@@ -352,8 +352,7 @@ ReferenceType::ReferenceType()
   initiate();
 }
 
-const NameMapper::VectorString&
-ReferenceType::getNameList() const
+const std::vector<std::string>& ReferenceType::getNameList() const
 {
   return NAME_LIST;
 }

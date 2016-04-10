@@ -1,5 +1,4 @@
 #include <bitset>
-#include <chrono>
 #include <string>
 #include <vector>
 
@@ -90,8 +89,6 @@ enum ColumnType
   COLUMN_TEST_INTEGER_RANGE,
   COLUMN_TEST_INDEX_LIST,
   COLUMN_TEST_FLOAT,
-  COLUMN_TEST_TIMEPOINT,
-  COLUMN_TEST_COORDINATE,
   COLUMN_TEST_STRING,
   COLUMN_TEST_STRING_LIST,
   // LAST
@@ -106,8 +103,6 @@ enum ValueType
   INTEGER_RANGE,
   INDEX_LIST,
   FLOAT,
-  TIMEPOINT,
-  COORDINATE,
   STRING,
   STRING_LIST,
 
@@ -120,6 +115,7 @@ enum UnitType
   NO_UNIT,
   DEGREE,
   SECOND,
+  MJD,
   KILO_EV,
 
   // LAST
@@ -136,19 +132,16 @@ enum CoordinateSystemType
   COORDINATE_SYSTEM_UNDEFINED
 };
 
-typedef bool Flag;
-typedef std::size_t Integer;
-typedef int Index;
+typedef bool                 Flag;
+typedef std::size_t          Integer;
+typedef int                  Index;
 typedef std::vector<Integer> IntegerRange;
-typedef std::vector<Index> IndexList;
-typedef double Float;
-typedef std::chrono::system_clock::time_point TimePoint;
-typedef double Coordinate;
-typedef std::string String;
-typedef std::vector<std::string> StringList;
+typedef std::vector<Index>   IndexList;
+typedef double               Float;
+typedef std::string          String;
+typedef std::vector<String>  StringList;
 
-typedef std::bitset<COLUMN_TYPE_UNDEFINED> ColumnFlags;
-
-} // namespace type
+typedef std::bitset<type::COLUMN_TYPE_UNDEFINED> ColumnFlags;
+}
 
 }

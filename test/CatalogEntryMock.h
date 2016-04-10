@@ -19,7 +19,6 @@ public:
   type::IntegerRange* getIntegerRange(type::ColumnType column);
   type::IndexList* getIndexList(type::ColumnType column);
   type::Float* getFloat(type::ColumnType column);
-  type::TimePoint* getTimePoint(type::ColumnType column);
   type::String* getString(type::ColumnType column);
   type::StringList* getStringList(type::ColumnType column);
 
@@ -32,8 +31,6 @@ protected:
   type::IntegerRange _integerRange;
   type::IndexList _indexList;
   type::Float _float;
-  type::TimePoint _timepoint;
-  type::Coordinate _coordinate;
   type::String _string;
   type::StringList _stringList;
 

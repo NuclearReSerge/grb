@@ -1,4 +1,5 @@
 #include "test/CatalogEntryMock.h"
+
 #include "test/NameMapperMock.h"
 
 namespace grb
@@ -7,7 +8,8 @@ namespace test
 {
 
 CatalogEntryMock::CatalogEntryMock()
-  : CatalogEntry(type::CATALOG_TEST)
+  : CatalogEntry(type::CATALOG_TEST),
+    _flag(false), _integer(0), _index(0), _float(0.0)
 {
   _mapper = new NameMapperMock;
 }
@@ -89,21 +91,6 @@ CatalogEntryMock::getFloat(type::ColumnType column)
   {
     case type::COLUMN_TEST_FLOAT:
       return &_float;
-    case type::COLUMN_TEST_COORDINATE:
-      return &_coordinate;
-    default:
-      break;
-  }
-  return nullptr;
-}
-
-type::TimePoint*
-CatalogEntryMock::getTimePoint(type::ColumnType column)
-{
-  switch (column)
-  {
-    case type::COLUMN_TEST_TIMEPOINT:
-      return &_timepoint;
     default:
       break;
   }

@@ -1,5 +1,7 @@
 #include "test/DataBaseFormatMock.h"
 
+#include "Data/DataType.h"
+
 namespace grb
 {
 namespace test
@@ -19,8 +21,6 @@ DataBaseFormatMock::initialize() throw(Exception)
   _format.push_back(new DataType(type::COLUMN_TEST_INTEGER_RANGE, false, type::NO_UNIT, type::INTEGER_RANGE));
   _format.push_back(new DataType(type::COLUMN_TEST_INDEX_LIST,    false, type::NO_UNIT, type::INDEX_LIST));
   _format.push_back(new DataType(type::COLUMN_TEST_FLOAT,         false, type::NO_UNIT, type::FLOAT));
-  _format.push_back(new DataType(type::COLUMN_TEST_TIMEPOINT,     false, type::NO_UNIT, type::TIMEPOINT));
-  _format.push_back(new DataType(type::COLUMN_TEST_COORDINATE,    false, type::NO_UNIT, type::COORDINATE));
   _format.push_back(new DataType(type::COLUMN_TEST_STRING,        false, type::NO_UNIT, type::STRING));
   _format.push_back(new DataType(type::COLUMN_TEST_STRING_LIST,   false, type::NO_UNIT, type::STRING_LIST));
 

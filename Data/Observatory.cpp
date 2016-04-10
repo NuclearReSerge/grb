@@ -8,7 +8,7 @@ namespace
 
 // cat grbcatalog.dat | egrep -v "^#" | awk -F "|" '{print $3}' | sed "s/\s*$//g" | sort | uniq | sed "s/^/\ \ \"/g" | sed "s/$/\",/g"
 
-const NameMapper::VectorString NAME_LIST
+const std::vector<std::string> NAME_LIST
 {
   "APEX",
   "BATSE-CGRO",
@@ -61,8 +61,7 @@ ObservatoryType::ObservatoryType()
   initiate();
 }
 
-const NameMapper::VectorString&
-ObservatoryType::getNameList() const
+const std::vector<std::string>& ObservatoryType::getNameList() const
 {
   return NAME_LIST;
 }

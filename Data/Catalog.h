@@ -1,4 +1,4 @@
-#include "Data/CatalogEntry.h"
+#include "Common/Global.h"
 
 #include <vector>
 
@@ -7,36 +7,22 @@
 namespace grb
 {
 
+class CatalogEntry;
+
 class Catalog
 {
 public:
-  Catalog(type::CatalogType type = type::CATALOG_TYPE_UNDEFINED)
-    : _type(type)
-  {
-  }
+  Catalog(type::CatalogType type = type::CATALOG_TYPE_UNDEFINED);
+  virtual ~Catalog();
 
-  ~Catalog()
-  {
-    for(CatalogEntry* entry : _catalog)
-    {
-      delete entry;
-    }
-    _catalog.clear();
-  }
+  type::CatalogType getType() const;
+  bool isEmpty() const;
 
-  type::CatalogType getType()
-  {
-    return _type;
-  }
-
-  std::vector<CatalogEntry*>& get()
-  {
-    return _catalog;
-  }
+  virtual CatalogEntry* createEntry();
+  void addEntry(CatalogEntry* entry);
+  std::vector<CatalogEntry*>& get();
 
 protected:
-
-private:
   type::CatalogType _type;
   std::vector<CatalogEntry*> _catalog;
 };

@@ -1,6 +1,5 @@
-#include "Data/DataBaseFormat.h"
-
 #include "Common/Exception.h"
+#include "Common/Global.h"
 #include "Common/Singleton.h"
 
 #include <map>
@@ -9,6 +8,8 @@
 
 namespace grb
 {
+
+class DataBaseFormat;
 
 class DataBaseFormatFactoryType
 {

@@ -1,4 +1,6 @@
-#include "DataBaseFormatGrbcat.h"
+#include "Data/DataBaseFormatGrbcat.h"
+
+#include "Data/DataType.h"
 
 namespace grb
 {
@@ -22,11 +24,11 @@ DataBaseFormatGrbcat::initialize() throw(Exception)
   _format.push_back(new DataType(type::ID,             true,  type::NO_UNIT, type::INTEGER));
   _format.push_back(new DataType(type::NAME,           true,  type::NO_UNIT, type::STRING));
   _format.push_back(new DataType(type::ALT_NAMES,      false, type::NO_UNIT, type::STRING_LIST));
-  _format.push_back(new DataType(type::TIME,           true,  type::NO_UNIT, type::TIMEPOINT));
+  _format.push_back(new DataType(type::TIME,           true,  type::MJD,     type::FLOAT));
   _format.push_back(new DataType(type::TIME_DEF,       true,  type::NO_UNIT, type::INDEX));
   _format.push_back(new DataType(type::OBSERVATORY,    true,  type::NO_UNIT, type::INDEX));
-  _format.push_back(new DataType(type::COORD_RA,       false, type::DEGREE,  type::COORDINATE));
-  _format.push_back(new DataType(type::COORD_DEC,      false, type::DEGREE,  type::COORDINATE));
+  _format.push_back(new DataType(type::COORD_RA,       false, type::DEGREE,  type::FLOAT));
+  _format.push_back(new DataType(type::COORD_DEC,      false, type::DEGREE,  type::FLOAT));
   _format.push_back(new DataType(type::COORD_FLAG,     true,  type::NO_UNIT, type::FLOAT));
   _format.push_back(new DataType(type::REGION,         false, type::NO_UNIT, type::INDEX));
   _format.push_back(new DataType(type::AFTERGLOW_FLAG, true,  type::NO_UNIT, type::FLAG));

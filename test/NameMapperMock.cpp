@@ -7,7 +7,7 @@ namespace test
 
 namespace
 {
-  const NameMapper::VectorString NAME_LIST
+  const std::vector<std::string> NAME_LIST
   {
     "NAME_LIST_FIRST",
     "NAME_LIST_LAST"
@@ -23,8 +23,7 @@ NameMapperMock::NameMapperMock()
   initiate();
 }
 
-const NameMapper::VectorString&
-NameMapperMock::getNameList() const
+const std::vector<std::string>& NameMapperMock::getNameList() const
 {
   return NAME_LIST;
 }

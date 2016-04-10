@@ -85,8 +85,6 @@ static std::vector<Column> COLUMN_NAMES
   { "column_test_integer_range", "Test column for integer range" },
   { "column_test_index_list", "Test column for index list" },
   { "column_test_float", "Test column for float" },
-  { "column_test_timepoint", "Test column for timepoint" },
-  { "column_test_coordinate", "Test column for coordinate" },
   { "column_test_string", "Test column for string" },
   { "column_test_string_list", "Test column for string list" },
   // LAST
@@ -101,8 +99,6 @@ static std::vector<std::string> VALUE_NAMES
   "integer range",
   "index list",
   "float",
-  "time point",
-  "coordinate",
   "string",
   "string list",
   // LAST
@@ -114,6 +110,7 @@ static std::vector<std::string> UNIT_NAMES
   "",
   "deg",
   "s",
+  "MJD"
   "keV",
   // LAST
   "unknown unit type"

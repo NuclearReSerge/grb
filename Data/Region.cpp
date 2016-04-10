@@ -8,7 +8,7 @@ namespace
 
 // cat grbcatalog.dat | egrep -v "^#" | awk -F "|" '{print $7}' | sed "s/\s*$//g" | sort | uniq | sed "s/^/\ \ \"/g" | sed "s/$/\",/g"
 
-const NameMapper::VectorString NAME_LIST
+const std::vector<std::string> NAME_LIST
 {
   "annulus",
   "annulus_int",
@@ -30,8 +30,7 @@ RegionType::RegionType()
   initiate();
 }
 
-const NameMapper::VectorString&
-RegionType::getNameList() const
+const std::vector<std::string>& RegionType::getNameList() const
 {
   return NAME_LIST;
 }

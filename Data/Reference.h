@@ -12,7 +12,7 @@ protected:
   friend class Singleton<ReferenceType>;
 
   ReferenceType();
-  const VectorString& getNameList() const;
+  const std::vector<std::string>& getNameList() const;
 };
 
 typedef Singleton<ReferenceType> Reference;

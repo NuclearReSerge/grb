@@ -1,7 +1,7 @@
 #include "Data/DataBaseFormatFactory.h"
 
 #include "Common/GlobalName.h"
-#include "DataBaseFormatGrbcat.h"
+#include "Data/DataBaseFormatGrbcat.h"
 
 #include <sstream>
 

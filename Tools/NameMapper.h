@@ -13,8 +13,6 @@ namespace grb
 class NameMapper
 {
 public:
-  typedef std::vector<std::string> VectorString;
-
   NameMapper() = delete;
   NameMapper(const type::ColumnType columnType, const std::string& description);
   virtual ~NameMapper();
@@ -26,7 +24,7 @@ public:
   const std::string& getDescription() const;
 
 protected:
-  virtual const VectorString& getNameList() const = 0;
+  virtual const std::vector<std::string>& getNameList() const = 0;
   void initiate();
 
   std::map<std::string, type::Index> _map;

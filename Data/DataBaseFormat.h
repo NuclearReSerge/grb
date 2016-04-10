@@ -1,10 +1,14 @@
 #include "Common/Exception.h"
-#include "Data/DataType.h"
+#include "Common/Global.h"
+
+#include <vector>
 
 #pragma once
 
 namespace grb
 {
+
+class DataType;
 
 class DataBaseFormat
 {
@@ -24,9 +28,9 @@ protected:
   void setupRequiredColumns();
 
   type::CoordinateSystemType _coordSys;
-  std::vector<DataType*> _format;
   const type::DatabaseTableType _type;
   type::ColumnFlags _requiredFlags;
+  std::vector<DataType*> _format;
 };
 
 }

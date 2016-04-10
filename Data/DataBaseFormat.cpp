@@ -1,7 +1,7 @@
 #include "Data/DataBaseFormat.h"
 
-#include "Common/Global.h"
 #include "Common/GlobalName.h"
+#include "Data/DataType.h"
 
 #include <sstream>
 

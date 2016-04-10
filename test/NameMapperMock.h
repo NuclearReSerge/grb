@@ -13,7 +13,7 @@ public:
   NameMapperMock();
 
 protected:
-  const NameMapper::VectorString& getNameList() const;
+  const std::vector<std::string>& getNameList() const;
 };
 
 }

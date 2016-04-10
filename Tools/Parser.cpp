@@ -1,14 +1,12 @@
 #include "Tools/Parser.h"
 
-#include "Common/Global.h"
 #include "Common/GlobalName.h"
+#include "Data/Catalog.h"
 #include "Data/CatalogEntry.h"
-#include "Data/CatalogEntryFactory.h"
 #include "Data/DataBaseFormat.h"
+#include "Data/DataType.h"
+#include "Tools/NameMapper.h"
 
-#include "Common/trace.h"
-
-#include <iostream>
 #include <sstream>
 #include <fstream>
 
@@ -24,28 +22,19 @@ const char  DELIM_LIST   = ',';
 const char  DELIM_RANGE  = '-';
 }
 
-
-Parser::Parser()
+Parser::Parser(const std::string& filename, const DataBaseFormat& format, Catalog& catalog)
   : _isSourceFile(false), _stream(nullptr), _row(0), _column(0),
-    _columnType(type::COLUMN_TYPE_UNDEFINED), _format(nullptr), _catalog(nullptr)
+    _columnType(type::COLUMN_TYPE_UNDEFINED), _format(format),
+    _columnsRequired(_format.getRequiredColumns()), _catalog(catalog)
 {
-}
-
-Parser::Parser(const std::string& filename, const DataBaseFormat* format, Catalog* catalog)
-  : Parser()
-{
-  _format = format;
-  _catalog = catalog;
   openFileStream(filename);
 }
 
-Parser::Parser(std::istream* stream, const DataBaseFormat* format, Catalog* catalog)
-  : Parser()
+Parser::Parser(std::istream* stream, const DataBaseFormat& format, Catalog& catalog)
+  : _isSourceFile(false), _stream(stream), _row(0), _column(0),
+    _columnType(type::COLUMN_TYPE_UNDEFINED), _format(format),
+    _columnsRequired(_format.getRequiredColumns()), _catalog(catalog)
 {
-  _stream = stream;
-  _format = format;
-  _catalog = catalog;
-
   if (!_stream)
   {
     Exception exc("Parsing failed, stream is nullptr", PRETTY_FUNCTION);
@@ -81,21 +70,19 @@ Parser::openFileStream(const std::string& filename)
 std::size_t
 Parser::parse() throw(Exception)
 {
-  const type::ColumnFlags& columnFlagsRequired = _format->getRequiredColumns();
-
   _row = 0;
   for (std::string line; std::getline(*_stream, line);)
   {
-    if (line[0] == COMMENT)
+    if (line.empty() || line[0] == COMMENT)
       continue;
 
-    CatalogEntry* entry = CatalogEntryFactory::instance()->create(_catalog->getType());
+    CatalogEntry* entry = _catalog.createEntry();
     type::ColumnFlags columnFlags;
     std::stringstream ss(line);
     _column = 0;
     for (std::string element; std::getline(ss, element, DELIM_COLUMN);)
     {
-      _columnType = _format->getColumnFormat(_column).getColumnType();
+      _columnType = _format.getColumnFormat(_column).getColumnType();
 
       element.erase(0, element.find_first_not_of(WHITESPACE));
       element.erase(element.find_last_not_of(WHITESPACE) + 1);
@@ -106,7 +93,7 @@ Parser::parse() throw(Exception)
       catch (Exception& exc)
       {
         columnFlags.set(_columnType, false);
-        if (columnFlagsRequired.test(_columnType))
+        if (_columnsRequired.test(_columnType))
         {
           delete entry;
           throw;
@@ -115,8 +102,7 @@ Parser::parse() throw(Exception)
       ++_column;
     }
 
-    columnFlags = (columnFlags & columnFlagsRequired) ^ columnFlagsRequired;
-    if (columnFlags.any())
+    if (checkRequiredColumns(columnFlags))
     {
       delete entry;
 
@@ -131,11 +117,11 @@ Parser::parse() throw(Exception)
       Exception exc(ss.str(), PRETTY_FUNCTION);
       throw exc;
     }
-    _catalog->get().push_back(entry);
+    _catalog.addEntry(entry);
     ++_row;
   }
 
-  if (_row == 0 || _catalog->get().empty())
+  if (_row == 0 || _catalog.isEmpty())
   {
     Exception exc("Parsing failed, stream is empty", PRETTY_FUNCTION);
     throw exc;
@@ -144,9 +130,16 @@ Parser::parse() throw(Exception)
 }
 
 bool
+Parser::checkRequiredColumns(type::ColumnFlags& columnFlags)
+{
+  columnFlags = (columnFlags & _columnsRequired) ^ _columnsRequired;
+  return columnFlags.any();
+}
+
+bool
 Parser::parseMapper(const std::string& raw, CatalogEntry* entry)
 {
-  type::ValueType valueType = _format->getColumnFormat(_column).getValueType();
+  type::ValueType valueType = _format.getColumnFormat(_column).getValueType();
 
   switch (valueType)
   {
@@ -161,10 +154,6 @@ Parser::parseMapper(const std::string& raw, CatalogEntry* entry)
     case type::INDEX_LIST:
       return parseValue(raw, entry->getMapper(_columnType), entry->getIndexList(_columnType));
     case type::FLOAT:
-      return parseValue(raw, entry->getFloat(_columnType));
-    case type::TIMEPOINT:
-      return parseValue(raw, entry->getTimePoint(_columnType));
-    case type::COORDINATE:
       return parseValue(raw, entry->getFloat(_columnType));
     case type::STRING:
       return parseValue(raw, entry->getString(_columnType));
@@ -339,22 +328,6 @@ Parser::parseValue(const std::string& raw, type::Float* value)
 }
 
 bool
-Parser::parseValue(const std::string& raw, type::TimePoint* value)
-{
-  if (!value)
-    throwException(type::TIMEPOINT);
-
-
-  if (raw.empty())
-  {
-    return false;
-  }
-
-  *value = std::chrono::system_clock::now();
-  return true;
-}
-
-bool
 Parser::parseValue(const std::string& raw, type::String* value)
 {
   if (!value)
@@ -373,6 +346,8 @@ Parser::parseValue(const std::string& raw, type::StringList* valueList)
   std::stringstream ss(raw);
   for (std::string item; std::getline(ss, item, DELIM_LIST);)
   {
+    if (item.empty())
+      return false;
     valueList->push_back(item);
   }
 

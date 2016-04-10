@@ -8,7 +8,7 @@ namespace
 
 // cat grbcatalog.dat | egrep -v "^#" | awk -F "|" '{print $13}' | sed "s/\s*$//g" | sed "s/-/\ /g" | sed "s/\.$//g" | sed "s/r\ T/r\ t/g" | sed "s/t\ S/t\ s/g" |sort | uniq | sed "s/^/\ \ \"/g"| sed "s/$/\",/g"
 
-const NameMapper::VectorString NAME_LIST
+const std::vector<std::string> NAME_LIST
 {
   "BAT trigger",
   "Earth Crossing Time",
@@ -30,8 +30,7 @@ TimeDefType::TimeDefType()
   initiate();
 }
 
-const NameMapper::VectorString&
-TimeDefType::getNameList() const
+const std::vector<std::string>& TimeDefType::getNameList() const
 {
   return NAME_LIST;
 }

@@ -8,31 +8,14 @@ namespace grb
 class DataType
 {
 public:
-  DataType()
-    : _columnType(type::COLUMN_TYPE_UNDEFINED), _isRequired(false),
-      _unitType(type::UNIT_TYPE_UNDEFINED), _valueType(type::VALUE_TYPE_UNDEFINED)
-  { }
+  DataType();
   DataType(type::ColumnType columnType, bool isRequired, type::UnitType unitType,
-           type::ValueType valueType)
-    : _columnType(columnType), _isRequired(isRequired), _unitType(unitType), _valueType(valueType)
-  { }
+           type::ValueType valueType);
 
-  type::ColumnType getColumnType() const
-  {
-    return _columnType;
-  }
-  bool isColumnRequired() const
-  {
-    return _isRequired;
-  }
-  type::UnitType getUnitType() const
-  {
-    return _unitType;
-  }
-  type::ValueType getValueType() const
-  {
-    return _valueType;
-  }
+  type::ColumnType getColumnType() const;
+  bool isColumnRequired() const;
+  type::UnitType getUnitType() const;
+  type::ValueType getValueType() const;
 
 private:
   const type::ColumnType _columnType;
