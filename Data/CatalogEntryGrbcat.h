@@ -30,6 +30,7 @@ public:
   const type::String& getLocalNotes() const { return _local_notes; }
   const type::Integer& getClassId() const { return _class_id; }
 
+protected:
   type::Flag* getFlag(type::ColumnType column);
   type::Integer* getInteger(type::ColumnType column);
   type::Index* getIndex(type::ColumnType column);
@@ -38,12 +39,10 @@ public:
   type::Float* getFloat(type::ColumnType column);
   type::String* getString(type::ColumnType column);
   type::StringList* getStringList(type::ColumnType column);
-
   NameMapper* getMapper(type::ColumnType column);
-
   bool isValid();
 
-protected:
+private:
   type::Integer _record_number;
   type::Integer _id;
   type::String _name;

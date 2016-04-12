@@ -41,7 +41,7 @@ DataBaseFormatFactoryType::getFormat(const type::DatabaseTableType dbType) throw
 void
 DataBaseFormatFactoryType::initialize()
 {
-  _formatMap.insert({type::HEASARC_GRBCAT, new DataBaseFormatGrbcat(type::HEASARC_GRBCAT)});
+  _formatMap.insert({type::HEASARC_GRBCAT, new DataBaseFormatGrbcat});
 
   for (const auto& format : _formatMap)
   {

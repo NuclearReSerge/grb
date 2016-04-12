@@ -16,6 +16,8 @@ public:
 
   type::CatalogType getType() const;
 
+protected:
+  friend class Parser;
   virtual type::Flag* getFlag(type::ColumnType column) = 0;
   virtual type::Integer* getInteger(type::ColumnType column) = 0;
   virtual type::Index* getIndex(type::ColumnType column) = 0;
@@ -24,9 +26,7 @@ public:
   virtual type::Float* getFloat(type::ColumnType column) = 0;
   virtual type::String* getString(type::ColumnType column) = 0;
   virtual type::StringList* getStringList(type::ColumnType column) = 0;
-
   virtual NameMapper* getMapper(type::ColumnType column) = 0;
-
   virtual bool isValid() = 0;
 
 private:

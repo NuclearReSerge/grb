@@ -9,10 +9,14 @@ namespace grb
 class DataBaseFormatGrbcat : public DataBaseFormat
 {
 public:
-  DataBaseFormatGrbcat() = delete;
-  DataBaseFormatGrbcat(const type::DatabaseTableType dbType);
+  DataBaseFormatGrbcat();
+  type::CoordinateSystemType getCoordinateSystem() const;
 
-  void initialize() throw(Exception);
+protected:
+  void initialize();
+
+private:
+  type::CoordinateSystemType _coordSys;
 };
 
 }

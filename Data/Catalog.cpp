@@ -1,5 +1,6 @@
 #include "Data/Catalog.h"
 
+#include "Common/Exception.h"
 #include "Common/GlobalName.h"
 #include "Data/CatalogEntry.h"
 #include "Data/CatalogEntryFactory.h"
@@ -30,15 +31,44 @@ Catalog::getType() const
 }
 
 bool
-Catalog::isEmpty() const
+Catalog::empty() const
 {
   return _catalog.empty();
 }
 
 std::size_t
-Catalog::getSize() const
+Catalog::size() const
 {
   return _catalog.size();
+}
+
+std::vector<CatalogEntry*>::const_iterator
+Catalog::begin() const
+{
+    return _catalog.begin();
+}
+
+std::vector<CatalogEntry*>::const_iterator
+Catalog::end() const
+{
+    return _catalog.end();
+}
+
+const CatalogEntry&
+Catalog::operator[](std::size_t index) const
+{
+  try
+  {
+    return *_catalog[index];
+  }
+  catch (std::out_of_range& sysExc)
+  {
+    std::stringstream ss;
+    ss << "Catalog of type=" << _type << " [" << GlobalName::getCatalog(_type)
+       << "] does not have an entry index=" << index << ", sysExc.what()\n" << sysExc.what();
+    Exception exc(type::EXCEPTION_WARNING, ss.str(), PRETTY_FUNCTION);
+    throw exc;
+  }
 }
 
 CatalogEntry*
@@ -52,19 +82,6 @@ Catalog::addEntry(CatalogEntry* entry)
 {
   if (entry)
     _catalog.push_back(entry);
-}
-
-const CatalogEntry&
-Catalog::getEntry(std::size_t index) const throw(Exception)
-{
-  if (index < _catalog.size())
-    return *_catalog[index];
-
-  std::stringstream ss;
-  ss << "Catalog of type=" << _type << "[" << GlobalName::getCatalog(_type)
-     << "] does not have an entry of index=" << index;
-  Exception exc(type::EXCEPTION_WARNING, ss.str(), PRETTY_FUNCTION);
-  throw exc;
 }
 
 }

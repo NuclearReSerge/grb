@@ -40,11 +40,12 @@ NameMapper::getIndex(const std::string& name) const  throw(Exception)
   {
     return _map.at(name);
   }
-  catch (std::out_of_range& sysExc)
+  catch (std::exception& stdExc)
   {
     std::stringstream ss;
-    ss << "NameMapper did not find index for name=" << name << " in column type=" << _columnType
-       << " [" << GlobalName::getColumn(_columnType) << "], exc.what()=" << sysExc.what();
+    ss << "NameMapper type=" << _columnType << " [" << GlobalName::getColumn(_columnType)
+       << "]. Index for key name=" << name << " not found.";
+    ss << std::endl << "std::exception.what()=" << stdExc.what() << ".";
     Exception exc(type::EXCEPTION_WARNING, ss.str(), PRETTY_FUNCTION);
     throw exc;
   }
@@ -59,8 +60,8 @@ NameMapper::getName(const type::Index& index) const  throw(Exception)
   if (iter == _map.end())
   {
     std::stringstream ss;
-    ss << "NameMapper did not find name for index=" << index << " in column type=" << _columnType
-       << " [" << GlobalName::getColumn(_columnType) << "]";
+    ss << "NameMapper type=" << _columnType << " [" << GlobalName::getColumn(_columnType)
+       << "]. Name for key index=" << index << " not found.";
     Exception exc(type::EXCEPTION_WARNING, ss.str(), PRETTY_FUNCTION);
     throw exc;
   }

@@ -12,6 +12,7 @@ class CatalogMock : public Catalog
 public:
   CatalogMock();
 
+protected:
   CatalogEntry* createEntry();
 };
 

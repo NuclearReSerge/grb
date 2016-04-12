@@ -127,14 +127,10 @@ TEST_F(ParserFileTest, file_Grbcat)
     std::cout << exc.what() << std::endl;
   }
   ASSERT_EQ(2, rows);
-  ASSERT_EQ(2, catalog.getSize());
-  checkRecordGRBCAT_1(static_cast<const CatalogEntryGRBCAT&>(catalog.getEntry(0)));
-  checkRecordGRBCAT_10119(static_cast<const CatalogEntryGRBCAT&>(catalog.getEntry(1)));
+  ASSERT_EQ(2, catalog.size());
+  checkRecordGRBCAT_1(static_cast<const CatalogEntryGRBCAT&>(catalog[0]));
+  checkRecordGRBCAT_10119(static_cast<const CatalogEntryGRBCAT&>(catalog[1]));
 }
 
 }
 }
-
-
-//
-

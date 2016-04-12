@@ -20,9 +20,9 @@ public:
   const type::IndexList& getIndexList() const { return _indexList; }
   const type::Float& getFloat() const { return _float; }
   const type::String& getString() const { return _string; }
-  const type::StringList& getStringList() const { return _stringList; };
+  const type::StringList& getStringList() const { return _stringList; }
 
-
+protected:
   type::Flag* getFlag(type::ColumnType column);
   type::Integer* getInteger(type::ColumnType column);
   type::Index* getIndex(type::ColumnType column);
@@ -31,12 +31,10 @@ public:
   type::Float* getFloat(type::ColumnType column);
   type::String* getString(type::ColumnType column);
   type::StringList* getStringList(type::ColumnType column);
-
   NameMapper* getMapper(type::ColumnType column);
-
   bool isValid();
 
-protected:
+private:
   type::Flag _flag;
   type::Integer _integer;
   type::Index _index;
@@ -45,7 +43,6 @@ protected:
   type::Float _float;
   type::String _string;
   type::StringList _stringList;
-
   NameMapper* _mapper;
 };
 

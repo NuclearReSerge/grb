@@ -3,6 +3,6 @@
 #pragma once
 
 #define TRACE(_MSG_)\
-  std::cout << __PRETTY_FUNCTION__ << " " << _MSG_ << std::endl;
+  std::cout << " " << _MSG_ << std::endl;
 
-
+//__PRETTY_FUNCTION__ <<

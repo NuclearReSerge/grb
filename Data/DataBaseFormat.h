@@ -1,4 +1,3 @@
-#include "Common/Exception.h"
 #include "Common/Global.h"
 
 #include <vector>
@@ -17,17 +16,23 @@ public:
   DataBaseFormat(const type::DatabaseTableType dbType);
   virtual ~DataBaseFormat();
 
-  virtual void initialize() throw(Exception);
   type::DatabaseTableType getType() const;
-  type::CoordinateSystemType getCoordinateSystem() const;
-  std::size_t getSize() const;
   const type::ColumnFlags& getRequiredColumns() const;
-  const DataType& getColumnFormat(const std::size_t column) const throw(Exception);
+
+  bool empty() const;
+  std::size_t size() const;
+  std::vector<DataType*>::const_iterator begin() const;
+  std::vector<DataType*>::const_iterator end() const;
+  const DataType& operator[](std::size_t index) const;
 
 protected:
-  void setupRequiredColumns();
+  friend class DataBaseFormatFactoryType;
+  virtual void initialize() = 0;
+  void addDataType(DataType* dataType);
+  void setColumnFlag(std::size_t column, bool required = true);
+  void setColumnFlags();
 
-  type::CoordinateSystemType _coordSys;
+private:
   const type::DatabaseTableType _type;
   type::ColumnFlags _requiredFlags;
   std::vector<DataType*> _format;

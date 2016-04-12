@@ -37,7 +37,7 @@ Parser::Parser(std::istream* stream, const DataBaseFormat& format, Catalog& cata
 {
   if (!_stream)
   {
-    Exception exc(type::EXCEPTION_CRITICAL, "Parsing failed, stream is nullptr", PRETTY_FUNCTION);
+    Exception exc(type::EXCEPTION_CRITICAL, "Parsing failed. Stream is nullptr.", PRETTY_FUNCTION);
     throw exc;
   }
 }
@@ -55,13 +55,14 @@ void
 Parser::openFileStream(const std::string& filename)
 {
   _stream = new std::ifstream(filename);
+
   if(_stream->fail())
   {
-    std::stringstream ss;
-    ss << "Parsing failed, unable to open file=" << filename;
-    Exception exc(type::EXCEPTION_CRITICAL, ss.str(), PRETTY_FUNCTION);
     delete _stream;
-    _stream = nullptr;
+
+    std::stringstream ss;
+    ss << "Parsing failed. Unable to open file=" << filename << ".";
+    Exception exc(type::EXCEPTION_CRITICAL, ss.str(), PRETTY_FUNCTION);
     throw exc;
   }
   _isSourceFile = true;
@@ -71,10 +72,12 @@ std::size_t
 Parser::parse() throw(Exception)
 {
   _row = 0;
+
   for (std::string line; std::getline(*_stream, line);)
   {
     if (line.empty() || line[0] == COMMENT)
       continue;
+
     CatalogEntry* entry = _catalog.createEntry();
     try
     {
@@ -85,39 +88,56 @@ Parser::parse() throw(Exception)
       delete entry;
       throw;
     }
+
     _catalog.addEntry(entry);
     ++_row;
   }
-  if (_row == 0 || _catalog.isEmpty())
+
+  if (_row == 0 || _catalog.empty())
   {
-    Exception exc(type::EXCEPTION_CRITICAL,
-                  "Parsing failed, stream or Catalog is empty",
+    Exception exc(type::EXCEPTION_WARNING, "Parsing failed. Stream or Catalog is empty.",
                   PRETTY_FUNCTION);
     throw exc;
   }
+
   return _row;
 }
 
 void
-Parser::parseLine(std::string& line, CatalogEntry* entry)
+Parser::parseLine(const std::string& line, CatalogEntry* entry)
 {
   type::ColumnFlags columnFlags;
   std::stringstream ss(line);
   _column = 0;
+
   for (std::string element; std::getline(ss, element, DELIM_COLUMN);)
   {
-    _columnType = _format.getColumnFormat(_column).getColumnType();
     element.erase(0, element.find_first_not_of(WHITESPACE));
     element.erase(element.find_last_not_of(WHITESPACE) + 1);
+
+    bool result = false;
     try
     {
-      columnFlags.set(_columnType, parseMapper(element, entry));
+      _columnType = _format[_column].getColumnType();
+      result = parseMapper(element, entry);
     }
-    catch (Exception& exc)
+    catch (Exception& grbExc)
     {
-      if (_columnsRequired.test(_columnType))
+      if (grbExc.getLevel() == type::EXCEPTION_CRITICAL)
+      {
+        std::stringstream ss;
+        ss << std::endl << grbExc.what();
+        Exception exc(type::EXCEPTION_CRITICAL,
+                      getExceptionString(ss.str()),
+                      PRETTY_FUNCTION);
+        throw exc;
+      }
+      if(_columnsRequired.test(_columnType))
+      {
         throw;
+      }
     }
+    columnFlags.set(_columnType, result);
     ++_column;
   }
 
@@ -126,52 +146,57 @@ Parser::parseLine(std::string& line, CatalogEntry* entry)
   if (!entry->isValid())
   {
     std::stringstream ss;
-    ss << "Parsing failed at row=" << _row+1 << " data not valid.";
+    ss << "Parsing failed row=" << _row+1 << ". Data not valid.";
     Exception exc(type::EXCEPTION_WARNING, ss.str(), PRETTY_FUNCTION);
     throw exc;
   }
 }
 
 void
-Parser::checkColumns(type::ColumnFlags& columnFlags)
+Parser::checkColumns(const type::ColumnFlags& columnFlags)
 {
-  const bool allReqired = ((columnFlags & _columnsRequired) ^ _columnsRequired).none();
-  const bool allProcessed = _column == _format.getSize();
+  const bool allRequired = ((columnFlags & _columnsRequired) ^ _columnsRequired).none();
+  const bool allProcessed = _column == _format.size();
 
-  if (!allProcessed || !allReqired)
+  if (allProcessed && allRequired)
+    return;
+
+  std::stringstream ss;
+  ss << "Parsing failed row=" << _row+1 << ". Columns of type={";
+
+  if (!allProcessed)
   {
-    std::stringstream ss;
-    ss << "Parsing failed at row=" << _row+1 << " columns={";
-    if (!allProcessed)
+    std::size_t i = 0;
+    for (const DataType* dataType : _format)
     {
-      for (std::size_t i = _column; i < _format.getSize(); ++i)
-      {
-        _columnType = _format.getColumnFormat(i).getColumnType();
-        ss << i << " [" << GlobalName::getColumn(_columnType) << "] ";
-      }
-      ss << " } not processed.";
+      if (i++ < _column)
+        continue;
+
+      ss << i << " [" << GlobalName::getColumn(dataType->getColumnType()) << "] ";
     }
-    else
-    {
-      for (std::size_t i = 0; i < _format.getSize(); ++i)
-      {
-        _columnType = _format.getColumnFormat(i).getColumnType();
-        if (columnFlags[_columnType])
-          ss << i << " [" << GlobalName::getColumn(_columnType) << "] ";
-      }
-      ss << "} require valid values.";
-    }
-    Exception exc(type::EXCEPTION_WARNING, ss.str(), PRETTY_FUNCTION);
-    throw exc;
+    ss << "} not processed.";
   }
+  else
+  {
+    std::size_t i = 0;
+    for (const DataType* dataType : _format)
+    {
+      if (!columnFlags[dataType->getColumnType()])
+        ss << i << " [" << GlobalName::getColumn(dataType->getColumnType()) << "] ";
+      ++i;
+    }
+    ss << "} require valid values.";
+  }
+  Exception exc(type::EXCEPTION_WARNING, ss.str(), PRETTY_FUNCTION);
+  throw exc;
 }
 
 bool
 Parser::parseMapper(const std::string& raw, CatalogEntry* entry)
 {
-  type::ValueType valueType = _format.getColumnFormat(_column).getValueType();
+  _valueType = _format[_column].getValueType();
 
-  switch (valueType)
+  switch (_valueType)
   {
     case type::FLAG:
       return parseValue(raw, entry->getFlag(_columnType));
@@ -192,12 +217,9 @@ Parser::parseMapper(const std::string& raw, CatalogEntry* entry)
     default:
       break;
   }
-
-  std::stringstream ss;
-  ss << "Parsing failed at row=" << _row+1 << ", column="<< _column+1
-     << " [" << GlobalName::getColumn(_columnType) << "] value type="
-     << valueType << " [" << GlobalName::getValue(valueType) << "] is not supported.";
-  Exception exc(type::EXCEPTION_WARNING, ss.str(), PRETTY_FUNCTION);
+  Exception exc(type::EXCEPTION_WARNING,
+                getExceptionString("Value type is not supported."),
+                PRETTY_FUNCTION);
   throw exc;
 }
 
@@ -205,7 +227,12 @@ bool
 Parser::parseValue(const std::string& raw, type::Flag* value)
 { 
   if (!value)
-    throwException(type::FLAG);
+  {
+    Exception exc(type::EXCEPTION_WARNING,
+                  getExceptionString("Column-Value mapping failed."),
+                  PRETTY_FUNCTION);
+    throw exc;
+  }
 
   switch (raw[0])
   {
@@ -222,10 +249,10 @@ Parser::parseValue(const std::string& raw, type::Flag* value)
     default:
       break;
   }
+
   std::stringstream ss;
-  ss << "Parsing failed at row:column=" << _row+1 << ":" << _column+1
-     << " [" << GlobalName::getColumn(_columnType) << "] for bool=" << raw;
-  Exception exc(type::EXCEPTION_WARNING, ss.str(), PRETTY_FUNCTION);
+  ss << "Raw string=" << raw << ".";
+  Exception exc(type::EXCEPTION_WARNING, getExceptionString(ss.str()), PRETTY_FUNCTION);
   throw exc;
 }
 
@@ -233,7 +260,12 @@ bool
 Parser::parseValue(const std::string& raw, type::Integer* value)
 {
   if (!value)
-    throwException(type::INTEGER);
+  {
+    Exception exc(type::EXCEPTION_WARNING,
+                  getExceptionString("Column-Value mapping failed."),
+                  PRETTY_FUNCTION);
+    throw exc;
+  }
 
   try
   {
@@ -244,13 +276,12 @@ Parser::parseValue(const std::string& raw, type::Integer* value)
     }
     *value = (std::size_t) res;
   }
-  catch (std::exception& sysExc)
+  catch (std::exception& stdExc)
   {
     std::stringstream ss;
-    ss << "Parsing failed at row:column=" << _row+1 << ":" << _column+1
-       << " [" << GlobalName::getColumn(_columnType) << "] for int=" << raw
-       << ", exc.what()=" << sysExc.what();
-    Exception exc(type::EXCEPTION_WARNING, ss.str(), PRETTY_FUNCTION);
+    ss << "Raw string=" << raw << ".";
+    ss << std::endl << "std::exception.what()=" << stdExc.what() << ".";
+    Exception exc(type::EXCEPTION_WARNING, getExceptionString(ss.str()), PRETTY_FUNCTION);
     throw exc;
   }
   return true;
@@ -260,7 +291,13 @@ bool
 Parser::parseValue(const std::string& raw, const NameMapper* mapper, type::Index* value)
 {
   if (!mapper || !value)
-    throwException(type::INDEX);
+  {
+    Exception exc(type::EXCEPTION_WARNING,
+                  getExceptionString(!value ? "Column-Value mapping failed." :
+                                              "NameMapper not found."),
+                  PRETTY_FUNCTION);
+    throw exc;
+  }
 
   try
   {
@@ -269,11 +306,9 @@ Parser::parseValue(const std::string& raw, const NameMapper* mapper, type::Index
   catch (Exception& mapExc)
   {
     std::stringstream ss;
-    ss << "Parsing failed at row:column=" << _row+1 << ":" << _column+1
-       << " [" << GlobalName::getColumn(_columnType) << "] for string=" << raw << " and mapper="
-       << mapper->getColumnType() << " [" << GlobalName::getColumn(mapper->getColumnType())
-       << "], mapperExc.what()\n" << mapExc.what();
-    Exception exc(type::EXCEPTION_WARNING, ss.str(), PRETTY_FUNCTION);
+    ss << "Raw string=" << raw << ".";
+    ss << std::endl << mapExc.what();
+    Exception exc(type::EXCEPTION_WARNING, getExceptionString(ss.str()), PRETTY_FUNCTION);
     throw exc;
   }
   return true;
@@ -283,7 +318,12 @@ bool
 Parser::parseValue(const std::string& raw, type::IntegerRange* value)
 {
   if (!value)
-    throwException(type::INTEGER_RANGE);
+  {
+    Exception exc(type::EXCEPTION_WARNING,
+                  getExceptionString("Column-Value mapping failed."),
+                  PRETTY_FUNCTION);
+    throw exc;
+  }
 
   std::stringstream ss(raw);
   for (std::string item; std::getline(ss, item, DELIM_RANGE);)
@@ -298,9 +338,8 @@ Parser::parseValue(const std::string& raw, type::IntegerRange* value)
   if (value->size() != 2)
   {
     std::stringstream ss;
-    ss << "Parsing failed at row:column=" << _row+1 << ":" << _column+1
-       << " [" << GlobalName::getColumn(_columnType) << "] for int[2]=" << raw;
-    Exception exc(type::EXCEPTION_WARNING, ss.str(), PRETTY_FUNCTION);
+    ss << "Raw string=" << raw << ".";
+    Exception exc(type::EXCEPTION_WARNING, getExceptionString(ss.str()), PRETTY_FUNCTION);
     throw exc;
   }
   return true;
@@ -310,7 +349,13 @@ bool
 Parser::parseValue(const std::string& raw, const NameMapper* mapper, type::IndexList* valueList)
 {
   if (!valueList)
-    throwException(type::INDEX_LIST);
+  {
+    Exception exc(type::EXCEPTION_WARNING,
+                  getExceptionString(!valueList ? "Column-Value mapping failed." :
+                                                  "NameMapper not found."),
+                  PRETTY_FUNCTION);
+    throw exc;
+  }
 
   std::stringstream ss(raw);
   for (std::string item; std::getline(ss, item, DELIM_LIST);)
@@ -326,10 +371,8 @@ Parser::parseValue(const std::string& raw, const NameMapper* mapper, type::Index
   if (valueList->empty())
   {
     std::stringstream ss;
-    ss << "Parsing failed at row:column=" << _row+1 << ":" << _column+1
-       << " [" << GlobalName::getColumn(_columnType) << "] for index_list=" << raw
-       << " is empty";
-    Exception exc(type::EXCEPTION_WARNING, ss.str(), PRETTY_FUNCTION);
+    ss << "Raw string=" << raw << ".";
+    Exception exc(type::EXCEPTION_WARNING, getExceptionString(ss.str()), PRETTY_FUNCTION);
     throw exc;
   }
   return true;
@@ -339,19 +382,23 @@ bool
 Parser::parseValue(const std::string& raw, type::Float* value)
 {
   if (!value)
-    throwException(type::FLOAT);
+  {
+    Exception exc(type::EXCEPTION_WARNING,
+                  getExceptionString("Column-Value mapping failed."),
+                  PRETTY_FUNCTION);
+    throw exc;
+  }
 
   try
   {
     *value = std::stod(raw);
   }
-  catch (std::exception& sysExc)
+  catch (std::exception& stdExc)
   {
     std::stringstream ss;
-    ss << "Parsing failed at row:column=" << _row+1 << ":" << _column+1
-       << " [" << GlobalName::getColumn(_columnType) << "] for double=" << raw
-       << ", exc.what()=" << sysExc.what();
-    Exception exc(type::EXCEPTION_WARNING, ss.str(), PRETTY_FUNCTION);
+    ss << "Raw string=" << raw << ".";
+    ss << std::endl << "std::exception.what()=" << stdExc.what() << ".";
+    Exception exc(type::EXCEPTION_WARNING, getExceptionString(ss.str()), PRETTY_FUNCTION);
     throw exc;
   }
   return true;
@@ -361,7 +408,12 @@ bool
 Parser::parseValue(const std::string& raw, type::String* value)
 {
   if (!value)
-    throwException(type::STRING);
+  {
+    Exception exc(type::EXCEPTION_WARNING,
+                  getExceptionString("Column-Value mapping failed."),
+                  PRETTY_FUNCTION);
+    throw exc;
+  }
 
   *value = raw;
   return !value->empty();
@@ -371,7 +423,12 @@ bool
 Parser::parseValue(const std::string& raw, type::StringList* valueList)
 {
   if (!valueList)
-    throwException(type::STRING_LIST);
+  {
+    Exception exc(type::EXCEPTION_WARNING,
+                  getExceptionString("Column-Value mapping failed."),
+                  PRETTY_FUNCTION);
+    throw exc;
+  }
 
   std::stringstream ss(raw);
   for (std::string item; std::getline(ss, item, DELIM_LIST);)
@@ -384,15 +441,15 @@ Parser::parseValue(const std::string& raw, type::StringList* valueList)
   return !valueList->empty();
 }
 
-void
-Parser::throwException(type::ValueType valueType)
+std::string
+Parser::getExceptionString(std::string cause)
 {
   std::stringstream ss;
-  ss << "Parsing failed at row=" << _row+1 << ", column="<< _column+1
-     << " [" << GlobalName::getColumn(_columnType) << "] value type="
-     << valueType << " [" << GlobalName::getValue(valueType) << "] does not match the column.";
-  Exception exc(type::EXCEPTION_WARNING, ss.str(), PRETTY_FUNCTION);
-  throw exc;
+  ss << "Parsing failed row=" << _row+1 << ", column=" << _column+1
+     << ", column type=" << _columnType << " [" << GlobalName::getColumn(_columnType)
+     << "], value type=" << _valueType << " [" << GlobalName::getValue(_valueType)
+     << "]. " << cause;
+  return ss.str();
 }
 
 }

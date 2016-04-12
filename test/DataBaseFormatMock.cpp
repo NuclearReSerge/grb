@@ -13,36 +13,24 @@ DataBaseFormatMock::DataBaseFormatMock()
 }
 
 void
-DataBaseFormatMock::initialize() throw(Exception)
+DataBaseFormatMock::initialize()
 {
-  _format.push_back(new DataType(type::COLUMN_TEST_FLAG,          false, type::NO_UNIT, type::FLAG));
-  _format.push_back(new DataType(type::COLUMN_TEST_INTEGER,       false, type::NO_UNIT, type::INTEGER));
-  _format.push_back(new DataType(type::COLUMN_TEST_INDEX,         false, type::NO_UNIT, type::INDEX));
-  _format.push_back(new DataType(type::COLUMN_TEST_INTEGER_RANGE, false, type::NO_UNIT, type::INTEGER_RANGE));
-  _format.push_back(new DataType(type::COLUMN_TEST_INDEX_LIST,    false, type::NO_UNIT, type::INDEX_LIST));
-  _format.push_back(new DataType(type::COLUMN_TEST_FLOAT,         false, type::NO_UNIT, type::FLOAT));
-  _format.push_back(new DataType(type::COLUMN_TEST_STRING,        false, type::NO_UNIT, type::STRING));
-  _format.push_back(new DataType(type::COLUMN_TEST_STRING_LIST,   false, type::NO_UNIT, type::STRING_LIST));
+  addDataType(new DataType(type::COLUMN_TEST_FLAG,          false, type::NO_UNIT, type::FLAG));
+  addDataType(new DataType(type::COLUMN_TEST_INTEGER,       false, type::NO_UNIT, type::INTEGER));
+  addDataType(new DataType(type::COLUMN_TEST_INDEX,         false, type::NO_UNIT, type::INDEX));
+  addDataType(new DataType(type::COLUMN_TEST_INTEGER_RANGE, false, type::NO_UNIT, type::INTEGER_RANGE));
+  addDataType(new DataType(type::COLUMN_TEST_INDEX_LIST,    false, type::NO_UNIT, type::INDEX_LIST));
+  addDataType(new DataType(type::COLUMN_TEST_FLOAT,         false, type::NO_UNIT, type::FLOAT));
+  addDataType(new DataType(type::COLUMN_TEST_STRING,        false, type::NO_UNIT, type::STRING));
+  addDataType(new DataType(type::COLUMN_TEST_STRING_LIST,   false, type::NO_UNIT, type::STRING_LIST));
 
-  setupRequiredColumns();
-}
-
-std::vector<DataType*>&
-DataBaseFormatMock::getFormatVector()
-{
-  return _format;
+  setColumnFlags();
 }
 
 void
-DataBaseFormatMock::setCoordinateSystem(type::CoordinateSystemType coordSys)
+DataBaseFormatMock::setColumnFlag(std::size_t column, bool required)
 {
-  _coordSys = coordSys;
-}
-
-void
-DataBaseFormatMock::setColumnRequired(std::size_t pos, bool val)
-{
-  _requiredFlags.set(pos, val);
+  DataBaseFormat::setColumnFlag(column, required);
 }
 
 }
