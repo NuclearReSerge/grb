@@ -57,18 +57,14 @@ Catalog::end() const
 const CatalogEntry&
 Catalog::operator[](std::size_t index) const
 {
-  try
-  {
+  if (index < _catalog.size())
     return *_catalog[index];
-  }
-  catch (std::out_of_range& sysExc)
-  {
-    std::stringstream ss;
-    ss << "Catalog of type=" << _type << " [" << GlobalName::getCatalog(_type)
-       << "] does not have an entry index=" << index << ", sysExc.what()\n" << sysExc.what();
-    Exception exc(type::EXCEPTION_WARNING, ss.str(), PRETTY_FUNCTION);
-    throw exc;
-  }
+
+  std::stringstream ss;
+  ss << "Catalog type=" << _type << " [" << GlobalName::getCatalog(_type)
+     << "]. Index=" << index << " is out of range.";
+  Exception exc(type::EXCEPTION_WARNING, ss.str(), PRETTY_FUNCTION);
+  throw exc;
 }
 
 CatalogEntry*

@@ -131,6 +131,15 @@ enum CoordinateSystemType
   COORDINATE_SYSTEM_UNDEFINED
 };
 
+enum DateTimeType
+{
+  JULIAN_DATE,
+  MODIFIED_JULIAN_DATE,
+
+  // LAST
+  DATE_TIME_TYPE_UNDEFINED
+};
+
 typedef bool                 Flag;
 typedef std::size_t          Integer;
 typedef int                  Index;

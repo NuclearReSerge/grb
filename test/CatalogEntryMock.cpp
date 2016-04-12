@@ -19,6 +19,38 @@ CatalogEntryMock::~CatalogEntryMock()
   delete _mapper;
 }
 
+const type::Flag&
+CatalogEntryMock::getFlag() const
+{ return _flag; }
+
+const type::Integer&
+CatalogEntryMock::getInteger() const
+{ return _integer; }
+
+const type::Index&
+CatalogEntryMock::getIndex() const
+{ return _index; }
+
+const type::IntegerRange&
+CatalogEntryMock::getIntegerRange() const
+{ return _integerRange; }
+
+const type::IndexList&
+CatalogEntryMock::getIndexList() const
+{ return _indexList; }
+
+const type::Float&
+CatalogEntryMock::getFloat() const
+{ return _float; }
+
+const type::String&
+CatalogEntryMock::getString() const
+{ return _string; }
+
+const type::StringList&
+CatalogEntryMock::getStringList() const
+{ return _stringList; }
+
 type::Flag*
 CatalogEntryMock::getFlag(type::ColumnType column)
 {

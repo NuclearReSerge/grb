@@ -22,6 +22,7 @@ public:
   static std::string& getValue(type::ValueType valueType);
   static std::string& getUnit(type::UnitType unitType);
   static std::string& getCoordinateSystem(type::CoordinateSystemType coordinateSystemType);
+  static std::string& getDateType(type::DateTimeType dateTimeType);
 
 private:
   static std::string& getWithRangeCheck(std::vector<std::string>& nameList, std::size_t index);

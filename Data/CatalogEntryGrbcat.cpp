@@ -11,10 +11,83 @@ namespace grb
 
 CatalogEntryGRBCAT::CatalogEntryGRBCAT()
   : CatalogEntry(type::GRBCAT),
-    _record_number(0), _id(0), _time(), _time_def(-1), _observatory(-1), _coordinates(), _region(-1),
+    _record_number(0), _id(0), _time(type::MODIFIED_JULIAN_DATE), _time_def(-1),
+    _observatory(-1), _coordinates(type::J2000), _region(-1),
     _afterglow_flag(false), _t50(), _t90(), _t_other(), _flux_flag(false), _class_id(0)
 {
 }
+
+const type::Integer&
+CatalogEntryGRBCAT::getRecordNumber() const
+{ return _record_number; }
+
+const type::Integer&
+CatalogEntryGRBCAT::getId() const
+{ return _id; }
+
+const type::String&
+CatalogEntryGRBCAT::getName() const
+{ return _name; }
+
+const type::StringList&
+CatalogEntryGRBCAT::getAltNames() const
+{ return _alt_names; }
+
+const TimePoint&
+CatalogEntryGRBCAT::getTime() const
+{ return _time; }
+
+const type::Index&
+CatalogEntryGRBCAT::getTimeDef() const
+{ return _time_def; }
+
+const type::Index&
+CatalogEntryGRBCAT::getObservatory() const
+{ return _observatory; }
+
+const Coordinates&
+CatalogEntryGRBCAT::getCoodinates() const
+{ return _coordinates; }
+
+const type::Index&
+CatalogEntryGRBCAT::getRegion() const
+{ return _region; }
+
+const type::Flag&
+CatalogEntryGRBCAT::getAfterglowFlag() const
+{ return _afterglow_flag; }
+
+const type::IndexList&
+CatalogEntryGRBCAT::getReference() const
+{ return _reference; }
+
+const Duration&
+CatalogEntryGRBCAT::getT50() const
+{ return _t50; }
+
+const Duration&
+CatalogEntryGRBCAT::getT90() const
+{ return _t90; }
+
+const DurationOther&
+CatalogEntryGRBCAT::getTOther() const
+{ return _t_other; }
+
+const type::Flag&
+CatalogEntryGRBCAT::getFluxFlag() const
+{ return _flux_flag; }
+
+const type::String&
+CatalogEntryGRBCAT::getFluxNotes() const
+{ return _flux_notes; }
+
+const type::String&
+CatalogEntryGRBCAT::getLocalNotes() const
+{ return _local_notes; }
+
+const type::Integer&
+CatalogEntryGRBCAT::getClassId() const
+{ return _class_id; }
 
 type::Flag*
 CatalogEntryGRBCAT::getFlag(type::ColumnType column)
@@ -111,13 +184,13 @@ CatalogEntryGRBCAT::getFloat(type::ColumnType column)
   switch (column)
   {
     case type::COORD_RA:
-      return &_coordinates.getH();
+      return &_coordinates.getHorizontal();
     case type::COORD_DEC:
-      return &_coordinates.getV();
+      return &_coordinates.getVertical();
     case type::COORD_FLAG:
       return &_coordinates.getCoordFlag();
     case type::TIME:
-      return &_time.getMJD();
+      return &_time.getTime();
     case type::T50:
       return &_t50.getDuration();
     case type::T50_ERROR:

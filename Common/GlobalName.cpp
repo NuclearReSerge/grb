@@ -124,6 +124,14 @@ static std::vector<std::string> COORDINATE_SYSTEM_NAMES
   "unknown coordinate system"
 };
 
+static std::vector<std::string> DATE_TIME_NAMES
+{
+  "Julian Date",
+  "Modified Julian Date",
+  // LAST
+  "unknown date time type"
+};
+
 std::string&
 GlobalName::getDatabaseTable(type::DatabaseTableType dbType)
 {
@@ -174,13 +182,18 @@ GlobalName::getCoordinateSystem(type::CoordinateSystemType coordinateSystemType)
 }
 
 std::string&
+GlobalName::getDateType(type::DateTimeType dateTimeType)
+{
+  return getWithRangeCheck(DATE_TIME_NAMES, dateTimeType);
+}
+
+std::string&
 GlobalName::getWithRangeCheck(std::vector<std::string>& nameList, std::size_t index)
 {
-  if (index >= nameList.size())
-  {
-    return nameList[nameList.size()-1];
-  }
-  return nameList[index];
+  if (index < nameList.size())
+    return nameList[index];
+
+  return nameList[nameList.size()-1];
 }
 
 }
