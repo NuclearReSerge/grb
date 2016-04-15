@@ -30,6 +30,11 @@ protected:
   type::Integer& getEmin();
   type::Integer& getEmax();
 
+  void setDurationUnitType(type::UnitType unitType);
+  void setEnergyUnitType(type::UnitType unitType);
+
+  bool isValid();
+
 private:
   bool _isPresent;
   type::Index _mod;
@@ -38,6 +43,9 @@ private:
   type::IntegerRange _range;
   type::Integer _emin;
   type::Integer _emax;
+  type::UnitType _durationUnitType;
+  type::UnitType _energyUnitType;
+
 };
 
 class DurationOther
@@ -57,9 +65,14 @@ protected:
   type::Float& getDuration();
   type::String& getNotes();
 
+  void setDurationUnitType(type::UnitType unitType);
+
+  bool isValid();
+
 private:
   bool _isPresent;
   type::Float _duration;
+  type::UnitType _durationUnitType;
   type::String _notes;
 };
 

@@ -15,7 +15,7 @@ CatalogMock::CatalogMock()
 CatalogEntry*
 CatalogMock::createEntry()
 {
-  return new CatalogEntryMock();
+  return new CatalogEntryMock(*this);
 }
 
 }

@@ -10,6 +10,8 @@
 #include <sstream>
 #include <fstream>
 
+#include "Common/trace.h"
+
 namespace grb
 {
 
@@ -71,6 +73,10 @@ Parser::openFileStream(const std::string& filename)
 std::size_t
 Parser::parse() throw(Exception)
 {
+  for (std::size_t column = 0; column < type::COLUMN_TYPE_UNDEFINED; ++column)
+    _catalog.setUnitType((type::ColumnType) _column, _format[_column].getUnitType());
+
+
   _row = 0;
 
   for (std::string line; std::getline(*_stream, line);)
@@ -194,33 +200,44 @@ Parser::checkColumns(const type::ColumnFlags& columnFlags)
 bool
 Parser::parseMapper(const std::string& raw, CatalogEntry* entry)
 {
+  bool result = false;
   _valueType = _format[_column].getValueType();
 
   switch (_valueType)
   {
     case type::FLAG:
-      return parseValue(raw, entry->getFlag(_columnType));
-    case type::INTEGER:
-      return parseValue(raw, entry->getInteger(_columnType));
-    case type::INDEX:
-      return parseValue(raw, entry->getMapper(_columnType), entry->getIndex(_columnType));
-    case type::INTEGER_RANGE:
-      return parseValue(raw, entry->getIntegerRange(_columnType));
-    case type::INDEX_LIST:
-      return parseValue(raw, entry->getMapper(_columnType), entry->getIndexList(_columnType));
-    case type::FLOAT:
-      return parseValue(raw, entry->getFloat(_columnType));
-    case type::STRING:
-      return parseValue(raw, entry->getString(_columnType));
-    case type::STRING_LIST:
-      return parseValue(raw, entry->getStringList(_columnType));
-    default:
+      result = parseValue(raw, entry->getFlag(_columnType));
       break;
+    case type::INTEGER:
+      result = parseValue(raw, entry->getInteger(_columnType));
+      break;
+    case type::INDEX:
+      result = parseValue(raw, entry->getMapper(_columnType), entry->getIndex(_columnType));
+      break;
+    case type::INTEGER_RANGE:
+      result = parseValue(raw, entry->getIntegerRange(_columnType));
+      break;
+    case type::INDEX_LIST:
+      result = parseValue(raw, entry->getMapper(_columnType), entry->getIndexList(_columnType));
+      break;
+    case type::FLOAT:
+      result = parseValue(raw, entry->getFloat(_columnType));
+      break;
+    case type::STRING:
+      result = parseValue(raw, entry->getString(_columnType));
+      break;
+    case type::STRING_LIST:
+      result = parseValue(raw, entry->getStringList(_columnType));
+      break;
+    default:
+    {
+      Exception exc(type::EXCEPTION_WARNING,
+                    getExceptionString("Value type is not supported."),
+                    PRETTY_FUNCTION);
+      throw exc;
+    }
   }
-  Exception exc(type::EXCEPTION_WARNING,
-                getExceptionString("Value type is not supported."),
-                PRETTY_FUNCTION);
-  throw exc;
+  return result;
 }
 
 bool
@@ -250,7 +267,7 @@ Parser::parseValue(const std::string& raw, type::Flag* value)
       break;
   }
 
-  std::stringstream ss;
+ std::stringstream ss;
   ss << "Raw string=" << raw << ".";
   Exception exc(type::EXCEPTION_WARNING, getExceptionString(ss.str()), PRETTY_FUNCTION);
   throw exc;

@@ -5,13 +5,14 @@
 namespace grb
 {
 
+class Catalog;
 class NameMapper;
 
 class CatalogEntry
 {
 public:
   CatalogEntry() = delete;
-  CatalogEntry(type::CatalogType type);
+  CatalogEntry(const Catalog& catalog);
   virtual ~CatalogEntry();
 
   type::CatalogType getType() const;
@@ -26,11 +27,15 @@ protected:
   virtual type::Float* getFloat(type::ColumnType column) = 0;
   virtual type::String* getString(type::ColumnType column) = 0;
   virtual type::StringList* getStringList(type::ColumnType column) = 0;
+
   virtual NameMapper* getMapper(type::ColumnType column) = 0;
+
+  virtual void setUnitType(type::ColumnType column, type::UnitType unitType) = 0;
+
   virtual bool isValid() = 0;
 
 private:
-  type::CatalogType _type;
+  const Catalog& _catalog;
 };
 
 }

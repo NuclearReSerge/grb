@@ -4,7 +4,8 @@ namespace grb
 {
 
 Coordinates::Coordinates(type::CoordinateSystemType type)
-  : _type(type), _coord_flag(0.0), _horizontal(0.0), _vertical(0.0)
+  : _type(type), _coord_flag(0.0), _horizontal(0.0), _vertical(0.0),
+    _horizontalUnitType(type::UNIT_TYPE_UNDEFINED), _verticalUnitType(type::UNIT_TYPE_UNDEFINED)
 {
 }
 
@@ -72,6 +73,24 @@ type::Float&
 Coordinates::getVertical()
 {
   return _vertical;
+}
+
+void
+Coordinates::setHorizontalUnitType(type::UnitType unitType)
+{
+  _horizontalUnitType = unitType;
+}
+
+void
+Coordinates::setVerticalUnitType(type::UnitType unitType)
+{
+  _verticalUnitType = unitType;
+}
+
+bool
+Coordinates::isValid()
+{
+  return true;
 }
 
 }

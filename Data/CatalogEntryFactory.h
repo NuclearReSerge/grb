@@ -6,12 +6,13 @@
 namespace grb
 {
 
+class Catalog;
 class CatalogEntry;
 
 class CatalogEntryFactoryType
 {
 public:
-  CatalogEntry* create(type::CatalogType catType);
+  CatalogEntry* create(const Catalog& catalog);
 
 protected:
   friend class Singleton<CatalogEntryFactoryType>;

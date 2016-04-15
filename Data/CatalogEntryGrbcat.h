@@ -9,10 +9,12 @@
 namespace grb
 {
 
+class Catalog;
+
 class CatalogEntryGRBCAT : public CatalogEntry
 {
 public:
-  CatalogEntryGRBCAT();
+  CatalogEntryGRBCAT(const Catalog& catalog);
 
   const type::Integer& getRecordNumber() const;
   const type::Integer& getId() const;
@@ -42,7 +44,11 @@ protected:
   type::Float* getFloat(type::ColumnType column);
   type::String* getString(type::ColumnType column);
   type::StringList* getStringList(type::ColumnType column);
+
   NameMapper* getMapper(type::ColumnType column);
+
+  void setUnitType(type::ColumnType column, type::UnitType unitType);
+
   bool isValid();
 
 private:

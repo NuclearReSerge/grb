@@ -9,85 +9,120 @@
 namespace grb
 {
 
-CatalogEntryGRBCAT::CatalogEntryGRBCAT()
-  : CatalogEntry(type::GRBCAT),
+CatalogEntryGRBCAT::CatalogEntryGRBCAT(const Catalog& catalog)
+  : CatalogEntry(catalog),
     _record_number(0), _id(0), _time(type::MODIFIED_JULIAN_DATE), _time_def(-1),
     _observatory(-1), _coordinates(type::J2000), _region(-1),
     _afterglow_flag(false), _t50(), _t90(), _t_other(), _flux_flag(false), _class_id(0)
-{
-}
+{ }
 
 const type::Integer&
 CatalogEntryGRBCAT::getRecordNumber() const
-{ return _record_number; }
+{
+  return _record_number;
+}
 
 const type::Integer&
 CatalogEntryGRBCAT::getId() const
-{ return _id; }
+{
+  return _id;
+}
 
 const type::String&
 CatalogEntryGRBCAT::getName() const
-{ return _name; }
+{
+  return _name;
+}
 
 const type::StringList&
 CatalogEntryGRBCAT::getAltNames() const
-{ return _alt_names; }
+{
+  return _alt_names;
+}
 
 const TimePoint&
 CatalogEntryGRBCAT::getTime() const
-{ return _time; }
+{
+  return _time;
+}
 
 const type::Index&
 CatalogEntryGRBCAT::getTimeDef() const
-{ return _time_def; }
+{
+  return _time_def;
+}
 
 const type::Index&
 CatalogEntryGRBCAT::getObservatory() const
-{ return _observatory; }
+{
+  return _observatory;
+}
 
 const Coordinates&
 CatalogEntryGRBCAT::getCoodinates() const
-{ return _coordinates; }
+{
+  return _coordinates;
+}
 
 const type::Index&
 CatalogEntryGRBCAT::getRegion() const
-{ return _region; }
+{
+  return _region;
+}
 
 const type::Flag&
 CatalogEntryGRBCAT::getAfterglowFlag() const
-{ return _afterglow_flag; }
+{
+  return _afterglow_flag;
+}
 
 const type::IndexList&
 CatalogEntryGRBCAT::getReference() const
-{ return _reference; }
+{
+  return _reference;
+}
 
 const Duration&
 CatalogEntryGRBCAT::getT50() const
-{ return _t50; }
+{
+  return _t50;
+}
 
 const Duration&
 CatalogEntryGRBCAT::getT90() const
-{ return _t90; }
+{
+  return _t90;
+}
 
 const DurationOther&
 CatalogEntryGRBCAT::getTOther() const
-{ return _t_other; }
+{
+  return _t_other;
+}
 
 const type::Flag&
 CatalogEntryGRBCAT::getFluxFlag() const
-{ return _flux_flag; }
+{
+  return _flux_flag;
+}
 
 const type::String&
 CatalogEntryGRBCAT::getFluxNotes() const
-{ return _flux_notes; }
+{
+  return _flux_notes;
+}
 
 const type::String&
 CatalogEntryGRBCAT::getLocalNotes() const
-{ return _local_notes; }
+{
+  return _local_notes;
+}
 
 const type::Integer&
 CatalogEntryGRBCAT::getClassId() const
-{ return _class_id; }
+{
+  return _class_id;
+}
 
 type::Flag*
 CatalogEntryGRBCAT::getFlag(type::ColumnType column)
@@ -262,10 +297,54 @@ CatalogEntryGRBCAT::getMapper(type::ColumnType column)
   return nullptr;
 }
 
+void
+CatalogEntryGRBCAT::setUnitType(type::ColumnType column, type::UnitType unitType)
+{
+  switch (column)
+  {
+    case type::COORD_RA:
+      _coordinates.setHorizontalUnitType(unitType);
+      break;
+    case type::COORD_DEC:
+      _coordinates.setVerticalUnitType(unitType);
+      break;
+    case type::TIME:
+      _time.setTimeUnitType(unitType);
+      break;
+    case type::T50:
+    case type::T50_ERROR:
+      _t50.setDurationUnitType(unitType);
+      break;
+    case type::T50_EMIN:
+    case type::T50_EMAX:
+      _t50.setEnergyUnitType(unitType);
+      break;
+    case type::T90:
+    case type::T90_ERROR:
+      _t90.setDurationUnitType(unitType);
+      break;
+    case type::T90_EMIN:
+    case type::T90_EMAX:
+      _t90.setEnergyUnitType(unitType);
+      break;
+    case type::T_OTHER:
+      _t_other.setDurationUnitType(unitType);
+      break;
+    default:
+      break;
+  }
+}
+
 bool
 CatalogEntryGRBCAT::isValid()
 {
-  return true;
+  return _record_number && _id && _class_id &&
+      _name[0] == 'G' && _name[1] == 'R' && _name[2] == 'B' &&
+      _time.isValid() &&
+      _coordinates.isValid() &&
+      _t50.isValid() &&
+      _t90.isValid() &&
+      _t_other.isValid();
 }
 
 }

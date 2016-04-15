@@ -1,15 +1,19 @@
 #include "test/CatalogEntryMock.h"
 
+#include "Data/Catalog.h"
 #include "test/NameMapperMock.h"
+
+#include "Common/trace.h"
 
 namespace grb
 {
 namespace test
 {
 
-CatalogEntryMock::CatalogEntryMock()
-  : CatalogEntry(type::CATALOG_TEST),
-    _flag(false), _integer(0), _index(-1), _float(0.0)
+CatalogEntryMock::CatalogEntryMock(const Catalog& catalog)
+  : CatalogEntry(catalog),
+    _flag(false), _integer(0), _index(-1), _float(0.0),
+    _integerUnitType(type::UNIT_TYPE_UNDEFINED), _floatUnitType(type::UNIT_TYPE_UNDEFINED)
 {
   _mapper = new NameMapperMock;
 }
@@ -21,41 +25,59 @@ CatalogEntryMock::~CatalogEntryMock()
 
 const type::Flag&
 CatalogEntryMock::getFlag() const
-{ return _flag; }
+{
+  return _flag;
+}
 
 const type::Integer&
 CatalogEntryMock::getInteger() const
-{ return _integer; }
+{
+  return _integer;
+}
 
 const type::Index&
 CatalogEntryMock::getIndex() const
-{ return _index; }
+{
+  return _index;
+}
 
 const type::IntegerRange&
 CatalogEntryMock::getIntegerRange() const
-{ return _integerRange; }
+{
+  return _integerRange;
+}
 
 const type::IndexList&
 CatalogEntryMock::getIndexList() const
-{ return _indexList; }
+{
+  return _indexList;
+}
 
 const type::Float&
 CatalogEntryMock::getFloat() const
-{ return _float; }
+{
+  return _float;
+}
 
 const type::String&
 CatalogEntryMock::getString() const
-{ return _string; }
+{
+  return _string;
+}
 
 const type::StringList&
 CatalogEntryMock::getStringList() const
-{ return _stringList; }
+{
+  return _stringList;
+}
 
 type::Flag*
 CatalogEntryMock::getFlag(type::ColumnType column)
 {
   if (column == type::COLUMN_TEST_FLAG)
+  {
     return &_flag;
+  }
   return nullptr;
 }
 
@@ -130,12 +152,20 @@ CatalogEntryMock::getMapper(type::ColumnType column)
   return nullptr;
 }
 
+void
+CatalogEntryMock::setUnitType(type::ColumnType column, type::UnitType unitType)
+{
+  if (column == type::COLUMN_TEST_INTEGER)
+    _integerUnitType = unitType;
+  else if (column == type::COLUMN_TEST_FLOAT)
+    _floatUnitType = unitType;
+}
+
 bool
 CatalogEntryMock::isValid()
 {
   return true;
 }
-
 
 }
 }

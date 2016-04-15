@@ -1,5 +1,6 @@
 #include "Common/Global.h"
 
+#include <map>
 #include <vector>
 
 #pragma once
@@ -16,6 +17,7 @@ public:
   virtual ~Catalog();
 
   type::CatalogType getType() const;
+  type::UnitType getUnitType(type::ColumnType column) const;
 
   bool empty() const;
   std::size_t size() const;
@@ -28,9 +30,14 @@ protected:
   virtual CatalogEntry* createEntry();
   void addEntry(CatalogEntry* entry);
 
+  void setUnitType(type::ColumnType column, type::UnitType unitType);
+
 private:
   type::CatalogType _type;
+  std::map<type::ColumnType, type::UnitType> _unitMap;
+
   std::vector<CatalogEntry*> _catalog;
+
 };
 
 }

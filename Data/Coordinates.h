@@ -30,11 +30,18 @@ protected:
   type::Float& getHorizontal();
   type::Float& getVertical();
 
+  void setHorizontalUnitType(type::UnitType unitType);
+  void setVerticalUnitType(type::UnitType unitType);
+
+  bool isValid();
+
 private:
   type::CoordinateSystemType _type;
   type::Float _coord_flag;
   type::Float _horizontal;
   type::Float _vertical;
+  type::UnitType _horizontalUnitType;
+  type::UnitType _verticalUnitType;
 };
 
 }

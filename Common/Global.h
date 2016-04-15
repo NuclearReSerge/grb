@@ -114,7 +114,9 @@ enum UnitType
   NO_UNIT,
   DEGREE,
   SECOND,
-  MJD,
+  UNIT_UNIX,
+  UNIT_JD,
+  UNIT_MJD,
   KILO_EV,
 
   // LAST
@@ -133,6 +135,7 @@ enum CoordinateSystemType
 
 enum DateTimeType
 {
+  UNIX,
   JULIAN_DATE,
   MODIFIED_JULIAN_DATE,
 

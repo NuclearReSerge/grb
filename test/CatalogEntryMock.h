@@ -4,13 +4,16 @@
 
 namespace grb
 {
+
+class Catalog;
+
 namespace test
 {
 
 class CatalogEntryMock : public CatalogEntry
 {
 public:
-  CatalogEntryMock();
+  CatalogEntryMock(const Catalog& catalog);
   ~CatalogEntryMock();
 
   const type::Flag& getFlag() const;
@@ -31,7 +34,11 @@ protected:
   type::Float* getFloat(type::ColumnType column);
   type::String* getString(type::ColumnType column);
   type::StringList* getStringList(type::ColumnType column);
+
   NameMapper* getMapper(type::ColumnType column);
+
+  void setUnitType(type::ColumnType column, type::UnitType unitType);
+
   bool isValid();
 
 private:
@@ -43,6 +50,8 @@ private:
   type::Float _float;
   type::String _string;
   type::StringList _stringList;
+  type::UnitType _integerUnitType;
+  type::UnitType _floatUnitType;
   NameMapper* _mapper;
 };
 

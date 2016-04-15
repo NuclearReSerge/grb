@@ -1,10 +1,12 @@
 #include "Data/CatalogEntry.h"
 
+#include "Data/Catalog.h"
+
 namespace grb
 {
 
-CatalogEntry::CatalogEntry(type::CatalogType type)
-  : _type(type)
+CatalogEntry::CatalogEntry(const Catalog& catalog)
+  : _catalog(catalog)
 {
 }
 
@@ -15,7 +17,7 @@ CatalogEntry::~CatalogEntry()
 type::CatalogType
 CatalogEntry::getType() const
 {
-  return _type;
+  return _catalog.getType();
 }
 
 }

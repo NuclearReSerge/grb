@@ -1,4 +1,6 @@
 #include "Data/CatalogEntryFactory.h"
+
+#include "Data/Catalog.h"
 #include "Data/CatalogEntryGrbcat.h"
 
 namespace grb
@@ -9,12 +11,12 @@ CatalogEntryFactoryType::CatalogEntryFactoryType()
 }
 
 CatalogEntry*
-CatalogEntryFactoryType::create(type::CatalogType catType)
+CatalogEntryFactoryType::create(const Catalog& catalog)
 {
-  switch (catType)
+  switch (catalog.getType())
   {
     case type::GRBCAT:
-      return new CatalogEntryGRBCAT;
+      return new CatalogEntryGRBCAT(catalog);
     default:
       break;
   }
