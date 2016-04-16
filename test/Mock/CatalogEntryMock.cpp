@@ -1,9 +1,7 @@
-#include "test/CatalogEntryMock.h"
+#include "test/Mock/CatalogEntryMock.h"
+#include "test/Mock/NameMapperMock.h"
 
 #include "Data/Catalog.h"
-#include "test/NameMapperMock.h"
-
-#include "Common/trace.h"
 
 namespace grb
 {

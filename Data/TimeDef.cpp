@@ -12,11 +12,11 @@ const std::vector<std::string> NAME_LIST
 {
   "BAT trigger",
   "Earth Crossing Time",
-  "Not specified",
+  "Not Specified",
   "Time at CGRO (or BATSE)",
   "Time at Detecting Instrument",
   "Time at Watch/GRANAT",
-  "Trigger time"
+  "Trigger Time"
 };
 
 const std::string DESCRIPTION = "\

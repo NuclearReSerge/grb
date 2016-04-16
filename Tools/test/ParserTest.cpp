@@ -1,8 +1,8 @@
 #include "Tools/Parser.h"
 
-#include "test/CatalogMock.h"
-#include "test/CatalogEntryMock.h"
-#include "test/DataBaseFormatMock.h"
+#include "test/Mock/CatalogMock.h"
+#include "test/Mock/CatalogEntryMock.h"
+#include "test/Mock/DataBaseFormatMock.h"
 
 #include <gtest/gtest.h>
 #include <sstream>

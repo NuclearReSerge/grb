@@ -1,6 +1,6 @@
 #include "Data/TimeDef.h"
 
-#include "test/NameMapperCommon.h"
+#include "test/Mock/NameMapperCommon.h"
 
 #include <gtest/gtest.h>
 
@@ -18,7 +18,7 @@ class TimeDefTest : public NameMapperCommon
     _mapper = TimeDef::instance();
     _columnType = type::TIME_DEF;
     _first = "BAT trigger";
-    _last = "Trigger time";
+    _last = "Trigger Time";
     _firstIdx = 0;
     _lastIdx = 6;
   }

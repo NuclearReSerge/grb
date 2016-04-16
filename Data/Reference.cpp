@@ -5,15 +5,14 @@ namespace grb
 
 namespace
 {
-
-// cat grbcatalog.dat | egrep -v "^#" | awk -F "|" '{print $14}' | sed "s/,\s*/\n/g" | sed "s/\s*$//g" | sort | uniq | sed "s/^/\ \ \"/g" | sed "s/$/\",/g"
+// cat heasarc_grbcat.tdat.filtered | awk -F "|" '{print $13}' | sed "s/,\s*/\n/g" | sed "s/\s*$//g" | sort | uniq | sed "s/^/\ \ \"/g" | sed "s/$/\",/g"
 
 const std::vector<std::string> NAME_LIST
 {
   "1974ApJ...188L...1S",
   "1982ApJ...259L..51K",
   "1982grap.symp..211D",
-  "1984Ap&amp;SS.105..379Y",
+  "1984Ap&SS.105..379Y",
   "1987ApJS...64..305A",
   "1990PhDT.........2C",
   "1992AIPC..265...48T",
@@ -22,7 +21,7 @@ const std::vector<std::string> NAME_LIST
   "1994wedo.book.....C",
   "1996AIPC..384..545T",
   "1997ApJS..110..157L",
-  "1998A&amp;AS..129....1S",
+  "1998A&AS..129....1S",
   "1998AIPC..428...54T",
   "1998ApJ...492..246K",
   "1998ApJS..118..391L",
@@ -86,7 +85,7 @@ const std::vector<std::string> NAME_LIST
   "2002GCN..1768....1G",
   "2002GCN..1771....1H",
   "2002GCN..1772....1H",
-  "2003A&amp;A...400.1021B",
+  "2003A&A...400.1021B",
   "2003GCN..1816....1K",
   "2003GCN..1836....1B",
   "2003GCN..1838....1G",

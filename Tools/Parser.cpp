@@ -377,6 +377,11 @@ Parser::parseValue(const std::string& raw, const NameMapper* mapper, type::Index
   std::stringstream ss(raw);
   for (std::string item; std::getline(ss, item, DELIM_LIST);)
   {
+    item.erase(0, item.find_first_not_of(WHITESPACE));
+    item.erase(item.find_last_not_of(WHITESPACE) + 1);
+    if(item.empty())
+      return false;
+
     int index;
     if (!parseValue(item, mapper, &index))
     {
@@ -450,8 +455,11 @@ Parser::parseValue(const std::string& raw, type::StringList* valueList)
   std::stringstream ss(raw);
   for (std::string item; std::getline(ss, item, DELIM_LIST);)
   {
+    item.erase(0, item.find_first_not_of(WHITESPACE));
+    item.erase(item.find_last_not_of(WHITESPACE) + 1);
     if (item.empty())
       return false;
+
     valueList->push_back(item);
   }
 

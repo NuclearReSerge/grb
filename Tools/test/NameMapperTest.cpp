@@ -1,5 +1,5 @@
-#include "test/NameMapperCommon.h"
-#include "test/NameMapperMock.h"
+#include "test/Mock/NameMapperCommon.h"
+#include "test/Mock/NameMapperMock.h"
 
 
 namespace grb

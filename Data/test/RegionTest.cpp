@@ -1,6 +1,6 @@
 #include "Data/Region.h"
 
-#include "test/NameMapperCommon.h"
+#include "test/Mock/NameMapperCommon.h"
 
 #include <gtest/gtest.h>
 

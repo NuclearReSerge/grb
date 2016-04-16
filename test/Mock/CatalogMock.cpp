@@ -1,6 +1,5 @@
-#include "test/CatalogMock.h"
-
-#include "test/CatalogEntryMock.h"
+#include "test/Mock/CatalogMock.h"
+#include "test/Mock/CatalogEntryMock.h"
 
 namespace grb
 {

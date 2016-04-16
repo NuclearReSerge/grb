@@ -36,7 +36,7 @@ DataBaseFormatGrbcat::initialize()
   addDataType(new DataType(type::COORD_FLAG,     true,  type::NO_UNIT,  type::FLOAT));
   addDataType(new DataType(type::REGION,         false, type::NO_UNIT,  type::INDEX));
   addDataType(new DataType(type::AFTERGLOW_FLAG, true,  type::NO_UNIT,  type::FLAG));
-  addDataType(new DataType(type::REFERENCE,      true,  type::NO_UNIT,  type::INDEX_LIST));
+  addDataType(new DataType(type::REFERENCE,      false, type::NO_UNIT,  type::INDEX_LIST));
   addDataType(new DataType(type::T50_MOD,        false, type::NO_UNIT,  type::INDEX));
   addDataType(new DataType(type::T50,            false, type::SECOND,   type::FLOAT));
   addDataType(new DataType(type::T50_ERROR,      false, type::SECOND,   type::FLOAT));
