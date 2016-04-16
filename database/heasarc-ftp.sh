@@ -32,11 +32,11 @@ function unify_strings()
   local FILE_HELP=$1".help"
   local TARGET="$2"
   local SOURCE="$3"
-  
-  echo "Check $SOURCE = $(grep "$SOURCE" $FILE_DUMP | wc -l)"
+
+  echo -e "\tCheck $SOURCE = $(grep "$SOURCE" $FILE_DUMP | wc -l)"
   sed "s/$SOURCE/$TARGET/g" $FILE_DUMP > $FILE_HELP
   mv $FILE_HELP $FILE_DUMP
-  echo "Check $SOURCE = $(grep "$SOURCE" $FILE_DUMP | wc -l)"
+  echo -e "\tCheck $SOURCE = $(grep "$SOURCE" $FILE_DUMP | wc -l)"
 }
 
 function remove_rows()
@@ -44,7 +44,7 @@ function remove_rows()
   local FILE_DUMP=$1".dump"
   local FILE_HELP=$1".help"
   local REF_ID=$2
-  echo "Removing reference_number = $REF_ID"
+  echo -e "\r\tRemoving reference_number = $REF_ID"
   cat $FILE_DUMP | egrep -v "^$REF_ID" > $FILE_HELP
   mv $FILE_HELP $FILE_DUMP
 }
@@ -56,9 +56,10 @@ function filter_heasarc_grbcat()
   local FILE_FILT=$FILE".filtered"
   local STR
   local REF
-  echo "FILE $FILE -> $FILE_DUMP"
+
+  gunzip -k $FILE$GUNZIP_EXT
   cat $FILE | grep "|" > $FILE_DUMP
-  
+
   for STR in "${TIME_DEF_1_SOURCE[@]}"; do
     unify_strings $FILE "$TIME_DEF_1_TARGET" "$STR"
   done
@@ -70,20 +71,35 @@ function filter_heasarc_grbcat()
   for STR in "${TIME_DEF_3_SOURCE[@]}"; do
     unify_strings $FILE "$TIME_DEF_3_TARGET" "$STR"
   done
-    
+
   for REF in "${INVALID_ROWS[@]}"; do
     remove_rows $FILE $REF
   done
-  
+
   mv $FILE_DUMP $FILE_FILT
+}
+
+function call_tcl()
+{
+  ./heasarc-ftp.tcl ${FILES[@]}
+  if [ $(echo $?) -ne 0 ]; then
+    exit 1
+  fi
 }
 
 function main_func()
 {
+  #call_tcl
   local FILE
   for FILE in ${FILES[@]}; do
-    if [ -f $FILE ]; then
-      filter_heasarc_grbcat $FILE
+    if [ -f $FILE$GUNZIP_EXT ]; then
+      case "$FILE" in
+        "heasarc_grbcat.tdat") echo "Filtering $FILE"
+          filter_heasarc_grbcat $FILE
+          ;;
+        *) echo "Unknown file $FILE"
+	  ;;
+      esac
     fi
   done
 }

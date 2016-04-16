@@ -9,7 +9,8 @@ namespace grb
 
 namespace type
 {
-// http://heasarc.gsfc.nasa.gov/FTP/heasarc/dbase/dump/
+// High Energy Astrophysics Science Archive Research Center
+// http://heasarc.gsfc.nasa.gov/
 enum DatabaseTableType
 {
   // HEASARC
