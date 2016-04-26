@@ -11,7 +11,7 @@ QMAKE_CXXFLAGS += -std=c++11 -O0 -Wextra -Werror -Wpedantic
 
 QMAKE_LFLAGS = -g
 
-QMAKE_LIBS = -lgtest -pthread
+QMAKE_LIBS = -lgtest -lgmock -pthread
 
 HEADERS += \
     Common/Exception.h \
@@ -36,7 +36,9 @@ HEADERS += \
     Data/TimeMod.h \
     Data/TimePoint.h \
     Tools/NameMapper.h \
-    Tools/Parser.h
+    Tools/Parser.h \
+    Analyzer/GreatCircleDistance.h \
+    test/Mock/CoordinatesMock.h
 
 SOURCES += \
     Analyzer/Init.cpp \
@@ -59,7 +61,10 @@ SOURCES += \
     Data/TimeMod.cpp \
     Data/TimePoint.cpp \
     Tools/NameMapper.cpp \
-    Tools/Parser.cpp
+    Tools/Parser.cpp \
+    Analyzer/GreatCircleDistance.cpp \
+    test/UnitTest/Analyzer/test/GreatCircleDistanceTest.cpp \
+    test/Mock/CoordinatesMock.cpp
 
 HEADERS += \
     test/Mock/CatalogEntryMock.h \

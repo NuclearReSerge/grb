@@ -9,6 +9,11 @@ Coordinates::Coordinates(type::CoordinateSystemType type)
 {
 }
 
+Coordinates::~Coordinates()
+{
+
+}
+
 type::CoordinateSystemType
 Coordinates::getType() const
 {

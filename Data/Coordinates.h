@@ -10,6 +10,7 @@ class Coordinates
 {
 public:
   Coordinates(type::CoordinateSystemType type = type::COORDINATE_SYSTEM_UNDEFINED);
+  virtual ~Coordinates();
 
   type::CoordinateSystemType getType() const;
 
@@ -33,7 +34,7 @@ protected:
   void setHorizontalUnitType(type::UnitType unitType);
   void setVerticalUnitType(type::UnitType unitType);
 
-  bool isValid();
+  virtual bool isValid();
 
 private:
   type::CoordinateSystemType _type;

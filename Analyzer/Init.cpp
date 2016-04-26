@@ -8,7 +8,7 @@ namespace
 {
   const char* LINE_78_ASTER = "******************************************************************************";
   const char* PROGRAM_NAME = "Gamma-Ray Burst Correlation Analyzer";
-  const char* TDAT_FILE_EXT = "tdat.filtered";
+  const char* TDAT_FILE_EXT = "tdat";
 }
 
 void

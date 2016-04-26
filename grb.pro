@@ -34,7 +34,8 @@ HEADERS += \
     Data/TimeMod.h \
     Data/TimePoint.h \
     Tools/NameMapper.h \
-    Tools/Parser.h
+    Tools/Parser.h \
+    Analyzer/GreatCircleDistance.h
 
 SOURCES += \
     Analyzer/Init.cpp \
@@ -58,4 +59,5 @@ SOURCES += \
     Data/TimeMod.cpp \
     Data/TimePoint.cpp \
     Tools/NameMapper.cpp \
-    Tools/Parser.cpp
+    Tools/Parser.cpp \
+    Analyzer/GreatCircleDistance.cpp
