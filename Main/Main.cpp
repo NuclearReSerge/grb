@@ -38,7 +38,8 @@ main(int argc, char** argv)
 {
   grb::intro();
   grb::CommandLine cli(argc, argv);
-  grb::Analyzer analyzer;
+
+  grb::Analyzer* analyzer = nullptr;
 
   while (!cli.quit())
   {
@@ -64,7 +65,7 @@ main(int argc, char** argv)
       std::cerr << exc.what() << std::endl;
       if (exc.getLevel() == grb::type::EXCEPTION_CRITICAL)
       {
-        grb::usage(cli.getBinaryName());
+        //grb::usage(cli.getBinaryName());
         return grb::type::COMMAND_LINE_PARSING_FAILED;
       }
     }

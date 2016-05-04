@@ -16,7 +16,7 @@ public:
 
 protected:
   std::string doHelp(type::HelpType type);
-  void doExecute(Analyzer& analyzer);
+  void doExecute(Analyzer*& analyzer);
 
 private:
   bool _showAll;

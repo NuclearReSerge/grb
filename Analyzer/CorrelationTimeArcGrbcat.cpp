@@ -3,11 +3,13 @@
 #include "Data/Catalog.h"
 #include "Data/CatalogEntryGrbcat.h"
 
+#include "Common/trace.h"
+
 namespace grb
 {
 
 CorrelationTimeArcGrbcat::CorrelationTimeArcGrbcat()
-  :Correlation(type::TIME_DIFF_VS_CIRCLE_DIST_GRBCAT)
+  : Correlation(type::TIME_DIFF_VS_CIRCLE_DIST_GRBCAT)
 {
 }
 
@@ -19,11 +21,13 @@ CorrelationTimeArcGrbcat::~CorrelationTimeArcGrbcat()
 bool
 CorrelationTimeArcGrbcat::buildCF(const Catalog& catalog)
 {
-  if (! checkCatalog(catalog))
+  if (!checkCatalog(catalog))
   {
     return false;
   }
   filterEntries(catalog);
+
+  TRACE("ENTRIES " << _entries.size());
 
   return true;
 }

@@ -36,12 +36,12 @@ public:
   virtual bool parse(std::list<std::string>& args) throw(Exception);
 
   std::string help(type::HelpType type = type::HELP_SHORT);
-  void execute(Analyzer& analyzer);
+  void execute(Analyzer*& analyzer);
   bool wasExecuted() const;
 
 protected:
   virtual std::string doHelp(type::HelpType type) = 0;
-  virtual void doExecute(Analyzer& analyzer) = 0;
+  virtual void doExecute(Analyzer*& analyzer) = 0;
   virtual CommandLine& getCLI();
 
 private:

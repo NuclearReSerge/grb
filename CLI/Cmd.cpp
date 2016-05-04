@@ -60,7 +60,7 @@ Cmd::help(type::HelpType type)
 }
 
 void
-Cmd::execute(Analyzer& analyzer)
+Cmd::execute(Analyzer*& analyzer)
 {
   doExecute(analyzer);
   getCLI().incCmdIdx();

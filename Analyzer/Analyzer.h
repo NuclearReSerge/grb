@@ -1,4 +1,5 @@
 #include <memory>
+#include <string>
 
 #pragma once
 
@@ -15,6 +16,8 @@ public:
 
   Catalog* getCatalog();
   void setCatalog(Catalog* catalog);
+
+  virtual void execute(const std::string& subcommand) = 0;
 
 private:
   std::unique_ptr<Catalog> _catalog;

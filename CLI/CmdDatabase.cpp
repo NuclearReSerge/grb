@@ -1,3 +1,4 @@
+#include "Analyzer/AnalyzerFactory.h"
 #include "Common/GlobalName.h"
 #include "CLI/CommandMapper.h"
 #include "Data/Catalog.h"
@@ -9,16 +10,15 @@
 #include <iostream>
 #include <sstream>
 
-#include "Common/trace.h"
-
 namespace grb
 {
 
 namespace
 {
-  const char* TDAT_FILE_EXT = "tdat";
-  const char* HELP_SHORT = " - reads the database file and creates a catalog.";
-  const char* HELP_LONG = " <DB_FILE>.tdat";
+
+const char* TDAT_FILE_EXT = "tdat";
+const char* HELP_SHORT = " - reads the database file and creates a catalog.";
+const char* HELP_LONG = " <DB_FILE>.tdat";
 
 }
 
@@ -52,19 +52,6 @@ CmdDatabase::parse(std::list<std::string>& args) throw(Exception)
   return Cmd::parse(args);
 }
 
-type::DatabaseTableType
-CmdDatabase::getDbType() const
-{
-  return _dbType;
-}
-
-type::CatalogType
-CmdDatabase::getCatType() const
-{
-  return _catType;
-}
-
-
 std::string
 CmdDatabase::doHelp(type::HelpType type)
 {
@@ -75,24 +62,38 @@ CmdDatabase::doHelp(type::HelpType type)
 }
 
 void
-CmdDatabase::doExecute(Analyzer& analyzer)
+CmdDatabase::doExecute(Analyzer*& analyzer)
 {
-  analyzer.setCatalog(new Catalog(_catType));
+  std::size_t rows;
+  Catalog* catalog = new Catalog(_catType);
+
   try
   {
     Parser parser(_dbFile,
                   DataBaseFormatFactory::instance()->getFormat(_dbType),
-                  *analyzer.getCatalog());
-    std::size_t rows = parser.parse();
-    std::cout << "Parsing successful. Extraced " << rows << " rows." << std::endl;
+                  *catalog);
+    rows = parser.parse();
   }
   catch (grb::Exception& parseExc)
   {
+    delete catalog;
     std::stringstream ss;
     ss << "Parsing failed." << std::endl << parseExc.what();
     Exception exc(parseExc.getLevel(), ss.str(), PRETTY_FUNCTION);
     throw exc;
   }
+  std::cout << "Parsing successful. Extraced " << rows << " rows." << std::endl;
+
+  analyzer = AnalyzerFactory::instance()->create(_catType);
+  if (!analyzer)
+  {
+    delete catalog;
+    std::stringstream ss;
+    ss << "Analyzer not available." << std::endl;
+    Exception exc(type::EXCEPTION_CRITICAL, ss.str(), PRETTY_FUNCTION);
+    throw exc;
+  }
+  analyzer->setCatalog(catalog);
 }
 
 bool
@@ -146,6 +147,5 @@ CmdDatabase::filenameMapping(const std::string& filename)
               GlobalName::getCatalog(_catType).c_str());
   return true;
 }
-
 
 }

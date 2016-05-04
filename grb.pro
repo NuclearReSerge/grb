@@ -47,7 +47,9 @@ HEADERS += \
     Data/TimePoint.h \
     Tools/Mapper.h \
     Tools/NameMapper.h \
-    Tools/Parser.h
+    Tools/Parser.h \
+    CLI/CmdAnalyze.h \
+    Analyzer/AnalyzerFactory.h
 
 SOURCES += \
     Analyzer/AnalyzeGrbcat.cpp \
@@ -83,4 +85,6 @@ SOURCES += \
     Main/Init.cpp \
     Main/Main.cpp \
     Tools/NameMapper.cpp \
-    Tools/Parser.cpp
+    Tools/Parser.cpp \
+    CLI/CmdAnalyze.cpp \
+    Analyzer/AnalyzerFactory.cpp

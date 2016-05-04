@@ -4,6 +4,7 @@
 #include "CLI/CmdQuit.h"
 #include "CLI/CmdHelp.h"
 #include "CLI/CmdDatabase.h"
+#include "CLI/CmdAnalyze.h"
 
 namespace grb
 {
@@ -41,6 +42,8 @@ CommandFactoryType::create(CommandLine& cli, const type::CommandType cmdType)
       return new CmdHelp(cli);
     case type::CMD_DATABASE:
       return new CmdDatabase(cli);
+    case type::CMD_ANALYZE:
+      return new CmdAnalyze(cli);
     default:
       break;
   }

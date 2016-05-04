@@ -11,7 +11,8 @@ const std::vector<std::string> CMD_LIST
   "exit",
   "quit",
   "help",
-  "database"
+  "database",
+  "analyze"
 };
 
 }

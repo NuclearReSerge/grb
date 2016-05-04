@@ -35,9 +35,11 @@ CmdQuit::doHelp(type::HelpType type)
 }
 
 void
-CmdQuit::doExecute(Analyzer& analyzer)
+CmdQuit::doExecute(Analyzer*& analyzer)
 {
-  analyzer.getCatalog(); // dummy
+  delete analyzer;
+  analyzer = nullptr;
+
   getCLI().setQuit();
   std::cout << "Bye!" << std::endl;
 }

@@ -1,15 +1,14 @@
 #include "CLI/Cmd.h"
-#include "Common/Global.h"
 
 #pragma once
 
 namespace grb
 {
 
-class CmdDatabase : public Cmd
+class CmdAnalyze : public Cmd
 {
 public:
-  CmdDatabase(CommandLine& cli);
+  CmdAnalyze(CommandLine& cli);
 
   bool parse(std::list<std::string>& args) throw(Exception);
 
@@ -17,14 +16,8 @@ protected:
   std::string doHelp(type::HelpType type);
   void doExecute(Analyzer*& analyzer);
 
-  bool filenameMapping(const std::string& filename);
-
 private:
-  std::string _dbFile;
-  type::DatabaseTableType _dbType;
-  type::CatalogType _catType;
-
-
+  std::string _subcommand;
 };
 
 }

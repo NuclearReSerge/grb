@@ -26,6 +26,7 @@ enum CommandType
   CMD_QUIT,
   CMD_HELP,
   CMD_DATABASE,
+  CMD_ANALYZE,
   // LAST
   UNKNOWN_COMMAND_NAME
 };

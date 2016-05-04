@@ -60,9 +60,9 @@ CmdHelp::doHelp(type::HelpType type)
 }
 
 void
-CmdHelp::doExecute(Analyzer& analyzer)
+CmdHelp::doExecute(Analyzer*& analyzer)
 {
-  analyzer.getCatalog(); // dummy
+  std::cout << "Available commands:" << std::endl;
 
   if (_showAll)
   {
@@ -90,6 +90,10 @@ CmdHelp::doExecute(Analyzer& analyzer)
     std::cout << cmd->help(type::HELP_FULL);
     delete cmd;
   }
+
+// just a dummy code
+  if(analyzer)
+    return;
 }
 
 }
