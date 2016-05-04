@@ -30,7 +30,7 @@ TimeDefType::TimeDefType()
   initiate();
 }
 
-const std::vector<std::string>& TimeDefType::getNameList() const
+const std::vector<std::string>& TimeDefType::getList() const
 {
   return NAME_LIST;
 }

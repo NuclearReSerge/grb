@@ -61,7 +61,7 @@ ObservatoryType::ObservatoryType()
   initiate();
 }
 
-const std::vector<std::string>& ObservatoryType::getNameList() const
+const std::vector<std::string>& ObservatoryType::getList() const
 {
   return NAME_LIST;
 }

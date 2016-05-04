@@ -23,7 +23,7 @@ NameMapperMock::NameMapperMock()
   initiate();
 }
 
-const std::vector<std::string>& NameMapperMock::getNameList() const
+const std::vector<std::string>& NameMapperMock::getList() const
 {
   return NAME_LIST;
 }

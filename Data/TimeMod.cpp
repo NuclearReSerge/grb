@@ -25,7 +25,7 @@ TimeModType::TimeModType(const type::ColumnType columnType)
   initiate();
 }
 
-const std::vector<std::string>& TimeModType::getNameList() const
+const std::vector<std::string>& TimeModType::getList() const
 {
   return NAME_LIST;
 }

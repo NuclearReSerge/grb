@@ -9,7 +9,10 @@ Exception::Exception(type::ExceptionLevel level, const std::string& message,
                      const std::string& function)
   : _level(level)
 {
-  _message = _prefix;
+  if (!(_level & type::EXCEPTION_MOD_NO_PREFIX))
+  {
+    _message = _prefix;
+  }
   if (!function.empty())
   {
     _message += "[" + function + "] ";
@@ -26,7 +29,7 @@ Exception::what() const noexcept
 type::ExceptionLevel
 Exception::getLevel() const
 {
-  return _level;
+  return (type::ExceptionLevel) (_level & type::EXCEPTION_MASK);
 }
 
 const std::string& Exception::getPrefix()

@@ -12,7 +12,7 @@ protected:
   friend class Singleton<RegionType>;
 
   RegionType();
-  const std::vector<std::string>& getNameList() const;
+  const std::vector<std::string>& getList() const;
 };
 
 typedef Singleton<RegionType> Region;

@@ -3,11 +3,16 @@
 namespace grb
 {
 
+namespace
+{
+
 struct Column
 {
   std::string name;
   std::string description;
 };
+
+}
 
 static std::vector<std::string> DATABASE_TABLE_NAMES
 {

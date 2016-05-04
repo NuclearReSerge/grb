@@ -9,6 +9,27 @@ namespace grb
 
 namespace type
 {
+
+enum ErrorLevelCode
+{
+  NO_ERROR,
+  COMMAND_LINE_PARSING_FAILED,
+  DATABASE_PARSING_FAILED,
+
+  // LAST
+  UNKNOWN_ERROR_LEVEL_CODE
+};
+
+enum CommandType
+{
+  CMD_EXIT,
+  CMD_QUIT,
+  CMD_HELP,
+  CMD_DATABASE,
+  // LAST
+  UNKNOWN_COMMAND_NAME
+};
+
 // High Energy Astrophysics Science Archive Research Center
 // http://heasarc.gsfc.nasa.gov/
 enum DatabaseTableType

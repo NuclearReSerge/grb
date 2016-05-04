@@ -36,8 +36,8 @@ TEST_F(ExceptionTest, noLevel_no_Message_no_Function)
   _level = type::EXCEPTION_LEVEL_UNKNOWN;
 
   Exception exc;
-  ASSERT_EQ(_level, exc.getLevel());
-  ASSERT_STREQ(_what.c_str(), exc.what());
+  ASSERT_EQ(type::EXCEPTION_MASK, exc.getLevel());
+  ASSERT_STREQ("", exc.what());
 }
 
 TEST_F(ExceptionTest, Level_noMessage_no_Function)

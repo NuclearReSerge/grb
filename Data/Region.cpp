@@ -30,7 +30,7 @@ RegionType::RegionType()
   initiate();
 }
 
-const std::vector<std::string>& RegionType::getNameList() const
+const std::vector<std::string>& RegionType::getList() const
 {
   return NAME_LIST;
 }

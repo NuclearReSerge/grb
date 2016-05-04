@@ -11,12 +11,19 @@ namespace type
 {
 enum ExceptionLevel
 {
-  EXCEPTION_CRITICAL,
-  EXCEPTION_HIGH,
-  EXCEPTION_WARNING,
-  EXCEPTION_LOW,
-  // last
-  EXCEPTION_LEVEL_UNKNOWN
+  EXCEPTION_CRITICAL      = 0x00,
+  EXCEPTION_HIGH          = 0x01,
+  EXCEPTION_WARNING       = 0x02,
+  EXCEPTION_LOW           = 0x03,
+//EXCEPTION_              = 0x0E,
+  EXCEPTION_MASK          = 0x0F,
+  // MODIFIERS
+  EXCEPTION_MOD_NO_PREFIX = 0x10,
+//EXCEPTION_MOD_            0x20,
+//EXCEPTION_MOD_            0x40,
+//EXCEPTION_MOD_            0x80,
+  // LAST
+  EXCEPTION_LEVEL_UNKNOWN = 0xFF
 };
 }
 //#define INCLUDE_FUNCTION_IN_EXC

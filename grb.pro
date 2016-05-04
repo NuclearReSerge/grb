@@ -12,6 +12,18 @@ QMAKE_CXXFLAGS += -std=c++11 -O0 -Wextra -Werror -Wpedantic
 QMAKE_LFLAGS = -g
 
 HEADERS += \
+    Analyzer/AnalyzeGrbcat.h \
+    Analyzer/Analyzer.h \
+    Analyzer/Correlation.h \
+    Analyzer/CorrelationTimeArcGrbcat.h \
+    Analyzer/GreatCircleDistance.h \
+    CLI/Cmd.h \
+    CLI/CmdDatabase.h \
+    CLI/CmdHelp.h \
+    CLI/CmdQuit.h \
+    CLI/CommandFactory.h \
+    CLI/CommandLine.h \
+    CLI/CommandMapper.h \
     Common/Exception.h \
     Common/Global.h \
     Common/GlobalName.h \
@@ -33,13 +45,23 @@ HEADERS += \
     Data/TimeDef.h \
     Data/TimeMod.h \
     Data/TimePoint.h \
+    Tools/Mapper.h \
     Tools/NameMapper.h \
-    Tools/Parser.h \
-    Analyzer/GreatCircleDistance.h
+    Tools/Parser.h
 
 SOURCES += \
-    Analyzer/Init.cpp \
-    Analyzer/Main.cpp \
+    Analyzer/AnalyzeGrbcat.cpp \
+    Analyzer/Analyzer.cpp \
+    Analyzer/Correlation.cpp \
+    Analyzer/CorrelationTimeArcGrbcat.cpp \
+    Analyzer/GreatCircleDistance.cpp \
+    CLI/Cmd.cpp \
+    CLI/CmdDatabase.cpp \
+    CLI/CmdHelp.cpp \
+    CLI/CmdQuit.cpp \
+    CLI/CommandFactory.cpp \
+    CLI/CommandLine.cpp \
+    CLI/CommandMapper.cpp \
     Common/Exception.cpp \
     Common/GlobalName.cpp \
     Data/Catalog.cpp \
@@ -58,6 +80,7 @@ SOURCES += \
     Data/TimeDef.cpp \
     Data/TimeMod.cpp \
     Data/TimePoint.cpp \
+    Main/Init.cpp \
+    Main/Main.cpp \
     Tools/NameMapper.cpp \
-    Tools/Parser.cpp \
-    Analyzer/GreatCircleDistance.cpp
+    Tools/Parser.cpp

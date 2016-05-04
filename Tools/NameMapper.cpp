@@ -13,40 +13,19 @@ NameMapper::NameMapper(const type::ColumnType columnType, const std::string& des
 {
 }
 
-NameMapper::~NameMapper()
-{
-  _map.clear();
-}
-
-void NameMapper::initiate()
-{
-  type::Index i = 0;
-  for (const std::string& name : getNameList())
-  {
-    _map.insert({name, i++});
-  }
-}
-
-bool
-NameMapper::isPresent(const std::string& name) const
-{
-  return _map.find(name) != _map.end();
-}
-
 type::Index
 NameMapper::getIndex(const std::string& name) const  throw(Exception)
 {
   try
   {
-    return _map.at(name);
+    return getValue(name);
   }
-  catch (std::exception& stdExc)
+  catch (Exception& baseExc)
   {
     std::stringstream ss;
-    ss << "NameMapper type=" << _columnType << " [" << GlobalName::getColumn(_columnType)
-       << "]. Index for key name=" << name << " not found.";
-    ss << std::endl << "std::exception.what()=" << stdExc.what() << ".";
-    Exception exc(type::EXCEPTION_WARNING, ss.str(), PRETTY_FUNCTION);
+    ss << "NameMapper type=" << _columnType << " [" << GlobalName::getColumn(_columnType) << "].";
+    ss << std::endl << baseExc.what();
+    Exception exc(baseExc.getLevel(), ss.str(), PRETTY_FUNCTION);
     throw exc;
   }
 }
@@ -54,19 +33,18 @@ NameMapper::getIndex(const std::string& name) const  throw(Exception)
 const std::string&
 NameMapper::getName(const type::Index& index) const  throw(Exception)
 {
-  const auto iter = std::find_if(_map.begin(), _map.end(),
-                [index](const std::pair<std::string, type::Index>& item)
-                { return item.second == index; });
-  if (iter == _map.end())
+  try
+  {
+    return getKey(index);
+  }
+  catch (Exception& baseExc)
   {
     std::stringstream ss;
-    ss << "NameMapper type=" << _columnType << " [" << GlobalName::getColumn(_columnType)
-       << "]. Name for key index=" << index << " not found.";
-    Exception exc(type::EXCEPTION_WARNING, ss.str(), PRETTY_FUNCTION);
+    ss << "NameMapper type=" << _columnType << " [" << GlobalName::getColumn(_columnType) << "].";
+    ss << std::endl << baseExc.what();
+    Exception exc(baseExc.getLevel(), ss.str(), PRETTY_FUNCTION);
     throw exc;
   }
-
-  return iter->first;
 }
 
 type::ColumnType

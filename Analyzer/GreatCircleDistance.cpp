@@ -53,10 +53,10 @@ GreatCircleDistance::getHaversineFormula(const Coordinates& p1, const Coordinate
 {
   const type::Float phi1 = p1.getLatitude();
   const type::Float phi2 = p2.getLatitude();
-  const type::Float v1 = 0.5 * std::sin(std::abs(phi1 - phi2));
-  const type::Float v2 = 0.5 * std::sin(std::abs(p1.getLongnitude() - p2.getLongnitude()));
+  const type::Float v1 = std::sin(0.5 * std::abs(phi1 - phi2));
+  const type::Float v2 = std::sin(0.5 * std::abs(p1.getLongnitude() - p2.getLongnitude()));
 
-  return 2.0 * std::asin( v1*v1 + std::cos(phi1)*std::cos(phi2)*v2*v2 );
+  return 2.0 * std::asin( std::sqrt(v1*v1 + std::cos(phi1)*std::cos(phi2)*v2*v2) );
 }
 
 type::Float

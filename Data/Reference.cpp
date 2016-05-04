@@ -351,7 +351,7 @@ ReferenceType::ReferenceType()
   initiate();
 }
 
-const std::vector<std::string>& ReferenceType::getNameList() const
+const std::vector<std::string>& ReferenceType::getList() const
 {
   return NAME_LIST;
 }
