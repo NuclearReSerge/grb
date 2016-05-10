@@ -5,7 +5,7 @@ CONFIG -= qt
 
 TARGET  = grb
 
-DEFINES += GRB_VERSION="0.1"
+DEFINES += GRB_VERSION="0.2"
 
 QMAKE_CXXFLAGS += -std=c++11 -O0 -Wextra -Werror -Wpedantic
 
@@ -49,7 +49,8 @@ HEADERS += \
     Tools/NameMapper.h \
     Tools/Parser.h \
     CLI/CmdAnalyze.h \
-    Analyzer/AnalyzerFactory.h
+    Analyzer/AnalyzerFactory.h \
+    Models/ModelBase.h
 
 SOURCES += \
     Analyzer/AnalyzeGrbcat.cpp \

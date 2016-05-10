@@ -56,13 +56,13 @@ Catalog::size() const
 std::vector<CatalogEntry*>::const_iterator
 Catalog::begin() const
 {
-    return _catalog.begin();
+  return _catalog.begin();
 }
 
 std::vector<CatalogEntry*>::const_iterator
 Catalog::end() const
 {
-    return _catalog.end();
+  return _catalog.end();
 }
 
 const CatalogEntry&

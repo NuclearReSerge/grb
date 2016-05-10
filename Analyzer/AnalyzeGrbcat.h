@@ -1,5 +1,8 @@
 #include "Analyzer/Analyzer.h"
 
+#include <string>
+#include <list>
+
 #pragma once
 
 namespace grb
@@ -13,9 +16,19 @@ public:
   AnalyzeGrbcat();
   ~AnalyzeGrbcat();
 
-  void execute(const std::string& subcommand);
+  void execute(const std::string& subcommands);
+
+protected:
+  void parse();
+
+  void cmdCreateCF();
+  void cmdSetupCF();
+  void cmdBuildCF();
+  void cmdWriteCF();
 
 private:
+  std::list<std::string> _subcmd;
+
   Correlation* _correlation;
 
 };

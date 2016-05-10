@@ -12,7 +12,7 @@ const std::vector<std::string> CMD_LIST
   "quit",
   "help",
   "database",
-  "analyze"
+  "analyzer"
 };
 
 }

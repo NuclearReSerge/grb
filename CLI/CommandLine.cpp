@@ -74,6 +74,12 @@ CommandLine::parse(const std::string& input) throw(Exception)
   return cmdObj;
 }
 
+bool
+CommandLine::quit()
+{
+  return _quit;
+}
+
 void
 CommandLine::tokenize(const std::string& input, std::list<std::string>& words)
 {
@@ -84,12 +90,6 @@ CommandLine::tokenize(const std::string& input, std::list<std::string>& words)
     element.erase(element.find_last_not_of(WHITESPACE) + 1);
     words.push_back(element);
   }
-}
-
-bool
-CommandLine::quit()
-{
-  return _quit;
 }
 
 void

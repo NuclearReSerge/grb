@@ -26,13 +26,13 @@ public:
   Cmd* parse(const std::string& input) throw(Exception);
   bool quit();
 
+  static void tokenize(const std::string& input, std::list<std::string>& words);
 protected:
   friend class Cmd;
   friend class CmdQuit;
   void incCmdIdx();
   void setQuit();
 
-  void tokenize(const std::string& input, std::list<std::string>& words);
 private:
   bool _quit;
   std::size_t _cmdIndex;
