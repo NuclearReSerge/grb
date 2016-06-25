@@ -1,4 +1,4 @@
-#include "Duration.h"
+#include "Data/Duration.h"
 
 namespace grb
 {
@@ -30,42 +30,6 @@ void
 Duration::setPresent(bool val)
 {
   _isPresent = val;
-}
-
-const type::Index&
-Duration::getMod() const
-{
-  return _mod;
-}
-
-const type::Float&
-Duration::getDuration() const
-{
-  return _duration;
-}
-
-const type::Float&
-Duration::getError() const
-{
-  return _error;
-}
-
-const type::IntegerRange&
-Duration::getRange() const
-{
-  return _range;
-}
-
-const type::Integer&
-Duration::getEmin() const
-{
-  return _emin;
-}
-
-const type::Integer&
-Duration::getEmax() const
-{
-  return _emax;
 }
 
 type::Index&
@@ -147,25 +111,13 @@ DurationOther::setPresent(bool val)
   _isPresent = val;
 }
 
-const type::Float&
-DurationOther::getDuration() const
-{
-  return _duration;
-}
-
-const type::String&
-DurationOther::getNotes() const
-{
-  return _notes;
-}
-
 type::Float&
 DurationOther::getDuration()
 {
   return _duration;
 }
 
-type::String&
+ type::String&
 DurationOther::getNotes()
 {
   return _notes;

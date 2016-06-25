@@ -20,9 +20,19 @@ CmdQuit::CmdQuit(CommandLine& cli, type::CommandType cmdType)
 }
 
 bool
-CmdQuit::parse(std::list<std::string>& args) throw(Exception)
+CmdQuit::doParse(std::list<std::string>& args)
 {
-  return Cmd::parse(args);
+  if (!args.empty())
+    args.clear();
+
+  return true;
+}
+
+void
+CmdQuit::doExecute()
+{
+  getCLI().setQuit();
+  std::cout << "Bye!" << std::endl;
 }
 
 std::string
@@ -33,15 +43,4 @@ CmdQuit::doHelp(type::HelpType type)
 
   return HELP_LONG;
 }
-
-void
-CmdQuit::doExecute(Analyzer*& analyzer)
-{
-  delete analyzer;
-  analyzer = nullptr;
-
-  getCLI().setQuit();
-  std::cout << "Bye!" << std::endl;
-}
-
 }

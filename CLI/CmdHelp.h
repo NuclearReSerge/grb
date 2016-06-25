@@ -1,4 +1,4 @@
-#include <CLI/Cmd.h>
+#include "CLI/Cmd.h"
 
 #pragma once
 
@@ -12,11 +12,10 @@ class CmdHelp : public Cmd
 public:
   CmdHelp(CommandLine& cli);
 
-  bool parse(std::list<std::string>& args) throw(Exception);
-
 protected:
+  bool doParse(std::list<std::string>& args);
+  void doExecute();
   std::string doHelp(type::HelpType type);
-  void doExecute(Analyzer*& analyzer);
 
 private:
   bool _showAll;

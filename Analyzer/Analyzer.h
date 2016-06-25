@@ -1,3 +1,4 @@
+#include <list>
 #include <memory>
 #include <string>
 
@@ -7,6 +8,7 @@ namespace grb
 {
 
 class Catalog;
+class ModelBase;
 
 class Analyzer
 {
@@ -14,13 +16,8 @@ public:
   Analyzer();
   virtual ~Analyzer();
 
-  Catalog* getCatalog();
-  void setCatalog(Catalog* catalog);
-
-  virtual void execute(const std::string& subcommand) = 0;
-
-private:
-  std::unique_ptr<Catalog> _catalog;
+  virtual bool parse(std::list<std::string>& subcmd) = 0;
+  virtual void run() = 0;
 };
 
 }

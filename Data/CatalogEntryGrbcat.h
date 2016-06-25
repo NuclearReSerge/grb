@@ -16,24 +16,25 @@ class CatalogEntryGRBCAT : public CatalogEntry
 public:
   CatalogEntryGRBCAT(const Catalog& catalog);
 
-  const type::Integer& getRecordNumber() const;
-  const type::Integer& getId() const;
-  const type::String& getName() const;
-  const type::StringList& getAltNames() const;
-  const TimePoint& getTime() const;
-  const type::Index& getTimeDef() const;
-  const type::Index& getObservatory() const;
-  const Coordinates& getCoodinates() const;
-  const type::Index& getRegion() const;
-  const type::Flag& getAfterglowFlag() const;
-  const type::IndexList& getReference() const;
-  const Duration& getT50() const;
-  const Duration& getT90() const;
-  const DurationOther& getTOther() const;
-  const type::Flag& getFluxFlag() const;
-  const type::String& getFluxNotes() const;
-  const type::String& getLocalNotes() const;
-  const type::Integer& getClassId() const;
+  type::Integer& getRecordNumber();
+  type::Integer& getId();
+  type::String& getName();
+  type::StringList& getAltNames();
+  TimePoint& getTime();
+  type::Index& getTimeDef();
+  type::Index& getObservatory();
+  type::Float& getCoordFlag();
+  Coordinates& getCoodinates();
+  type::Index& getRegion();
+  type::Flag& getAfterglowFlag();
+  type::IndexList& getReference();
+  Duration& getT50();
+  Duration& getT90();
+  DurationOther& getTOther();
+  type::Flag& getFluxFlag();
+  type::String& getFluxNotes();
+  type::String& getLocalNotes();
+  type::Integer& getClassId();
 
 protected:
   type::Flag* getFlag(type::ColumnType column);
@@ -59,6 +60,7 @@ private:
   TimePoint _time;
   type::Index _time_def;
   type::Index _observatory;
+  type::Float _coord_flag;
   Coordinates _coordinates;
   type::Index _region;
   type::Flag _afterglow_flag;

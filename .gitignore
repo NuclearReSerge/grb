@@ -1,3 +1,4 @@
 database/*.tdat
 database/*.tdat.*
+doxygen/*
 *.pro.*

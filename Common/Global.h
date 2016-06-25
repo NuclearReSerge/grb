@@ -17,7 +17,7 @@ enum ErrorLevelCode
   DATABASE_PARSING_FAILED,
 
   // LAST
-  UNKNOWN_ERROR_LEVEL_CODE
+  ERROR_LEVEL_CODE_UNDEFINED
 };
 
 enum CommandType
@@ -26,9 +26,10 @@ enum CommandType
   CMD_QUIT,
   CMD_HELP,
   CMD_DATABASE,
+  CMD_MODEL,
   CMD_ANALYZE,
   // LAST
-  UNKNOWN_COMMAND_NAME
+  COMMAND_UNDEFINED
 };
 
 // High Energy Astrophysics Science Archive Research Center
@@ -61,6 +62,31 @@ enum CatalogType
   CATALOG_TEST,
   // LAST
   CATALOG_TYPE_UNDEFINED
+};
+
+enum CorrelationType
+{
+  CORR_GRBCAT_TIME_DIFF_VS_CIRCLE_DIST,
+
+  // LAST
+  CORRELATION_TYPE_UNDEFINED
+};
+
+enum ModelType
+{
+  // ISOTROPIC MODELS
+  ISOTROPIC_SPHERE,
+  ISOTROPIC_BALL,
+  ISOTROPIC_JUMPER_CONST_DISTANCE,
+  ISOTROPIC_JUMPER_GAUSSIAN_DISTANCE,
+
+  // ANISOTROPIC MODELS
+  MILKYWAY_JUMPER,
+  MILKYWAY_JUMPER_WITH_CLUSTERS,
+  MILKYWAY_JUMPER_EXPLORER,
+
+  // LAST
+  MODEL_TYPE_UNDEFINED
 };
 
 enum ColumnType
@@ -148,12 +174,18 @@ enum UnitType
 
 enum CoordinateSystemType
 {
-  J2000,
-  B1950,
-  GALACTIC,
+  // math
+  CARTESIAN = 0, // x = 0, y = 1, z = 2
+  CYLINDRICAL = 3, // \rho = 3, \phi = 4, z = 5
+  SPHERICAL = 6, // r = 6, \phi = 7, \theta = 8
+  // astronomy
+  EQUATORIAL_B1950 = 9, // = 9, = 10, = 11
+  EQUATORIAL_J2000 = 12, // = 12, = 13, = 14
+  ECLIPTIC = 13, // = 15, = 16, = 17
+  GALACTIC = 18, // = 18, = 19, = 20
 
   // LAST
-  COORDINATE_SYSTEM_UNDEFINED
+  COORDINATE_SYSTEM_UNDEFINED = 21
 };
 
 enum DateTimeType

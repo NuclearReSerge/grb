@@ -42,6 +42,30 @@ static std::vector<std::string> CATALOG_NAMES
   "unknown catalog type"
 };
 
+static std::vector<std::string> CORRELATION_NAMES
+{
+  "grbcat_dtdarc",
+  // LAST
+  "unknown correlation type"
+};
+
+static std::vector<std::string> MODEL_NAMES
+{
+  // ISOTROPIC MODELS
+  "isotropic_sphere",
+  "isotropic_ball",
+  "isotropic_jumper_const_distance",
+  "isotropic_jumper_gaussian_distance",
+
+  // ANISOTROPIC MODELS
+  "milkyway_jumper",
+  "milkyway_jumper_with_clusters",
+  "milkyway_jumper_explorer",
+
+  // LAST
+  "unknown model type"
+};
+
 static std::vector<Column> COLUMN_NAMES
 {
   // HEASARC_GRBCAT
@@ -147,6 +171,18 @@ std::string&
 GlobalName::getCatalog(type::CatalogType catType)
 {
   return getWithRangeCheck(CATALOG_NAMES, catType);
+}
+
+std::string&
+GlobalName::getCorrelation(type::CorrelationType corrType)
+{
+  return getWithRangeCheck(CORRELATION_NAMES, corrType);
+}
+
+std::string&
+GlobalName::getModel(type::ModelType modelType)
+{
+  return getWithRangeCheck(MODEL_NAMES, modelType);
 }
 
 std::string&

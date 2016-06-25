@@ -16,7 +16,6 @@ CommandFactoryType::CommandFactoryType()
 Cmd*
 CommandFactoryType::create(CommandLine& cli, const std::string& command)
 {
-
   type::CommandType cmdType;
   try
   {

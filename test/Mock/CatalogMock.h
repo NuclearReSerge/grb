@@ -10,7 +10,11 @@ namespace test
 class CatalogMock : public Catalog
 {
 public:
-  CatalogMock();
+  CatalogMock(type::CatalogType type);
+
+  std::vector<CatalogEntry*>::iterator begin();
+  std::vector<CatalogEntry*>::iterator end();
+  CatalogEntry& operator[](std::size_t index);
 
 protected:
   CatalogEntry* createEntry();

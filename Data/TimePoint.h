@@ -12,14 +12,19 @@ public:
 
   type::DateTimeType getType() const;
 
-  const type::Float& getTime() const;
-  const type::Float& getTimeUnix() const;
-  const type::Float& getTimeJD() const;
-  const type::Float& getTimeMJD() const;
+  // general
+  type::Float& getX0();
+
+  // default
+  type::Float getTime();
+  // system date
+  type::Float getTimeUnix();
+  // Julian Date
+  type::Float getTimeJD();
+  type::Float getTimeMJD();
 
 protected:
   friend class CatalogEntryGRBCAT;
-  type::Float& getTime();
   void setTimeUnitType(type::UnitType unitType);
 
   bool isValid();

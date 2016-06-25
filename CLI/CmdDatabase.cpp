@@ -1,8 +1,8 @@
-#include "Analyzer/AnalyzerFactory.h"
-#include "Common/GlobalName.h"
 #include "CLI/CommandMapper.h"
+#include "Common/GlobalName.h"
 #include "Data/Catalog.h"
 #include "Data/DataBaseFormatFactory.h"
+#include "Main/AnalysisData.h"
 #include "Tools/Parser.h"
 
 #include "CLI/CmdDatabase.h"
@@ -25,11 +25,10 @@ const char* HELP_LONG = " <DB_FILE>.tdat";
 CmdDatabase::CmdDatabase(CommandLine& cli)
   : Cmd(cli, type::CMD_DATABASE)
 {
-
 }
 
 bool
-CmdDatabase::parse(std::list<std::string>& args) throw(Exception)
+CmdDatabase::doParse(std::list<std::string>& args)
 {
   if (args.empty())
   {
@@ -49,7 +48,31 @@ CmdDatabase::parse(std::list<std::string>& args) throw(Exception)
   }
   args.pop_front();
 
-  return Cmd::parse(args);
+  return true;
+}
+
+void
+CmdDatabase::doExecute()
+{
+  std::size_t rows;
+
+  G_CatalogData().reset(new Catalog(_catType));
+
+  try
+  {
+    Parser parser(_dbFile,
+                  DataBaseFormatFactory::instance()->getFormat(_dbType),
+                  *G_CatalogData().get());
+    rows = parser.parse();
+  }
+  catch (grb::Exception& parseExc)
+  {
+    std::stringstream ss;
+    ss << "Parsing failed." << std::endl << parseExc.what();
+    Exception exc(parseExc.getLevel(), ss.str(), PRETTY_FUNCTION);
+    throw exc;
+  }
+  std::cout << "Parsing successful. Extraced " << rows << " rows." << std::endl;
 }
 
 std::string
@@ -59,41 +82,6 @@ CmdDatabase::doHelp(type::HelpType type)
     return HELP_SHORT;
 
   return HELP_LONG;
-}
-
-void
-CmdDatabase::doExecute(Analyzer*& analyzer)
-{
-  std::size_t rows;
-  Catalog* catalog = new Catalog(_catType);
-
-  try
-  {
-    Parser parser(_dbFile,
-                  DataBaseFormatFactory::instance()->getFormat(_dbType),
-                  *catalog);
-    rows = parser.parse();
-  }
-  catch (grb::Exception& parseExc)
-  {
-    delete catalog;
-    std::stringstream ss;
-    ss << "Parsing failed." << std::endl << parseExc.what();
-    Exception exc(parseExc.getLevel(), ss.str(), PRETTY_FUNCTION);
-    throw exc;
-  }
-  std::cout << "Parsing successful. Extraced " << rows << " rows." << std::endl;
-
-  analyzer = AnalyzerFactory::instance()->create(_catType);
-  if (!analyzer)
-  {
-    delete catalog;
-    std::stringstream ss;
-    ss << "Analyzer not available." << std::endl;
-    Exception exc(type::EXCEPTION_CRITICAL, ss.str(), PRETTY_FUNCTION);
-    throw exc;
-  }
-  analyzer->setCatalog(catalog);
 }
 
 bool

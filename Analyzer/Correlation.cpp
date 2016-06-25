@@ -1,18 +1,19 @@
 #include "Analyzer/Correlation.h"
+#include "Model/ModelBase.h"
 
 namespace grb
 {
 
 Correlation::Correlation(type::CorrelationType type)
   : _xRange(0.0), _xPoints(0), _xDelta(0.0), _yRange(0.0), _yPoints(0), _yDelta(0.0),
-    _type(type)
+    _model(nullptr), _type(type)
 {
 
 }
 
 Correlation::~Correlation()
 {
-
+  delete _model;
 }
 
 type::CorrelationType

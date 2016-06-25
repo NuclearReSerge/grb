@@ -24,7 +24,7 @@ CmdHelp::CmdHelp(CommandLine& cli)
 }
 
 bool
-CmdHelp::parse(std::list<std::string>& args) throw(Exception)
+CmdHelp::doParse(std::list<std::string>& args)
 { 
   if (!args.empty())
   {
@@ -49,24 +49,14 @@ CmdHelp::parse(std::list<std::string>& args) throw(Exception)
   return true;
 }
 
-
-std::string
-CmdHelp::doHelp(type::HelpType type)
-{
-  if (type == type::HELP_SHORT)
-    return HELP_SHORT;
-
-  return HELP_LONG;
-}
-
 void
-CmdHelp::doExecute(Analyzer*& analyzer)
+CmdHelp::doExecute()
 {
   std::cout << "Available commands:" << std::endl;
 
   if (_showAll)
   {
-    for (int i = 0; i < type::UNKNOWN_COMMAND_NAME; ++i)
+    for (int i = 0; i < type::COMMAND_UNDEFINED; ++i)
     {
       Cmd* cmd = CommandFactory::instance()->create(getCLI(), (type::CommandType) i);
       if (!cmd)
@@ -90,10 +80,15 @@ CmdHelp::doExecute(Analyzer*& analyzer)
     std::cout << cmd->help(type::HELP_FULL);
     delete cmd;
   }
+}
 
-// just a dummy code
-  if(analyzer)
-    return;
+std::string
+CmdHelp::doHelp(type::HelpType type)
+{
+  if (type == type::HELP_SHORT)
+    return HELP_SHORT;
+
+  return HELP_LONG;
 }
 
 }

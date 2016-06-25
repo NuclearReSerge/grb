@@ -33,38 +33,38 @@ GreatCircleDistance::GreatCircleDistance(type::ArcFormulaType type)
 }
 
 type::Float
-GreatCircleDistance::operator()(const Coordinates& p1, const Coordinates& p2)
+GreatCircleDistance::operator()(Coordinates& p1, Coordinates& p2)
 {
   return (this->*_getDistance)(p1, p2);
 }
 
 type::Float
-GreatCircleDistance::getSphericalLawOfCosines(const Coordinates& p1, const Coordinates& p2) const
+GreatCircleDistance::getSphericalLawOfCosines(Coordinates& p1, Coordinates& p2) const
 {
-  const type::Float phi1 = p1.getLatitude();
-  const type::Float phi2 = p2.getLatitude();
-  const type::Float dlam = std::abs(p1.getLongnitude() - p2.getLongnitude());
+  const type::Float phi1 = p1.getCelLatitude();
+  const type::Float phi2 = p2.getCelLatitude();
+  const type::Float dlam = std::abs(p1.getCelLongnitude() - p2.getCelLongnitude());
 
   return std::acos( std::sin(phi1)*std::sin(phi2) + std::cos(phi1)*std::cos(phi2)*std::cos(dlam) );
 }
 
 type::Float
-GreatCircleDistance::getHaversineFormula(const Coordinates& p1, const Coordinates& p2) const
+GreatCircleDistance::getHaversineFormula(Coordinates& p1, Coordinates& p2) const
 {
-  const type::Float phi1 = p1.getLatitude();
-  const type::Float phi2 = p2.getLatitude();
+  const type::Float phi1 = p1.getCelLatitude();
+  const type::Float phi2 = p2.getCelLatitude();
   const type::Float v1 = std::sin(0.5 * std::abs(phi1 - phi2));
-  const type::Float v2 = std::sin(0.5 * std::abs(p1.getLongnitude() - p2.getLongnitude()));
+  const type::Float v2 = std::sin(0.5 * std::abs(p1.getCelLongnitude() - p2.getCelLongnitude()));
 
   return 2.0 * std::asin( std::sqrt(v1*v1 + std::cos(phi1)*std::cos(phi2)*v2*v2) );
 }
 
 type::Float
-GreatCircleDistance::getVinventyFormulae(const Coordinates& p1, const Coordinates& p2) const
+GreatCircleDistance::getVinventyFormulae(Coordinates& p1, Coordinates& p2) const
 {
-  const type::Float phi1 = p1.getLatitude();
-  const type::Float phi2 = p2.getLatitude();
-  const type::Float dlam = std::abs(p1.getLongnitude() - p2.getLongnitude());
+  const type::Float phi1 = p1.getCelLatitude();
+  const type::Float phi2 = p2.getCelLatitude();
+  const type::Float dlam = std::abs(p1.getCelLongnitude() - p2.getCelLongnitude());
   const type::Float v1 = std::cos(phi2)*std::sin(dlam);
   const type::Float v2 = std::cos(phi1)*std::sin(phi2) -
                          std::sin(phi1)*std::cos(phi2)*std::cos(dlam);
@@ -75,9 +75,9 @@ GreatCircleDistance::getVinventyFormulae(const Coordinates& p1, const Coordinate
 }
 
 type::Float
-GreatCircleDistance::getZero(const Coordinates& p1, const Coordinates& p2) const
+GreatCircleDistance::getZero(Coordinates& p1, Coordinates& p2) const
 {
-  return 0.0 * p1.getHorizontal() * p2.getHorizontal();
+  return 0.0 * p1.getCarX() * p2.getCarX();
 }
 
 }

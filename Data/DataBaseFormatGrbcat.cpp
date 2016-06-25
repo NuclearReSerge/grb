@@ -5,7 +5,7 @@ namespace grb
 {
 
 DataBaseFormatGrbcat::DataBaseFormatGrbcat()
-  : DataBaseFormat(type::HEASARC_GRBCAT), _coordSys(type::J2000)
+  : DataBaseFormat(type::HEASARC_GRBCAT), _coordSys(type::EQUATORIAL_J2000)
 {
 }
 

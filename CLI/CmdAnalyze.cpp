@@ -1,4 +1,6 @@
+#include "Analyzer/AnalyzerFactory.h"
 #include "CLI/CmdAnalyze.h"
+#include "Main/AnalysisData.h"
 
 #include <sstream>
 
@@ -22,7 +24,7 @@ CmdAnalyze::CmdAnalyze(CommandLine& cli)
 }
 
 bool
-CmdAnalyze::parse(std::list<std::string>& args) throw(Exception)
+CmdAnalyze::doParse(std::list<std::string>& args)
 {
   if (args.empty())
   {
@@ -31,10 +33,34 @@ CmdAnalyze::parse(std::list<std::string>& args) throw(Exception)
     throw exc;
   }
 
-  _subcommand = args.front();
-  args.pop_front();
+  if (!G_Analyzer().get())
+  {
+    if (!G_CatalogData().get())
+    {
+      std::stringstream ss;
+      ss << "Noting to analyse. Provide a databse first.";
+      Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
+                    ss.str(), PRETTY_FUNCTION);
+      throw exc;
+    }
 
-  return Cmd::parse(args);
+    Analyzer* analyzer = AnalyzerFactory::instance()->create(G_CatalogData().get()->getType());
+    if (!analyzer)
+    {
+      std::stringstream ss;
+      ss << "Analyzer not available." << std::endl;
+      Exception exc(type::EXCEPTION_CRITICAL, ss.str(), PRETTY_FUNCTION);
+      throw exc;
+    }
+    G_Analyzer().reset(analyzer);
+  }
+  return G_Analyzer().get()->parse(args);
+}
+
+void
+CmdAnalyze::doExecute()
+{
+  G_Analyzer().get()->run();
 }
 
 std::string
@@ -44,20 +70,6 @@ CmdAnalyze::doHelp(type::HelpType type)
     return HELP_SHORT;
 
   return HELP_LONG;
-}
-
-void
-CmdAnalyze::doExecute(Analyzer*& analyzer)
-{
-  if (!analyzer)
-  {
-    std::stringstream ss;
-    ss << "Noting to analyse. Provide a databse first.";
-    Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
-                  ss.str(), PRETTY_FUNCTION);
-    throw exc;
-  }
-  analyzer->execute(_subcommand);
 }
 
 }

@@ -53,20 +53,20 @@ Catalog::size() const
   return _catalog.size();
 }
 
-std::vector<CatalogEntry*>::const_iterator
-Catalog::begin() const
+std::vector<CatalogEntry*>::iterator
+Catalog::begin()
 {
   return _catalog.begin();
 }
 
-std::vector<CatalogEntry*>::const_iterator
-Catalog::end() const
+std::vector<CatalogEntry*>::iterator
+Catalog::end()
 {
   return _catalog.end();
 }
 
-const CatalogEntry&
-Catalog::operator[](std::size_t index) const
+CatalogEntry&
+Catalog::operator[](std::size_t index)
 {
   if (index < _catalog.size())
     return *_catalog[index];

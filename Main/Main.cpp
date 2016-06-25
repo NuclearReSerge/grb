@@ -1,6 +1,7 @@
 #include "Analyzer/Analyzer.h"
 #include "CLI/CommandLine.h"
 #include "CLI/Cmd.h"
+#include "Main/AnalysisData.h"
 
 #include <iostream>
 #include <memory>
@@ -17,6 +18,41 @@ namespace grb
 
 extern void intro();
 extern void usage(const std::string& binaryName);
+
+std::unique_ptr<Catalog>&
+G_CatalogData()
+{
+  static std::unique_ptr<Catalog> _catalog;
+  return _catalog;
+}
+
+std::unique_ptr<Catalog>&
+G_CatalogModel()
+{
+  static std::unique_ptr<Catalog> _catalog;
+  return _catalog;
+}
+
+std::unique_ptr<ModelBase>&
+G_Model()
+{
+  static std::unique_ptr<ModelBase> _model;
+  return _model;
+}
+
+std::unique_ptr<Analyzer>&
+G_Analyzer()
+{
+  static std::unique_ptr<Analyzer> _analyzer;
+  return _analyzer;
+}
+
+std::unique_ptr<Correlation>&
+G_Correlation()
+{
+  static std::unique_ptr<Correlation> _correlation;
+  return _correlation;
+}
 
 }
 
@@ -39,8 +75,6 @@ main(int argc, char** argv)
   grb::intro();
   grb::CommandLine cli(argc, argv);
 
-  grb::Analyzer* analyzer = nullptr;
-
   while (!cli.quit())
   {
     std::cout << cli.getPrompt();
@@ -53,7 +87,7 @@ main(int argc, char** argv)
       grb::Cmd* cmdObj = cli.parse(cmdLine);
       if(cmdObj)
       {
-        cmdObj->execute(analyzer);
+        cmdObj->execute();
       }
       else
       {

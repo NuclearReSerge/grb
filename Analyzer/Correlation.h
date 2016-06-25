@@ -7,25 +7,13 @@
 namespace grb
 {
 
-namespace type
-{
-
-enum CorrelationType
-{
-  TIME_DIFF_VS_CIRCLE_DIST_GRBCAT,
-
-  // LAST
-  UNKNOWN_CORRELATION_TYPE
-};
-
-}
-
 class Catalog;
+class ModelBase;
 
 class Correlation
 {
 public:
-  Correlation(type::CorrelationType type = type::UNKNOWN_CORRELATION_TYPE);
+  Correlation(type::CorrelationType type = type::CORRELATION_TYPE_UNDEFINED);
   virtual ~Correlation();
 
   type::CorrelationType getType() const;
@@ -33,7 +21,7 @@ public:
   void setXAxis(type::Float range, std::size_t points);
   void setYAxis(type::Float range, std::size_t points);
 
-  virtual bool buildCF(const Catalog& catalog) = 0;
+  virtual bool buildCF(Catalog& catalog) = 0;
   virtual bool saveCF(const std::string& filename) = 0;
 
 protected:
@@ -45,6 +33,7 @@ protected:
   std::size_t _yPoints;
   type::Float _yDelta;
 
+  ModelBase* _model;
 private:
   type::CorrelationType _type;
 

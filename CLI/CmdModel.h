@@ -1,19 +1,24 @@
 #include "CLI/Cmd.h"
+#include "Common/Global.h"
 
 #pragma once
 
 namespace grb
 {
 
-class CmdAnalyze : public Cmd
+class ModelBase;
+
+class CmdModel : public Cmd
 {
 public:
-  CmdAnalyze(CommandLine& cli);
+  CmdModel(CommandLine& cli);
 
 protected:
   bool doParse(std::list<std::string>& args);
   void doExecute();
   std::string doHelp(type::HelpType type);
+
+  void modelNameMapping(const std::string& name);
 };
 
 }

@@ -12,114 +12,120 @@ namespace grb
 CatalogEntryGRBCAT::CatalogEntryGRBCAT(const Catalog& catalog)
   : CatalogEntry(catalog),
     _record_number(0), _id(0), _time(type::MODIFIED_JULIAN_DATE), _time_def(-1),
-    _observatory(-1), _coordinates(type::J2000), _region(-1),
+    _observatory(-1), _coordinates(type::EQUATORIAL_J2000), _region(-1),
     _afterglow_flag(false), _t50(), _t90(), _t_other(), _flux_flag(false), _class_id(0)
 { }
 
-const type::Integer&
-CatalogEntryGRBCAT::getRecordNumber() const
+type::Integer&
+CatalogEntryGRBCAT::getRecordNumber()
 {
   return _record_number;
 }
 
-const type::Integer&
-CatalogEntryGRBCAT::getId() const
+type::Integer&
+CatalogEntryGRBCAT::getId()
 {
   return _id;
 }
 
-const type::String&
-CatalogEntryGRBCAT::getName() const
+type::String&
+CatalogEntryGRBCAT::getName()
 {
   return _name;
 }
 
-const type::StringList&
-CatalogEntryGRBCAT::getAltNames() const
+type::StringList&
+CatalogEntryGRBCAT::getAltNames()
 {
   return _alt_names;
 }
 
-const TimePoint&
-CatalogEntryGRBCAT::getTime() const
+TimePoint&
+CatalogEntryGRBCAT::getTime()
 {
   return _time;
 }
 
-const type::Index&
-CatalogEntryGRBCAT::getTimeDef() const
+type::Index&
+CatalogEntryGRBCAT::getTimeDef()
 {
   return _time_def;
 }
 
-const type::Index&
-CatalogEntryGRBCAT::getObservatory() const
+type::Index&
+CatalogEntryGRBCAT::getObservatory()
 {
   return _observatory;
 }
 
-const Coordinates&
-CatalogEntryGRBCAT::getCoodinates() const
+type::Float&
+CatalogEntryGRBCAT::getCoordFlag()
+{
+  return _coord_flag;
+}
+
+Coordinates&
+CatalogEntryGRBCAT::getCoodinates()
 {
   return _coordinates;
 }
 
-const type::Index&
-CatalogEntryGRBCAT::getRegion() const
+type::Index&
+CatalogEntryGRBCAT::getRegion()
 {
   return _region;
 }
 
-const type::Flag&
-CatalogEntryGRBCAT::getAfterglowFlag() const
+type::Flag&
+CatalogEntryGRBCAT::getAfterglowFlag()
 {
   return _afterglow_flag;
 }
 
-const type::IndexList&
-CatalogEntryGRBCAT::getReference() const
+type::IndexList&
+CatalogEntryGRBCAT::getReference()
 {
   return _reference;
 }
 
-const Duration&
-CatalogEntryGRBCAT::getT50() const
+Duration&
+CatalogEntryGRBCAT::getT50()
 {
   return _t50;
 }
 
-const Duration&
-CatalogEntryGRBCAT::getT90() const
+Duration&
+CatalogEntryGRBCAT::getT90()
 {
   return _t90;
 }
 
-const DurationOther&
-CatalogEntryGRBCAT::getTOther() const
+DurationOther&
+CatalogEntryGRBCAT::getTOther()
 {
   return _t_other;
 }
 
-const type::Flag&
-CatalogEntryGRBCAT::getFluxFlag() const
+type::Flag&
+CatalogEntryGRBCAT::getFluxFlag()
 {
   return _flux_flag;
 }
 
-const type::String&
-CatalogEntryGRBCAT::getFluxNotes() const
+type::String&
+CatalogEntryGRBCAT::getFluxNotes()
 {
   return _flux_notes;
 }
 
-const type::String&
-CatalogEntryGRBCAT::getLocalNotes() const
+type::String&
+CatalogEntryGRBCAT::getLocalNotes()
 {
   return _local_notes;
 }
 
-const type::Integer&
-CatalogEntryGRBCAT::getClassId() const
+type::Integer&
+CatalogEntryGRBCAT::getClassId()
 {
   return _class_id;
 }
@@ -219,13 +225,13 @@ CatalogEntryGRBCAT::getFloat(type::ColumnType column)
   switch (column)
   {
     case type::COORD_RA:
-      return &_coordinates.getHorizontal();
+      return &_coordinates.getX2();
     case type::COORD_DEC:
-      return &_coordinates.getVertical();
+      return &_coordinates.getX3();
     case type::COORD_FLAG:
-      return &_coordinates.getCoordFlag();
+      return &_coord_flag;
     case type::TIME:
-      return &_time.getTime();
+      return &_time.getX0();
     case type::T50:
       return &_t50.getDuration();
     case type::T50_ERROR:
@@ -303,10 +309,10 @@ CatalogEntryGRBCAT::setUnitType(type::ColumnType column, type::UnitType unitType
   switch (column)
   {
     case type::COORD_RA:
-      _coordinates.setHorizontalUnitType(unitType);
+      _coordinates.setX2UnitType(unitType);
       break;
     case type::COORD_DEC:
-      _coordinates.setVerticalUnitType(unitType);
+      _coordinates.setX3UnitType(unitType);
       break;
     case type::TIME:
       _time.setTimeUnitType(unitType);

@@ -1,14 +1,11 @@
+#include "Analyzer/Analyzer.h"
 #include "Common/Global.h"
 #include "Common/Singleton.h"
-
-#include <string>
 
 #pragma once
 
 namespace grb
 {
-
-class Analyzer;
 
 class AnalyzerFactoryType
 {

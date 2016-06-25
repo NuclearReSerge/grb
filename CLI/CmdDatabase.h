@@ -11,11 +11,10 @@ class CmdDatabase : public Cmd
 public:
   CmdDatabase(CommandLine& cli);
 
-  bool parse(std::list<std::string>& args) throw(Exception);
-
 protected:
+  bool doParse(std::list<std::string>& args);
+  void doExecute();
   std::string doHelp(type::HelpType type);
-  void doExecute(Analyzer*& analyzer);
 
   bool filenameMapping(const std::string& filename);
 

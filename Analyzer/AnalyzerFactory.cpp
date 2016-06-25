@@ -1,6 +1,5 @@
 #include "Analyzer/AnalyzerFactory.h"
-
-#include "Analyzer/AnalyzeGrbcat.h"
+#include "Analyzer/AnalyzerGrbcat.h"
 
 namespace grb
 {
@@ -15,7 +14,7 @@ AnalyzerFactoryType::create(type::CatalogType catType)
   switch (catType)
   {
     case type::GRBCAT:
-      return new AnalyzeGrbcat;
+      return new AnalyzerGrbcat;
     default:
       break;
   }

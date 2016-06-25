@@ -25,6 +25,7 @@ Cmd::getType() const
 bool
 Cmd::parse(std::list<std::string>& args) throw(Exception)
 {
+  doParse(args);
   if (!args.empty())
   {
     std::stringstream ss;
@@ -42,6 +43,14 @@ Cmd::parse(std::list<std::string>& args) throw(Exception)
   return true;
 }
 
+void
+Cmd::execute()
+{
+  doExecute();
+  getCLI().incCmdIdx();
+  _wasExecuted = true;
+}
+
 std::string
 Cmd::help(type::HelpType type)
 {
@@ -57,14 +66,6 @@ Cmd::help(type::HelpType type)
     ss << "Usage: " << cmdName << doHelp(type::HELP_LONG) << std::endl;
   }
   return ss.str();
-}
-
-void
-Cmd::execute(Analyzer*& analyzer)
-{
-  doExecute(analyzer);
-  getCLI().incCmdIdx();
-  _wasExecuted = true;
 }
 
 bool

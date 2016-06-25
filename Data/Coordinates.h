@@ -5,7 +5,6 @@
 namespace grb
 {
 
-
 class Coordinates
 {
 public:
@@ -14,35 +13,129 @@ public:
 
   type::CoordinateSystemType getType() const;
 
-  const type::Float& getCoordFlag() const;
-// undefined coordinate system or based on type
-  const type::Float& getHorizontal() const;
-  const type::Float& getVertical() const;
-// equinox J2000
-  const type::Float& getRightAscension() const;
-  const type::Float& getDeclination() const;
-// galactic
-  const type::Float& getLongnitude() const;
-  const type::Float& getLatitude() const;
+  void setX1UnitType(type::UnitType unitType);
+  void setX2UnitType(type::UnitType unitType);
+  void setX3UnitType(type::UnitType unitType);
 
-protected:
-  friend class CatalogEntryGRBCAT;
-  type::Float& getCoordFlag();
-  type::Float& getHorizontal();
-  type::Float& getVertical();
+  // general
+  type::Float& getX1();
+  type::Float& getX2();
+  type::Float& getX3();
 
-  void setHorizontalUnitType(type::UnitType unitType);
-  void setVerticalUnitType(type::UnitType unitType);
+// CartesianSystem
+  type::Float getCarX();
+  type::Float getCarY();
+  type::Float getCarZ();
+// CylindricalSystem
+  type::Float getCylRho();
+  type::Float getCylPhi();
+  type::Float getCylZ();
+// SphericalSystem
+  type::Float getSphR();
+  type::Float getSphPhi();
+  type::Float getSphTheta();
+// CelestialSystem
+  // equinox J2000
+  type::Float getCelRightAscension();
+  type::Float getCelDeclination();
+  // galactic
+  type::Float getCelLongnitude();
+  type::Float getCelLatitude();
 
   virtual bool isValid();
 
+protected:
+  enum CoordinateIndex
+  {
+    X1,
+    X2,
+    X3
+  };
+
+  struct CommonSystem
+  {
+    type::Float x1;
+    type::Float x2;
+    type::Float x3;
+  };
+
+  struct CartesianSystem
+  {
+    type::Float x;
+    type::Float y;
+    type::Float z;
+  };
+
+  struct CylindricalSystem
+  {
+    type::Float rho;
+    type::Float phi;
+    type::Float z;
+  };
+
+  struct SphericalSystem
+  {
+    type::Float r;
+    type::Float phi;
+    type::Float theta;
+  };
+
+  struct CelestialSystem
+  {
+    type::Float dummy;
+    type::Float longitude;
+    type::Float latitude;
+  };
+
+  void conversionMapper(type::CoordinateSystemType targetSys, CoordinateIndex index);
+
+  typedef type::Float (Coordinates::*fPtr)(const CommonSystem& sys) const;
+
+  fPtr _convert;
+
+  type::Float identity(const CommonSystem& sys) const;
+
+  type::Float convCarCylX1(const CommonSystem& sys) const;
+  type::Float convCarCylX2(const CommonSystem& sys) const;
+  type::Float convCarCylX3(const CommonSystem& sys) const;
+
+  type::Float convCarSphX1(const CommonSystem& sys) const;
+  type::Float convCarSphX2(const CommonSystem& sys) const;
+  type::Float convCarSphX3(const CommonSystem& sys) const;
+
+  type::Float convCylCarX1(const CommonSystem& sys) const;
+  type::Float convCylCarX2(const CommonSystem& sys) const;
+  type::Float convCylCarX3(const CommonSystem& sys) const;
+
+  type::Float convCylSphX1(const CommonSystem& sys) const;
+  type::Float convCylSphX2(const CommonSystem& sys) const;
+  type::Float convCylSphX3(const CommonSystem& sys) const;
+
+  type::Float convSphCarX1(const CommonSystem& sys) const;
+  type::Float convSphCarX2(const CommonSystem& sys) const;
+  type::Float convSphCarX3(const CommonSystem& sys) const;
+
+  type::Float convSphCylX1(const CommonSystem& sys) const;
+  type::Float convSphCylX2(const CommonSystem& sys) const;
+  type::Float convSphCylX3(const CommonSystem& sys) const;
+
+
 private:
   type::CoordinateSystemType _type;
-  type::Float _coord_flag;
-  type::Float _horizontal;
-  type::Float _vertical;
-  type::UnitType _horizontalUnitType;
-  type::UnitType _verticalUnitType;
+  union
+  {
+    CommonSystem common;
+    CartesianSystem cartesian;
+    CylindricalSystem cylindrical;
+    SphericalSystem spherical;
+    CelestialSystem celestial;
+  } _u;
+
+  type::UnitType _x1Type;
+  type::UnitType _x2Type;
+  type::UnitType _x3Type;
+
+  fPtr _map[type::COORDINATE_SYSTEM_UNDEFINED];
 };
 
 }

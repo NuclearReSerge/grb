@@ -109,10 +109,10 @@ TEST_F(GreatCircleDistanceTest, points_RandomCoordinates)
 
   for (const TestData& data : testData)
   {
-    P1.getHorizontal() = data.point1.lambda;
-    P1.getVertical()   = data.point1.phi;
-    P2.getHorizontal() = data.point2.lambda;
-    P2.getVertical()   = data.point2.phi;
+    P1.getX2() = data.point1.lambda;
+    P1.getX3()   = data.point1.phi;
+    P2.getX2() = data.point2.lambda;
+    P2.getX3()   = data.point2.phi;
     EXPECT_DOUBLE_EQ((type::Float) data.result.spherical, distSpherical(P1, P2));
     EXPECT_DOUBLE_EQ((type::Float) data.result.haversine, distHaversine(P1, P2));
     EXPECT_DOUBLE_EQ((type::Float) data.result.vincenty,  distVincenty(P1, P2));

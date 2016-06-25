@@ -17,6 +17,10 @@ public:
 
   static std::string& getDatabaseTable(type::DatabaseTableType dbType);
   static std::string& getCatalog(type::CatalogType catType);
+  static std::string& getCorrelation(type::CorrelationType corrType);
+  static std::string& getModel(type::ModelType modelType);
+
+
   static std::string& getColumn(type::ColumnType columnType);
   static std::string& getColumnDescription(type::ColumnType columnType);
   static std::string& getValue(type::ValueType valueType);

@@ -10,8 +10,6 @@
 #include <sstream>
 #include <fstream>
 
-#include "Common/trace.h"
-
 namespace grb
 {
 

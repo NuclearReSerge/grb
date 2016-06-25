@@ -28,20 +28,21 @@ class Cmd
 {
 public:
   Cmd() = delete;
-  Cmd(CommandLine& cli, type::CommandType cmdType = type::UNKNOWN_COMMAND_NAME);
+  Cmd(CommandLine& cli, type::CommandType cmdType = type::COMMAND_UNDEFINED);
   virtual ~Cmd();
 
   type::CommandType getType() const;
 
-  virtual bool parse(std::list<std::string>& args) throw(Exception);
-
+  bool parse(std::list<std::string>& args) throw(Exception);
+  void execute();
   std::string help(type::HelpType type = type::HELP_SHORT);
-  void execute(Analyzer*& analyzer);
+
   bool wasExecuted() const;
 
 protected:
+  virtual bool doParse(std::list<std::string>& args) = 0;
+  virtual void doExecute() = 0;
   virtual std::string doHelp(type::HelpType type) = 0;
-  virtual void doExecute(Analyzer*& analyzer) = 0;
   virtual CommandLine& getCLI();
 
 private:

@@ -1,4 +1,4 @@
-#include "TimePoint.h"
+#include "Data/TimePoint.h"
 
 #include <cmath>
 
@@ -36,8 +36,14 @@ TimePoint::getType() const
   return _type;
 }
 
-const type::Float&
-TimePoint::getTime() const
+type::Float&
+TimePoint::getX0()
+{
+  return _time;
+}
+
+type::Float
+TimePoint::getTime()
 {
   switch (_type)
   {
@@ -52,26 +58,20 @@ TimePoint::getTime() const
   };
 }
 
-const type::Float&
-TimePoint::getTimeUnix() const
+type::Float
+TimePoint::getTimeUnix()
 {
   return _time;
 }
 
-const type::Float&
-TimePoint::getTimeJD() const
+type::Float
+TimePoint::getTimeJD()
 {
   return _time;
 }
 
-const type::Float&
-TimePoint::getTimeMJD() const
-{
-  return _time;
-}
-
-type::Float&
-TimePoint::getTime()
+type::Float
+TimePoint::getTimeMJD()
 {
   return _time;
 }

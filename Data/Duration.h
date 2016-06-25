@@ -14,15 +14,6 @@ public:
   bool isPresent() const;
   void setPresent(bool val = true);
 
-  const type::Index& getMod() const;
-  const type::Float& getDuration() const;
-  const type::Float& getError() const;
-  const type::IntegerRange& getRange() const;
-  const type::Integer& getEmin() const;
-  const type::Integer& getEmax() const;
-
-protected:
-  friend class CatalogEntryGRBCAT;
   type::Index& getMod();
   type::Float& getDuration();
   type::Float& getError();
@@ -30,6 +21,8 @@ protected:
   type::Integer& getEmin();
   type::Integer& getEmax();
 
+protected:
+  friend class CatalogEntryGRBCAT;
   void setDurationUnitType(type::UnitType unitType);
   void setEnergyUnitType(type::UnitType unitType);
 
@@ -57,14 +50,11 @@ public:
   bool isPresent() const;
   void setPresent(bool val = true);
 
-  const type::Float& getDuration() const;
-  const type::String& getNotes() const;
-
-protected:
-  friend class CatalogEntryGRBCAT;
   type::Float& getDuration();
   type::String& getNotes();
 
+protected:
+  friend class CatalogEntryGRBCAT;
   void setDurationUnitType(type::UnitType unitType);
 
   bool isValid();

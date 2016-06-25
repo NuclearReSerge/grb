@@ -1,12 +1,17 @@
-#include "Coordinates.h"
+#include "Data/Coordinates.h"
 
 namespace grb
 {
 
 Coordinates::Coordinates(type::CoordinateSystemType type)
-  : _type(type), _coord_flag(0.0), _horizontal(0.0), _vertical(0.0),
-    _horizontalUnitType(type::UNIT_TYPE_UNDEFINED), _verticalUnitType(type::UNIT_TYPE_UNDEFINED)
+  : _type(type),
+    _x1Type(type::UNIT_TYPE_UNDEFINED),
+    _x2Type(type::UNIT_TYPE_UNDEFINED),
+    _x3Type(type::UNIT_TYPE_UNDEFINED)
 {
+  _u.common.x1 = 0.0;
+  _u.common.x2 = 0.0;
+  _u.common.x3 = 0.0;
 }
 
 Coordinates::~Coordinates()
@@ -20,77 +25,134 @@ Coordinates::getType() const
   return _type;
 }
 
-const type::Float&
-Coordinates::getCoordFlag() const
+void
+Coordinates::setX1UnitType(type::UnitType unitType)
 {
-  return _coord_flag;
-}
-
-const type::Float&
-Coordinates::getHorizontal() const
-{
-  return _horizontal;
-}
-
-const type::Float&
-Coordinates::getVertical() const
-{
-  return _vertical;
-}
-
-const type::Float&
-Coordinates::getRightAscension() const
-{
-  return _horizontal;
-}
-
-const type::Float&
-Coordinates::getDeclination() const
-{
-  return _vertical;
-}
-
-const type::Float&
-Coordinates::getLongnitude() const
-{
-  return _horizontal;
-}
-
-const type::Float&
-Coordinates::getLatitude() const
-{
-  return _vertical;
-}
-
-type::Float&
-Coordinates::getCoordFlag()
-{
-  return _coord_flag;
-}
-
-type::Float&
-Coordinates::getHorizontal()
-{
-  return _horizontal;
-}
-
-type::Float&
-Coordinates::getVertical()
-{
-  return _vertical;
+  _x1Type = unitType;
 }
 
 void
-Coordinates::setHorizontalUnitType(type::UnitType unitType)
+Coordinates::setX2UnitType(type::UnitType unitType)
 {
-  _horizontalUnitType = unitType;
+  _x2Type = unitType;
 }
 
 void
-Coordinates::setVerticalUnitType(type::UnitType unitType)
+Coordinates::setX3UnitType(type::UnitType unitType)
 {
-  _verticalUnitType = unitType;
+  _x3Type = unitType;
 }
+
+
+/** ***********************************************************************************************/
+
+type::Float&
+Coordinates::getX1()
+{
+  return _u.common.x1;
+}
+
+type::Float&
+Coordinates::getX2()
+{
+  return _u.common.x2;
+}
+
+type::Float&
+Coordinates::getX3()
+{
+  return _u.common.x3;
+}
+
+/** ***********************************************************************************************/
+
+type::Float
+Coordinates::getCarX()
+{
+  return _u.cartesian.x;
+}
+
+type::Float
+Coordinates::getCarY()
+{
+  return _u.cartesian.y;
+}
+
+type::Float
+Coordinates::getCarZ()
+{
+  return _u.cartesian.z;
+}
+
+/** ***********************************************************************************************/
+
+type::Float
+Coordinates::getCylRho()
+{
+  return _u.cylindrical.rho;
+}
+
+type::Float
+Coordinates::getCylPhi()
+{
+  return _u.cylindrical.phi;
+}
+
+type::Float
+Coordinates::getCylZ()
+{
+  return _u.cylindrical.rho;
+}
+
+/** ***********************************************************************************************/
+
+type::Float
+Coordinates::getSphR()
+{
+  return _u.spherical.r;
+}
+
+type::Float
+Coordinates::getSphPhi()
+{
+  return _u.spherical.phi;
+}
+
+type::Float
+Coordinates::getSphTheta()
+{
+  return _u.spherical.theta;
+}
+
+/** ***********************************************************************************************/
+
+type::Float
+Coordinates::getCelRightAscension()
+{
+  return _u.celestial.longitude;
+}
+
+type::Float
+Coordinates::getCelDeclination()
+{
+  return _u.celestial.latitude;
+}
+
+/** ***********************************************************************************************/
+
+type::Float
+Coordinates::getCelLongnitude()
+{
+  return _u.celestial.longitude;
+}
+
+type::Float
+Coordinates::getCelLatitude()
+{
+  return _u.celestial.latitude;
+}
+
+/** ***********************************************************************************************/
 
 bool
 Coordinates::isValid()

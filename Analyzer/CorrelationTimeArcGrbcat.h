@@ -17,38 +17,23 @@ public:
   CorrelationTimeArcGrbcat();
   ~CorrelationTimeArcGrbcat();
 
-  bool buildCF(const Catalog& catalog);
+  bool buildCF(Catalog& catalog);
   bool saveCF(const std::string& filename);
 
 protected:
-  class CoordinatesBkg : public Coordinates
-  {
-  public:
-    CoordinatesBkg(type::Float time, type::Float hori, type::Float vert);
-    const type::Float& getTime() const;
-
-  private:
-    type::Float _time;
-  };
-
-  bool checkCatalog(const Catalog& catalog);
-  void filterEntries(const Catalog& catalog, std::vector<const CatalogEntry*>& entries);
+  bool checkCatalog(Catalog& catalog);
+  void filterEntries(Catalog& catalog, std::vector<CatalogEntry*>& entries);
   void initiate();
-
-
-  std::size_t generateCFCAT(const Catalog& catalog);
-  std::size_t generateCFBKG(const std::size_t points);
-  void generateBackground(std::vector<CoordinatesBkg>& coorVec, std::size_t points);
-
+  std::size_t generateCF(Catalog& catalog, std::vector< std::vector<std::size_t> > hist);
   void normalize(std::vector< std::vector<type::Float>>& cf, type::Float norm);
 private:
   type::ArcFormulaType _formula;
 
-  std::size_t _pairsCfCat;
-  std::size_t _pairsCfBkg;
+  std::size_t _pairsData;
+  std::size_t _pairsModel;
   std::vector< std::vector<type::Float> > _cf;
-  std::vector< std::vector<std::size_t> > _cfCat;
-  std::vector< std::vector<std::size_t> > _cfBkg;
+  std::vector< std::vector<std::size_t> > _histData;
+  std::vector< std::vector<std::size_t> > _histModel;
 };
 
 }

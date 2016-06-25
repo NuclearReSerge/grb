@@ -21,23 +21,24 @@ public:
 
   bool empty() const;
   std::size_t size() const;
-  std::vector<CatalogEntry*>::const_iterator begin() const;
-  std::vector<CatalogEntry*>::const_iterator end() const;
-  const CatalogEntry& operator[](std::size_t index) const;
 
-protected:
-  friend class Parser;
+  std::vector<CatalogEntry*>::iterator begin();
+  std::vector<CatalogEntry*>::iterator end();
+  CatalogEntry& operator[](std::size_t index);
+
+
   virtual CatalogEntry* createEntry();
   void addEntry(CatalogEntry* entry);
 
+protected:
+  friend class Parser;
   void setUnitType(type::ColumnType column, type::UnitType unitType);
+
+  std::vector<CatalogEntry*> _catalog;
 
 private:
   type::CatalogType _type;
   std::map<type::ColumnType, type::UnitType> _unitMap;
-
-  std::vector<CatalogEntry*> _catalog;
-
 };
 
 }

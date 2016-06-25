@@ -12,14 +12,18 @@ QMAKE_CXXFLAGS += -std=c++11 -O0 -Wextra -Werror -Wpedantic
 QMAKE_LFLAGS = -g
 
 HEADERS += \
-    Analyzer/AnalyzeGrbcat.h \
     Analyzer/Analyzer.h \
+    Analyzer/AnalyzerFactory.h \
+    Analyzer/AnalyzerGrbcat.h \
     Analyzer/Correlation.h \
+    Analyzer/CorrelationFactory.h \
     Analyzer/CorrelationTimeArcGrbcat.h \
     Analyzer/GreatCircleDistance.h \
     CLI/Cmd.h \
+    CLI/CmdAnalyze.h \
     CLI/CmdDatabase.h \
     CLI/CmdHelp.h \
+    CLI/CmdModel.h \
     CLI/CmdQuit.h \
     CLI/CommandFactory.h \
     CLI/CommandLine.h \
@@ -45,22 +49,28 @@ HEADERS += \
     Data/TimeDef.h \
     Data/TimeMod.h \
     Data/TimePoint.h \
+    Main/AnalysisData.h \
+    Model/IsotropicBallModel.h \
+    Model/IsotropicSphereModel.h \
+    Model/ModelBase.h \
+    Model/ModelFactory.h \
     Tools/Mapper.h \
     Tools/NameMapper.h \
-    Tools/Parser.h \
-    CLI/CmdAnalyze.h \
-    Analyzer/AnalyzerFactory.h \
-    Models/ModelBase.h
+    Tools/Parser.h
 
 SOURCES += \
-    Analyzer/AnalyzeGrbcat.cpp \
     Analyzer/Analyzer.cpp \
+    Analyzer/AnalyzerFactory.cpp \
+    Analyzer/AnalyzerGrbcat.cpp \
     Analyzer/Correlation.cpp \
+    Analyzer/CorrelationFactory.cpp \
     Analyzer/CorrelationTimeArcGrbcat.cpp \
     Analyzer/GreatCircleDistance.cpp \
     CLI/Cmd.cpp \
+    CLI/CmdAnalyze.cpp \
     CLI/CmdDatabase.cpp \
     CLI/CmdHelp.cpp \
+    CLI/CmdModel.cpp \
     CLI/CmdQuit.cpp \
     CLI/CommandFactory.cpp \
     CLI/CommandLine.cpp \
@@ -85,7 +95,10 @@ SOURCES += \
     Data/TimePoint.cpp \
     Main/Init.cpp \
     Main/Main.cpp \
+    Model/IsotropicBallModel.cpp \
+    Model/IsotropicSphereModel.cpp \
+    Model/ModelBase.cpp \
+    Model/ModelFactory.cpp \
     Tools/NameMapper.cpp \
-    Tools/Parser.cpp \
-    CLI/CmdAnalyze.cpp \
-    Analyzer/AnalyzerFactory.cpp
+    Tools/Parser.cpp
+
