@@ -1,5 +1,6 @@
 #include "Common/Exception.h"
 #include "Common/Global.h"
+#include "Data/ColumnMapper.h"
 #include "Tools/Mapper.h"
 
 #pragma once

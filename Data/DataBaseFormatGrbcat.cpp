@@ -1,5 +1,4 @@
 #include "Data/DataBaseFormatGrbcat.h"
-#include "Data/DataType.h"
 
 namespace grb
 {

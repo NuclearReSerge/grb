@@ -1,6 +1,6 @@
-#include "Analyzer/Analyzer.h"
 #include "Common/Exception.h"
-#include "Common/Global.h"
+#include "CLI/CmdMapper.h"
+//#include "Common/Global.h"
 
 #include <list>
 #include <string>
@@ -28,19 +28,19 @@ class Cmd
 {
 public:
   Cmd() = delete;
-  Cmd(CommandLine& cli, type::CommandType cmdType = type::COMMAND_UNDEFINED);
+  Cmd(CommandLine& cli, type::CommandType cmdType = type::UNDEFINED_COMMAND);
   virtual ~Cmd();
 
   type::CommandType getType() const;
 
-  bool parse(std::list<std::string>& args) throw(Exception);
+  bool parse(std::list<std::string>& tokens) throw(Exception);
   void execute();
   std::string help(type::HelpType type = type::HELP_SHORT);
 
   bool wasExecuted() const;
 
 protected:
-  virtual bool doParse(std::list<std::string>& args) = 0;
+  virtual bool doParse(std::list<std::string>& tokens) = 0;
   virtual void doExecute() = 0;
   virtual std::string doHelp(type::HelpType type) = 0;
   virtual CommandLine& getCLI();

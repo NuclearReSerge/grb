@@ -1,3 +1,4 @@
+#include "Data/Coordinates.h"
 #include "Data/DataBaseFormat.h"
 
 #pragma once
@@ -10,10 +11,10 @@ class DataBaseFormatGrbcat : public DataBaseFormat
 {
 public:
   DataBaseFormatGrbcat();
+
+  void initialize();
   type::CoordinateSystemType getCoordinateSystem() const;
 
-protected:
-  void initialize();
 
 private:
   type::CoordinateSystemType _coordSys;

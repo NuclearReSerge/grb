@@ -1,4 +1,5 @@
 #include "Common/Global.h"
+#include "Data/UnitMapper.h"
 
 #pragma once
 
@@ -22,7 +23,7 @@ public:
   type::Integer& getEmax();
 
 protected:
-  friend class CatalogEntryGRBCAT;
+  friend class CatalogEntryGrbcat;
   void setDurationUnitType(type::UnitType unitType);
   void setEnergyUnitType(type::UnitType unitType);
 
@@ -54,7 +55,7 @@ public:
   type::String& getNotes();
 
 protected:
-  friend class CatalogEntryGRBCAT;
+  friend class CatalogEntryGrbcat;
   void setDurationUnitType(type::UnitType unitType);
 
   bool isValid();

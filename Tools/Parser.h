@@ -1,5 +1,6 @@
 ﻿#include "Common/Exception.h"
 #include "Common/Global.h"
+#include "Data/DataType.h"
 
 #include <istream>
 #include <string>
@@ -18,8 +19,8 @@ class NameMapper;
 class Parser
 {
 public:
-  Parser(const std::string& filename, const DataBaseFormat& format, Catalog& catalog);
-  Parser(std::istream* stream, const DataBaseFormat& format, Catalog& catalog);
+  Parser(const std::string& filename, DataBaseFormat& format, Catalog& catalog);
+  Parser(std::istream* stream, DataBaseFormat& format, Catalog& catalog);
   ~Parser();
 
   std::size_t parse() throw(Exception);
@@ -51,7 +52,7 @@ private:
   type::ColumnType _columnType;
   type::ValueType _valueType;
 
-  const DataBaseFormat& _format;
+  DataBaseFormat& _format;
   const type::ColumnFlags& _columnsRequired;
   Catalog& _catalog;
 };

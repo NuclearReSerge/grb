@@ -1,52 +1,58 @@
 #include "Data/DataBaseFormatFactory.h"
 
-#include "Common/GlobalName.h"
 #include "Data/DataBaseFormatGrbcat.h"
-
-#include <sstream>
 
 namespace grb
 {
 
-DataBaseFormatFactoryType::DataBaseFormatFactoryType()
+namespace factory
 {
-  initialize();
-}
 
-DataBaseFormatFactoryType::~DataBaseFormatFactoryType()
+DataBaseFormat*
+DataBaseFormatFactory::create(type::DatabaseTableType type)
 {
-  for (const auto& format : _formatMap)
+  DataBaseFormat* format = nullptr;
+  switch (type)
   {
-    delete format.second;
+    case type::HEASARC_GRBCAT:
+    {
+      format = new DataBaseFormatGrbcat;
+      break;
+    }
+    case type::HEASARC_GRBCATAG:
+    case type::HEASARC_GRBCATANN:
+    case type::HEASARC_GRBCATBOX:
+    case type::HEASARC_GRBCATCIRC:
+    case type::HEASARC_GRBCATDUAL:
+    case type::HEASARC_GRBCATFLUX:
+    case type::HEASARC_GRBCATINT:
+    case type::HEASARC_GRBCATINTA:
+    case type::HEASARC_GRBCATIRR:
+    default:
+      break;
   }
+
+  if(format)
+    format->initialize();
+
+  return format;
 }
 
-const DataBaseFormat&
-DataBaseFormatFactoryType::getFormat(const type::DatabaseTableType dbType) throw(Exception)
+DataBaseFormat*
+DataBaseFormatFactory::create(const std::string& name)
 {
+  type::DatabaseTableType type;
   try
   {
-    return *_formatMap.at(dbType);
+    type = DataBaseFormatMapper::instance()->getValue(name);
   }
-  catch (std::out_of_range& sysExc)
+  catch (Exception& exc)
   {
-    std::stringstream ss;
-    ss << "Database format of type=" << dbType << "[" << GlobalName::getDatabaseTable(dbType)
-       << "] does not exist, exc.what()=" << sysExc.what();
-    Exception exc(type::EXCEPTION_CRITICAL, ss.str(), PRETTY_FUNCTION);
-    throw exc;
+    return nullptr;
   }
+  return create(type);
 }
 
-void
-DataBaseFormatFactoryType::initialize()
-{
-  _formatMap.insert({type::HEASARC_GRBCAT, new DataBaseFormatGrbcat});
-
-  for (const auto& format : _formatMap)
-  {
-    format.second->initialize();
-  }
 }
 
 }

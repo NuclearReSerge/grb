@@ -11,7 +11,7 @@ namespace grb
 
 Duration::Duration()
   : _isPresent(false), _mod(-1), _duration(0.0), _error(0.0), _emin(0), _emax(0),
-    _durationUnitType(type::UNIT_TYPE_UNDEFINED), _energyUnitType(type::UNIT_TYPE_UNDEFINED)
+    _durationUnitType(type::UNDEFINED_UNIT), _energyUnitType(type::UNDEFINED_UNIT)
 {
 }
 
@@ -93,7 +93,7 @@ Duration::isValid()
  **************************************************************************************************/
 
 DurationOther::DurationOther()
-  : _isPresent(false), _duration(0.0), _durationUnitType(type::UNIT_TYPE_UNDEFINED)
+  : _isPresent(false), _duration(0.0), _durationUnitType(type::UNDEFINED_UNIT)
 { }
 
 DurationOther::~DurationOther()

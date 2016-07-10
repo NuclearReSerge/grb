@@ -13,7 +13,7 @@ public:
   CmdHelp(CommandLine& cli);
 
 protected:
-  bool doParse(std::list<std::string>& args);
+  bool doParse(std::list<std::string>& tokens);
   void doExecute();
   std::string doHelp(type::HelpType type);
 

@@ -1,9 +1,9 @@
 #include "Analyzer/AnalyzerGrbcat.h"
-#include "Analyzer/CorrelationFactory.h"
-#include "Analyzer/CorrelationTimeArcGrbcat.h"
+
+#include "Correlation/CorrelationFactory.h"
+#include "Correlation/CorrelationTimeArcGrbcat.h"
 #include "CLI/CommandLine.h"
 #include "Common/Exception.h"
-#include "Common/GlobalName.h"
 #include "Data/Catalog.h"
 #include "Data/CatalogEntryGrbcat.h"
 #include "Main/AnalysisData.h"
@@ -44,7 +44,7 @@ std::vector<std::string> SUB_CMD
 
 type::Float getTime(CatalogEntry* entry)
 {
-  return static_cast<CatalogEntryGRBCAT*>(entry)->getTime().getTimeMJD();
+  return static_cast<CatalogEntryGrbcat*>(entry)->getCoodinates().getTimeMJD();
 }
 
 class CompareTime
@@ -59,28 +59,30 @@ public:
 }
 
 AnalyzerGrbcat::AnalyzerGrbcat()
+  : Analyzer(type::GRBCAT_ANALYZER), _correlation(nullptr)
 {
 }
 
 AnalyzerGrbcat::~AnalyzerGrbcat()
 {
+  delete _correlation;
 }
 
 bool
-AnalyzerGrbcat::parse(std::list<std::string>& subcmd)
+AnalyzerGrbcat::parse(std::list<std::string>& tokens)
 {
-  while (!subcmd.empty())
+  while (!tokens.empty())
   {
     bool result = false;
-    std::string token = subcmd.front();
-    subcmd.pop_front();
+    std::string token = tokens.front();
+    tokens.pop_front();
 
     if (token == SUB_CMD[subcmd::CREATE])
     {
-      if (!subcmd.empty())
+      if (!tokens.empty())
       {
-        result = cmdCreate(subcmd.front());
-        subcmd.pop_front();
+        result = cmdCreate(tokens.front());
+        tokens.pop_front();
       }
     }
     else if (token == SUB_CMD[subcmd::SET])
@@ -123,30 +125,23 @@ AnalyzerGrbcat::run()
 bool
 AnalyzerGrbcat::cmdCreate(std::string& cfName)
 {
-  type::CorrelationType corrType = type::CORRELATION_TYPE_UNDEFINED;
-
-  for (int i = 0; i < type::CORRELATION_TYPE_UNDEFINED; ++i)
-  {
-    if (cfName == GlobalName::getCorrelation((type::CorrelationType) i))
-      corrType = (type::CorrelationType) i;
-  }
-  Correlation* correlation = CorrelationFactory::instance()->create(corrType);
-
-  return correlation != nullptr;
+  _correlation = CorrelationFactory::instance()->create(cfName);
+  return _correlation != nullptr;
 }
 
 bool
 AnalyzerGrbcat::cmdSet()
 {
   Catalog* catalog = G_CatalogData().get();
-  auto minEntry = std::min_element(catalog->begin(), catalog->end(), CompareTime());
-  auto maxEntry = std::max_element(catalog->begin(), catalog->end(), CompareTime());
+  auto minEntry = std::min_element(catalog->getEntries().begin(), catalog->getEntries().end(),
+                                   CompareTime());
+  auto maxEntry = std::max_element(catalog->getEntries().begin(), catalog->getEntries().end(),
+                                   CompareTime());
 
   type::Float range = std::ceil((getTime(*maxEntry) - getTime(*minEntry)) / 365.0) * 365.0;
 
-  Correlation* correlation = G_Correlation().get();
-  correlation->setXAxis(range, 365);
-  correlation->setYAxis(M_PIl, 180);
+  _correlation->setXAxis(range, 365);
+  _correlation->setYAxis(M_PIl, 180);
 
   return true;
 }
@@ -154,8 +149,8 @@ AnalyzerGrbcat::cmdSet()
 bool
 AnalyzerGrbcat::cmdBuild()
 {
-  Correlation* correlation = G_Correlation().get();
-  if (!correlation->buildCF(*G_CatalogModel().get()))
+  if (!_correlation->buildCF(*G_CatalogData().get(),
+                             *G_CatalogModel().get()))
   {
     Exception exc(type::EXCEPTION_CRITICAL, "Failed to build CF.", PRETTY_FUNCTION);
     throw exc;
@@ -167,7 +162,7 @@ AnalyzerGrbcat::cmdBuild()
 bool
 AnalyzerGrbcat::cmdSave()
 {
-  G_Correlation().get()->saveCF("grbcf");
+  _correlation->saveCF("grbcf");
 
   return true;
 }

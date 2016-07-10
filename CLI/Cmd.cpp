@@ -1,6 +1,5 @@
 #include "CLI/Cmd.h"
 #include "CLI/CommandLine.h"
-#include "CLI/CommandMapper.h"
 
 #include <sstream>
 
@@ -23,15 +22,15 @@ Cmd::getType() const
 }
 
 bool
-Cmd::parse(std::list<std::string>& args) throw(Exception)
+Cmd::parse(std::list<std::string>& tokens) throw(Exception)
 {
-  doParse(args);
-  if (!args.empty())
+  doParse(tokens);
+  if (!tokens.empty())
   {
     std::stringstream ss;
-    ss << "Command " << CommandMapper::instance()->getKey(_type)
-       << " has "<< args.size() << " unparsed arguments ";
-    for (std::string arg : args)
+    ss << "Command " << CmdMapper::instance()->getKey(_type)
+       << " has "<< tokens.size() << " unparsed arguments ";
+    for (std::string arg : tokens)
     {
       ss << arg << " ";
     }
@@ -54,7 +53,7 @@ Cmd::execute()
 std::string
 Cmd::help(type::HelpType type)
 {
-  std::string cmdName = CommandMapper::instance()->getKey(_type);
+  std::string cmdName = CmdMapper::instance()->getKey(_type);
   std::stringstream ss;
 
   if (type == type::HELP_SHORT || type == type::HELP_FULL)

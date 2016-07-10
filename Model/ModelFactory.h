@@ -1,24 +1,24 @@
-#include "Common/Global.h"
 #include "Common/Singleton.h"
+#include "Model/Model.h"
 
 #pragma once
 
 namespace grb
 {
 
-class ModelBase;
+namespace factory
+{
 
-class ModelFactoryType
+class ModelFactory
 {
 public:
-  virtual ModelBase* create(type::ModelType modelType);
-
-protected:
-  friend class Singleton<ModelFactoryType>;
-  ModelFactoryType();
+  virtual Model* create(type::ModelType type);
+  virtual Model* create(const std::string& name);
 };
 
-typedef Singleton<ModelFactoryType> ModelFactory;
+}
+
+typedef Singleton<factory::ModelFactory> ModelFactory;
 
 }
 

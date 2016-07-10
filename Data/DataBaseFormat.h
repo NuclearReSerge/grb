@@ -1,4 +1,5 @@
-#include "Common/Global.h"
+#include "Data/DataBaseFormatMapper.h"
+#include "Data/DataType.h"
 
 #include <vector>
 
@@ -6,8 +7,6 @@
 
 namespace grb
 {
-
-class DataType;
 
 class DataBaseFormat
 {
@@ -18,16 +17,11 @@ public:
 
   type::DatabaseTableType getType() const;
   const type::ColumnFlags& getRequiredColumns() const;
+  std::vector<DataType*>& getDataTypes();
 
-  bool empty() const;
-  std::size_t size() const;
-  std::vector<DataType*>::const_iterator begin() const;
-  std::vector<DataType*>::const_iterator end() const;
-  const DataType& operator[](std::size_t index) const;
-
-protected:
-  friend class DataBaseFormatFactoryType;
   virtual void initialize() = 0;
+protected:
+
   void addDataType(DataType* dataType);
   void setColumnFlag(std::size_t column, bool required = true);
   void setColumnFlags();

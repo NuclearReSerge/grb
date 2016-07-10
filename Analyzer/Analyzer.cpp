@@ -1,17 +1,33 @@
 #include "Analyzer/Analyzer.h"
-#include "Data/Catalog.h"
-#include "Model/ModelBase.h"
 
 namespace grb
 {
 
-Analyzer::Analyzer()
+Analyzer::Analyzer(type::AnalyzerType type)
+  : _type(type), _configured(false)
 {
-
 }
 
 Analyzer::~Analyzer()
 {
+}
+
+type::AnalyzerType
+Analyzer::getType() const
+{
+  return _type;
+}
+
+bool
+Analyzer::isConfigured() const
+{
+  return _configured;
+}
+
+void
+Analyzer::setConfigured(const bool configured)
+{
+  _configured = configured;
 }
 
 }

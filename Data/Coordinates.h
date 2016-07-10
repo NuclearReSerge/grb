@@ -1,27 +1,113 @@
 #include "Common/Global.h"
+#include "Data/CoordinateSystemMapper.h"
+#include "Data/DateMapper.h"
+#include "Data/UnitMapper.h"
 
 #pragma once
 
 namespace grb
 {
 
+namespace type
+{
+
+enum CoordinateIndex
+{
+  X0,
+  X1,
+  X2,
+  X3,
+
+  NUMBER_OF_COORDINATES
+};
+
+struct CommonSystem
+{
+  type::Float x0;
+  type::Float x1;
+  type::Float x2;
+  type::Float x3;
+};
+
+struct CartesianSystem
+{
+  type::Float t;
+  type::Float x;
+  type::Float y;
+  type::Float z;
+};
+
+struct CylindricalSystem
+{
+  type::Float t;
+  type::Float rho;
+  type::Float phi;
+  type::Float z;
+};
+
+struct SphericalSystem
+{
+  type::Float t;
+  type::Float r;
+  type::Float phi;
+  type::Float theta;
+};
+
+struct CelestialSystem
+{
+  type::Float t;
+  type::Float dummy;
+  type::Float longitude;
+  type::Float latitude;
+};
+
+}
+
 class Coordinates
 {
 public:
-  Coordinates(type::CoordinateSystemType type = type::COORDINATE_SYSTEM_UNDEFINED);
+  Coordinates(type::CoordinateSystemType coorType = type::UNDEFINED_COORDINATE_SYSTEM,
+              type::DateType dateType = type::UNDEFINED_DATE);
   virtual ~Coordinates();
 
-  type::CoordinateSystemType getType() const;
+  type::CoordinateSystemType getCoorType() const;
+  type::DateType getDateType() const;
 
-  void setX1UnitType(type::UnitType unitType);
-  void setX2UnitType(type::UnitType unitType);
-  void setX3UnitType(type::UnitType unitType);
+  /** **********************************************************************************************
+   *
+   *
+   *
+   ************************************************************************************************/
+  void setUnitType(const type::CoordinateIndex idx, const type::UnitType type);
 
-  // general
+  type::UnitType getUnitType(const type::CoordinateIndex idx) const;
+
+  /** **********************************************************************************************
+   *
+   *
+   *
+   ************************************************************************************************/
+  type::Float& getX0();
   type::Float& getX1();
   type::Float& getX2();
   type::Float& getX3();
 
+  /** **********************************************************************************************
+   *
+   * time
+   *
+   ************************************************************************************************/
+  type::Float getT();
+  // system date
+  type::Float getTimeUnix();
+  // Julian Date
+  type::Float getTimeJD();
+  type::Float getTimeMJD();
+  /** **********************************************************************************************
+   *
+   * space
+   *
+   ************************************************************************************************/
 // CartesianSystem
   type::Float getCarX();
   type::Float getCarY();
@@ -44,98 +130,19 @@ public:
 
   virtual bool isValid();
 
-protected:
-  enum CoordinateIndex
-  {
-    X1,
-    X2,
-    X3
-  };
-
-  struct CommonSystem
-  {
-    type::Float x1;
-    type::Float x2;
-    type::Float x3;
-  };
-
-  struct CartesianSystem
-  {
-    type::Float x;
-    type::Float y;
-    type::Float z;
-  };
-
-  struct CylindricalSystem
-  {
-    type::Float rho;
-    type::Float phi;
-    type::Float z;
-  };
-
-  struct SphericalSystem
-  {
-    type::Float r;
-    type::Float phi;
-    type::Float theta;
-  };
-
-  struct CelestialSystem
-  {
-    type::Float dummy;
-    type::Float longitude;
-    type::Float latitude;
-  };
-
-  void conversionMapper(type::CoordinateSystemType targetSys, CoordinateIndex index);
-
-  typedef type::Float (Coordinates::*fPtr)(const CommonSystem& sys) const;
-
-  fPtr _convert;
-
-  type::Float identity(const CommonSystem& sys) const;
-
-  type::Float convCarCylX1(const CommonSystem& sys) const;
-  type::Float convCarCylX2(const CommonSystem& sys) const;
-  type::Float convCarCylX3(const CommonSystem& sys) const;
-
-  type::Float convCarSphX1(const CommonSystem& sys) const;
-  type::Float convCarSphX2(const CommonSystem& sys) const;
-  type::Float convCarSphX3(const CommonSystem& sys) const;
-
-  type::Float convCylCarX1(const CommonSystem& sys) const;
-  type::Float convCylCarX2(const CommonSystem& sys) const;
-  type::Float convCylCarX3(const CommonSystem& sys) const;
-
-  type::Float convCylSphX1(const CommonSystem& sys) const;
-  type::Float convCylSphX2(const CommonSystem& sys) const;
-  type::Float convCylSphX3(const CommonSystem& sys) const;
-
-  type::Float convSphCarX1(const CommonSystem& sys) const;
-  type::Float convSphCarX2(const CommonSystem& sys) const;
-  type::Float convSphCarX3(const CommonSystem& sys) const;
-
-  type::Float convSphCylX1(const CommonSystem& sys) const;
-  type::Float convSphCylX2(const CommonSystem& sys) const;
-  type::Float convSphCylX3(const CommonSystem& sys) const;
-
-
 private:
-  type::CoordinateSystemType _type;
+  type::CoordinateSystemType _coorType;
+  type::DateType _dateType;
+  type::UnitType _unitTypes[type::NUMBER_OF_COORDINATES];
+
   union
   {
-    CommonSystem common;
-    CartesianSystem cartesian;
-    CylindricalSystem cylindrical;
-    SphericalSystem spherical;
-    CelestialSystem celestial;
+    type::CommonSystem common;
+    type::CartesianSystem cartesian;
+    type::CylindricalSystem cylindrical;
+    type::SphericalSystem spherical;
+    type::CelestialSystem celestial;
   } _u;
-
-  type::UnitType _x1Type;
-  type::UnitType _x2Type;
-  type::UnitType _x3Type;
-
-  fPtr _map[type::COORDINATE_SYSTEM_UNDEFINED];
 };
 
 }

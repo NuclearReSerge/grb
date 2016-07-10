@@ -1,7 +1,6 @@
 #include "CLI/CmdHelp.h"
-#include "CLI/CommandFactory.h"
+#include "CLI/CmdFactory.h"
 #include "CLI/CommandLine.h"
-#include "CLI/CommandMapper.h"
 
 #include <iostream>
 
@@ -24,45 +23,30 @@ CmdHelp::CmdHelp(CommandLine& cli)
 }
 
 bool
-CmdHelp::doParse(std::list<std::string>& args)
+CmdHelp::doParse(std::list<std::string>& tokens)
 { 
-  if (!args.empty())
+  if (!tokens.empty())
   {
-    _specific = args.front();
+    _specific = tokens.front();
     _showAll = false;
-    args.pop_front();
+    tokens.pop_front();
   }
-
-  if (!args.empty())
-  {
-    std::stringstream ss;
-    ss << "Command " << CommandMapper::instance()->getKey(getType()) << " ";
-    for (std::string arg : args)
-    {
-      ss << arg << " ";
-    }
-    Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
-                  ss.str(), PRETTY_FUNCTION);
-    throw exc;
-  }
-
   return true;
 }
 
 void
 CmdHelp::doExecute()
 {
-  std::cout << "Available commands:" << std::endl;
-
   if (_showAll)
   {
-    for (int i = 0; i < type::COMMAND_UNDEFINED; ++i)
+    std::cout << "Available commands:" << std::endl;
+    for (int i = 0; i < type::UNDEFINED_COMMAND; ++i)
     {
-      Cmd* cmd = CommandFactory::instance()->create(getCLI(), (type::CommandType) i);
+      Cmd* cmd = CmdFactory::instance()->create(getCLI(), (type::CommandType) i);
       if (!cmd)
       {
         std::cout << "No help for command "
-                  << CommandMapper::instance()->getKey((type::CommandType) i) << std::endl;
+                  << CmdMapper::instance()->getKey((type::CommandType) i) << std::endl;
         return;
       }
       std::cout << cmd->help(type::HELP_SHORT);
@@ -71,7 +55,7 @@ CmdHelp::doExecute()
   }
   else
   {
-    Cmd* cmd = CommandFactory::instance()->create(getCLI(), _specific);
+    Cmd* cmd = CmdFactory::instance()->create(getCLI(), _specific);
     if (!cmd)
     {
       std::cout << "No help for command " << _specific << " or wrong command name." << std::endl;
@@ -80,6 +64,7 @@ CmdHelp::doExecute()
     std::cout << cmd->help(type::HELP_FULL);
     delete cmd;
   }
+  std::cout << std::endl;
 }
 
 std::string

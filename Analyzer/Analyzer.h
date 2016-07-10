@@ -1,5 +1,6 @@
+#include "Analyzer/AnalyzerMapper.h"
+
 #include <list>
-#include <memory>
 #include <string>
 
 #pragma once
@@ -7,17 +8,24 @@
 namespace grb
 {
 
-class Catalog;
-class ModelBase;
-
 class Analyzer
 {
 public:
-  Analyzer();
+  Analyzer(type::AnalyzerType type = type::UNDEFINED_ANALYZER);
   virtual ~Analyzer();
 
-  virtual bool parse(std::list<std::string>& subcmd) = 0;
+  type::AnalyzerType getType() const;
+  bool isConfigured() const;
+
+  virtual bool parse(std::list<std::string>& tokens) = 0;
   virtual void run() = 0;
+
+protected:
+  void setConfigured(const bool configured = true);
+
+private:
+  type::AnalyzerType _type;
+  bool _configured;
 };
 
 }

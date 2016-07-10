@@ -1,8 +1,6 @@
 #include "Common/Exception.h"
-#include "Common/Global.h"
 
 #include <list>
-#include <map>
 #include <string>
 #include <vector>
 
@@ -23,10 +21,10 @@ public:
   std::string getBinaryName() const;
   std::string getPrompt() const;
 
-  Cmd* parse(const std::string& input) throw(Exception);
+  Cmd* parse(std::list<std::string>& tokens) throw(Exception);
   bool quit();
 
-  static void tokenize(const std::string& input, std::list<std::string>& words);
+  static void tokenize(const std::string& input, std::list<std::string>& tokens);
 protected:
   friend class Cmd;
   friend class CmdQuit;

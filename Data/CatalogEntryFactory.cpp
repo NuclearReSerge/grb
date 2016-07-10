@@ -1,26 +1,41 @@
 #include "Data/CatalogEntryFactory.h"
 
-#include "Data/Catalog.h"
 #include "Data/CatalogEntryGrbcat.h"
 
 namespace grb
 {
 
-CatalogEntryFactoryType::CatalogEntryFactoryType()
+namespace factory
 {
-}
 
 CatalogEntry*
-CatalogEntryFactoryType::create(const Catalog& catalog)
+CatalogEntryFactory::create(type::CatalogEntryType type)
 {
-  switch (catalog.getType())
+  switch (type)
   {
-    case type::GRBCAT:
-      return new CatalogEntryGRBCAT(catalog);
+    case type::GRBCAT_ENTRY:
+      return new CatalogEntryGrbcat;
     default:
       break;
   }
   return nullptr;
+}
+
+CatalogEntry*
+CatalogEntryFactory::create(const std::string& name)
+{
+  type::CatalogEntryType type;
+  try
+  {
+    type = CatalogEntryMapper::instance()->getValue(name);
+  }
+  catch (Exception& exc)
+  {
+    return nullptr;
+  }
+  return create(type);
+}
+
 }
 
 }

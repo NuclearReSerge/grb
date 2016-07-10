@@ -1,19 +1,16 @@
 #include "Model/ModelFactory.h"
-#include "Model/ModelBase.h"
 
 #include "Model/IsotropicSphereModel.h"
 #include "Model/IsotropicBallModel.h"
 
-
 namespace grb
 {
 
-ModelFactoryType::ModelFactoryType()
+namespace factory
 {
-}
 
-ModelBase*
-ModelFactoryType::create(type::ModelType modelType)
+Model*
+ModelFactory::create(type::ModelType modelType)
 {
   switch (modelType)
   {
@@ -37,6 +34,23 @@ ModelFactoryType::create(type::ModelType modelType)
       break;
   }
   return nullptr;
+}
+
+Model*
+ModelFactory::create(const std::string& name)
+{
+  type::ModelType type;
+  try
+  {
+    type = ModelMapper::instance()->getValue(name);
+  }
+  catch (Exception& exc)
+  {
+    return nullptr;
+  }
+  return create(type);
+}
+
 }
 
 }

@@ -1,7 +1,5 @@
 #include "Tools/NameMapper.h"
 
-#include "Common/GlobalName.h"
-
 #include <sstream>
 #include <algorithm>
 
@@ -23,7 +21,8 @@ NameMapper::getIndex(const std::string& name) const  throw(Exception)
   catch (Exception& baseExc)
   {
     std::stringstream ss;
-    ss << "NameMapper type=" << _columnType << " [" << GlobalName::getColumn(_columnType) << "].";
+    ss << "NameMapper type=" << _columnType
+       << " [" << ColumnMapper::instance()->getKey(_columnType) << "].";
     ss << std::endl << baseExc.what();
     Exception exc(baseExc.getLevel(), ss.str(), PRETTY_FUNCTION);
     throw exc;
@@ -40,7 +39,8 @@ NameMapper::getName(const type::Index& index) const  throw(Exception)
   catch (Exception& baseExc)
   {
     std::stringstream ss;
-    ss << "NameMapper type=" << _columnType << " [" << GlobalName::getColumn(_columnType) << "].";
+    ss << "NameMapper type=" << _columnType
+       << " [" << ColumnMapper::instance()->getKey(_columnType) << "].";
     ss << std::endl << baseExc.what();
     Exception exc(baseExc.getLevel(), ss.str(), PRETTY_FUNCTION);
     throw exc;

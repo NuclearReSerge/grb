@@ -1,6 +1,4 @@
-#include "Common/Global.h"
-
-#include <map>
+#include "Data/CatalogEntryMapper.h"
 #include <vector>
 
 #pragma once
@@ -13,32 +11,18 @@ class CatalogEntry;
 class Catalog
 {
 public:
-  Catalog(type::CatalogType type = type::CATALOG_TYPE_UNDEFINED);
-  virtual ~Catalog();
+  Catalog(type::CatalogEntryType type = type::UNDEFINED_CATALOG_ENTRY);
+  ~Catalog();
 
-  type::CatalogType getType() const;
-  type::UnitType getUnitType(type::ColumnType column) const;
-
-  bool empty() const;
-  std::size_t size() const;
-
-  std::vector<CatalogEntry*>::iterator begin();
-  std::vector<CatalogEntry*>::iterator end();
-  CatalogEntry& operator[](std::size_t index);
-
-
-  virtual CatalogEntry* createEntry();
-  void addEntry(CatalogEntry* entry);
-
+  type::CatalogEntryType getType() const;
+  std::vector<CatalogEntry*>& getEntries();
 protected:
-  friend class Parser;
-  void setUnitType(type::ColumnType column, type::UnitType unitType);
 
   std::vector<CatalogEntry*> _catalog;
 
 private:
-  type::CatalogType _type;
-  std::map<type::ColumnType, type::UnitType> _unitMap;
+  type::CatalogEntryType _type;
+
 };
 
 }

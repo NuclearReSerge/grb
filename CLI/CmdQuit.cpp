@@ -20,11 +20,9 @@ CmdQuit::CmdQuit(CommandLine& cli, type::CommandType cmdType)
 }
 
 bool
-CmdQuit::doParse(std::list<std::string>& args)
+CmdQuit::doParse(std::list<std::string>& tokens)
 {
-  if (!args.empty())
-    args.clear();
-
+  tokens.clear();
   return true;
 }
 

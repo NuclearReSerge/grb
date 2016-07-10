@@ -1,19 +1,19 @@
 #include "Analyzer/AnalyzerFactory.h"
+
 #include "Analyzer/AnalyzerGrbcat.h"
 
 namespace grb
 {
 
-AnalyzerFactoryType::AnalyzerFactoryType()
+namespace factory
 {
-}
 
 Analyzer*
-AnalyzerFactoryType::create(type::CatalogType catType)
+AnalyzerFactory::create(type::AnalyzerType type)
 {
-  switch (catType)
+  switch (type)
   {
-    case type::GRBCAT:
+    case type::GRBCAT_ANALYZER:
       return new AnalyzerGrbcat;
     default:
       break;
@@ -21,5 +21,21 @@ AnalyzerFactoryType::create(type::CatalogType catType)
   return nullptr;
 }
 
+Analyzer*
+AnalyzerFactory::create(const std::string& name)
+{
+  type::AnalyzerType type;
+  try
+  {
+    type = AnalyzerMapper::instance()->getValue(name);
+  }
+  catch (Exception& exc)
+  {
+    return nullptr;
+  }
+  return create(type);
+}
+
+}
 
 }

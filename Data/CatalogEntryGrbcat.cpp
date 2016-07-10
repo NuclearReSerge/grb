@@ -9,129 +9,124 @@
 namespace grb
 {
 
-CatalogEntryGRBCAT::CatalogEntryGRBCAT(const Catalog& catalog)
-  : CatalogEntry(catalog),
-    _record_number(0), _id(0), _time(type::MODIFIED_JULIAN_DATE), _time_def(-1),
-    _observatory(-1), _coordinates(type::EQUATORIAL_J2000), _region(-1),
+CatalogEntryGrbcat::CatalogEntryGrbcat()
+  : CatalogEntry(type::GRBCAT_ENTRY),
+    _record_number(0), _id(0), _time_def(-1),
+    _observatory(-1), _coordinates(type::EQUATORIAL_J2000, type::MODIFIED_JULIAN_DATE),
+    _region(-1),
     _afterglow_flag(false), _t50(), _t90(), _t_other(), _flux_flag(false), _class_id(0)
 { }
 
 type::Integer&
-CatalogEntryGRBCAT::getRecordNumber()
+CatalogEntryGrbcat::getRecordNumber()
 {
   return _record_number;
 }
 
 type::Integer&
-CatalogEntryGRBCAT::getId()
+CatalogEntryGrbcat::getId()
 {
   return _id;
 }
 
 type::String&
-CatalogEntryGRBCAT::getName()
+CatalogEntryGrbcat::getName()
 {
   return _name;
 }
 
 type::StringList&
-CatalogEntryGRBCAT::getAltNames()
+CatalogEntryGrbcat::getAltNames()
 {
   return _alt_names;
 }
 
-TimePoint&
-CatalogEntryGRBCAT::getTime()
-{
-  return _time;
-}
-
 type::Index&
-CatalogEntryGRBCAT::getTimeDef()
+CatalogEntryGrbcat::getTimeDef()
 {
   return _time_def;
 }
 
 type::Index&
-CatalogEntryGRBCAT::getObservatory()
+CatalogEntryGrbcat::getObservatory()
 {
   return _observatory;
 }
 
 type::Float&
-CatalogEntryGRBCAT::getCoordFlag()
+CatalogEntryGrbcat::getCoordFlag()
 {
   return _coord_flag;
 }
 
 Coordinates&
-CatalogEntryGRBCAT::getCoodinates()
+CatalogEntryGrbcat::getCoodinates()
 {
   return _coordinates;
 }
 
 type::Index&
-CatalogEntryGRBCAT::getRegion()
+CatalogEntryGrbcat::getRegion()
 {
   return _region;
 }
 
 type::Flag&
-CatalogEntryGRBCAT::getAfterglowFlag()
+CatalogEntryGrbcat::getAfterglowFlag()
 {
   return _afterglow_flag;
 }
 
 type::IndexList&
-CatalogEntryGRBCAT::getReference()
+CatalogEntryGrbcat::getReference()
 {
   return _reference;
 }
 
 Duration&
-CatalogEntryGRBCAT::getT50()
+CatalogEntryGrbcat::getT50()
 {
   return _t50;
 }
 
 Duration&
-CatalogEntryGRBCAT::getT90()
+CatalogEntryGrbcat::getT90()
 {
   return _t90;
 }
 
 DurationOther&
-CatalogEntryGRBCAT::getTOther()
+CatalogEntryGrbcat::getTOther()
 {
   return _t_other;
 }
 
 type::Flag&
-CatalogEntryGRBCAT::getFluxFlag()
+CatalogEntryGrbcat::getFluxFlag()
 {
   return _flux_flag;
 }
 
 type::String&
-CatalogEntryGRBCAT::getFluxNotes()
+CatalogEntryGrbcat::getFluxNotes()
 {
   return _flux_notes;
 }
 
 type::String&
-CatalogEntryGRBCAT::getLocalNotes()
+CatalogEntryGrbcat::getLocalNotes()
 {
   return _local_notes;
 }
 
 type::Integer&
-CatalogEntryGRBCAT::getClassId()
+CatalogEntryGrbcat::getClassId()
 {
   return _class_id;
 }
 
 type::Flag*
-CatalogEntryGRBCAT::getFlag(type::ColumnType column)
+CatalogEntryGrbcat::getFlag(type::ColumnType column)
 {
   switch (column)
   {
@@ -146,7 +141,7 @@ CatalogEntryGRBCAT::getFlag(type::ColumnType column)
 }
 
 type::Integer*
-CatalogEntryGRBCAT::getInteger(type::ColumnType column)
+CatalogEntryGrbcat::getInteger(type::ColumnType column)
 {
   switch (column)
   {
@@ -171,7 +166,7 @@ CatalogEntryGRBCAT::getInteger(type::ColumnType column)
 }
 
 type::Index*
-CatalogEntryGRBCAT::getIndex(type::ColumnType column)
+CatalogEntryGrbcat::getIndex(type::ColumnType column)
 {
   switch (column)
   {
@@ -192,7 +187,7 @@ CatalogEntryGRBCAT::getIndex(type::ColumnType column)
 }
 
 type::IntegerRange*
-CatalogEntryGRBCAT::getIntegerRange(type::ColumnType column)
+CatalogEntryGrbcat::getIntegerRange(type::ColumnType column)
 {
   switch (column)
   {
@@ -207,7 +202,7 @@ CatalogEntryGRBCAT::getIntegerRange(type::ColumnType column)
 }
 
 type::IndexList*
-CatalogEntryGRBCAT::getIndexList(type::ColumnType column)
+CatalogEntryGrbcat::getIndexList(type::ColumnType column)
 {
   switch (column)
   {
@@ -220,7 +215,7 @@ CatalogEntryGRBCAT::getIndexList(type::ColumnType column)
 }
 
 type::Float*
-CatalogEntryGRBCAT::getFloat(type::ColumnType column)
+CatalogEntryGrbcat::getFloat(type::ColumnType column)
 {
   switch (column)
   {
@@ -231,7 +226,7 @@ CatalogEntryGRBCAT::getFloat(type::ColumnType column)
     case type::COORD_FLAG:
       return &_coord_flag;
     case type::TIME:
-      return &_time.getX0();
+      return &_coordinates.getX0();
     case type::T50:
       return &_t50.getDuration();
     case type::T50_ERROR:
@@ -249,7 +244,7 @@ CatalogEntryGRBCAT::getFloat(type::ColumnType column)
 }
 
 type::String*
-CatalogEntryGRBCAT::getString(type::ColumnType column)
+CatalogEntryGrbcat::getString(type::ColumnType column)
 {
   switch (column)
   {
@@ -268,7 +263,7 @@ CatalogEntryGRBCAT::getString(type::ColumnType column)
 }
 
 type::StringList*
-CatalogEntryGRBCAT::getStringList(type::ColumnType column)
+CatalogEntryGrbcat::getStringList(type::ColumnType column)
 {
   switch (column)
   {
@@ -281,7 +276,7 @@ CatalogEntryGRBCAT::getStringList(type::ColumnType column)
 }
 
 NameMapper*
-CatalogEntryGRBCAT::getMapper(type::ColumnType column)
+CatalogEntryGrbcat::getMapper(type::ColumnType column)
 {
   switch (column)
   {
@@ -304,18 +299,18 @@ CatalogEntryGRBCAT::getMapper(type::ColumnType column)
 }
 
 void
-CatalogEntryGRBCAT::setUnitType(type::ColumnType column, type::UnitType unitType)
+CatalogEntryGrbcat::setUnitType(type::ColumnType column, type::UnitType unitType)
 {
   switch (column)
   {
     case type::COORD_RA:
-      _coordinates.setX2UnitType(unitType);
+      _coordinates.setUnitType(type::X2, unitType);
       break;
     case type::COORD_DEC:
-      _coordinates.setX3UnitType(unitType);
+      _coordinates.setUnitType(type::X3, unitType);
       break;
     case type::TIME:
-      _time.setTimeUnitType(unitType);
+      _coordinates.setUnitType(type::X0, unitType);
       break;
     case type::T50:
     case type::T50_ERROR:
@@ -342,11 +337,10 @@ CatalogEntryGRBCAT::setUnitType(type::ColumnType column, type::UnitType unitType
 }
 
 bool
-CatalogEntryGRBCAT::isValid()
+CatalogEntryGrbcat::isValid()
 {
   return _record_number && _id && _class_id &&
       _name[0] == 'G' && _name[1] == 'R' && _name[2] == 'B' &&
-      _time.isValid() &&
       _coordinates.isValid() &&
       _t50.isValid() &&
       _t90.isValid() &&

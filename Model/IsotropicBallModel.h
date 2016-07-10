@@ -1,18 +1,18 @@
-#include "Model/ModelBase.h"
+#include "Model/Model.h"
 
 #pragma once
 
 namespace grb
 {
 
-class IsotropicBallModel : public ModelBase
+class IsotropicBallModel : public Model
 {
 public:
   IsotropicBallModel();
   ~IsotropicBallModel();
 
-  bool parse(std::list<std::string>& subcmd);
-  void generate(Catalog& catalog, std::size_t entries);
+  bool parse(std::list<std::string>& tokens);
+  void generate(Catalog& catalog);
 
 protected:
   void setTimeRange(double min, double max);

@@ -1,24 +1,23 @@
-#include "Common/Global.h"
 #include "Common/Singleton.h"
+#include "Data/CatalogEntry.h"
 
 #pragma once
 
 namespace grb
 {
 
-class Catalog;
-class CatalogEntry;
+namespace factory
+{
 
-class CatalogEntryFactoryType
+class CatalogEntryFactory
 {
 public:
-  CatalogEntry* create(const Catalog& catalog);
-
-protected:
-  friend class Singleton<CatalogEntryFactoryType>;
-  CatalogEntryFactoryType();
+  virtual CatalogEntry* create(type::CatalogEntryType type);
+  virtual CatalogEntry* create(const std::string& name);
 };
 
-typedef Singleton<CatalogEntryFactoryType> CatalogEntryFactory;
+}
+
+typedef Singleton<factory::CatalogEntryFactory> CatalogEntryFactory;
 
 }

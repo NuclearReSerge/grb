@@ -15,24 +15,20 @@ HEADERS += \
     Analyzer/Analyzer.h \
     Analyzer/AnalyzerFactory.h \
     Analyzer/AnalyzerGrbcat.h \
-    Analyzer/Correlation.h \
-    Analyzer/CorrelationFactory.h \
-    Analyzer/CorrelationTimeArcGrbcat.h \
-    Analyzer/GreatCircleDistance.h \
     CLI/Cmd.h \
-    CLI/CmdAnalyze.h \
     CLI/CmdDatabase.h \
     CLI/CmdHelp.h \
     CLI/CmdModel.h \
     CLI/CmdQuit.h \
-    CLI/CommandFactory.h \
     CLI/CommandLine.h \
-    CLI/CommandMapper.h \
     Common/Exception.h \
     Common/Global.h \
-    Common/GlobalName.h \
     Common/Singleton.h \
     Common/trace.h \
+    Correlation/Correlation.h \
+    Correlation/CorrelationFactory.h \
+    Correlation/CorrelationTimeArcGrbcat.h \
+    Correlation/GreatCircleDistance.h \
     Data/Catalog.h \
     Data/CatalogEntry.h \
     Data/CatalogEntryFactory.h \
@@ -48,35 +44,51 @@ HEADERS += \
     Data/Region.h \
     Data/TimeDef.h \
     Data/TimeMod.h \
-    Data/TimePoint.h \
     Main/AnalysisData.h \
     Model/IsotropicBallModel.h \
     Model/IsotropicSphereModel.h \
-    Model/ModelBase.h \
+    Model/Model.h \
     Model/ModelFactory.h \
+    Tools/ConvertSpaceTime.h \
     Tools/Mapper.h \
     Tools/NameMapper.h \
-    Tools/Parser.h
+    Tools/Parser.h \
+    Filter/Filter.h \
+    Filter/FilterFactory.h \
+    Filter/FilterNone.h \
+    Analyzer/AnalyzerMapper.h \
+    Correlation/CorrelationMapper.h \
+    CLI/CmdMapper.h \
+    CLI/CmdFactory.h \
+    Data/DataBaseFormatMapper.h \
+    Data/CatalogEntryMapper.h \
+    Data/CoordinateSystemMapper.h \
+    Data/DateMapper.h \
+    Filter/FilterMapper.h \
+    Model/ModelMapper.h \
+    Data/ColumnMapper.h \
+    Data/UnitMapper.h \
+    Data/ValueMapper.h \
+    Correlation/ArcFormulaMapper.h \
+    CLI/CmdAnalyzer.h \
+    CLI/CmdFilter.h \
+    CLI/CmdCorrelation.h
 
 SOURCES += \
     Analyzer/Analyzer.cpp \
     Analyzer/AnalyzerFactory.cpp \
     Analyzer/AnalyzerGrbcat.cpp \
-    Analyzer/Correlation.cpp \
-    Analyzer/CorrelationFactory.cpp \
-    Analyzer/CorrelationTimeArcGrbcat.cpp \
-    Analyzer/GreatCircleDistance.cpp \
     CLI/Cmd.cpp \
-    CLI/CmdAnalyze.cpp \
     CLI/CmdDatabase.cpp \
     CLI/CmdHelp.cpp \
     CLI/CmdModel.cpp \
     CLI/CmdQuit.cpp \
-    CLI/CommandFactory.cpp \
     CLI/CommandLine.cpp \
-    CLI/CommandMapper.cpp \
     Common/Exception.cpp \
-    Common/GlobalName.cpp \
+    Correlation/Correlation.cpp \
+    Correlation/CorrelationFactory.cpp \
+    Correlation/CorrelationTimeArcGrbcat.cpp \
+    Correlation/GreatCircleDistance.cpp \
     Data/Catalog.cpp \
     Data/CatalogEntry.cpp \
     Data/CatalogEntryFactory.cpp \
@@ -92,13 +104,33 @@ SOURCES += \
     Data/Region.cpp \
     Data/TimeDef.cpp \
     Data/TimeMod.cpp \
-    Data/TimePoint.cpp \
     Main/Init.cpp \
     Main/Main.cpp \
     Model/IsotropicBallModel.cpp \
     Model/IsotropicSphereModel.cpp \
-    Model/ModelBase.cpp \
+    Model/Model.cpp \
     Model/ModelFactory.cpp \
+    Tools/ConvertSpaceTime.cpp \
     Tools/NameMapper.cpp \
-    Tools/Parser.cpp
+    Tools/Parser.cpp \
+    Filter/Filter.cpp \
+    Filter/FilterFactory.cpp \
+    Filter/FilterNone.cpp \
+    Analyzer/AnalyzerMapper.cpp \
+    Correlation/CorrelationMapper.cpp \
+    CLI/CmdFactory.cpp \
+    CLI/CmdMapper.cpp \
+    Data/DataBaseFormatMapper.cpp \
+    Data/CatalogEntryMapper.cpp \
+    Data/CoordinateSystemMapper.cpp \
+    Data/DateMapper.cpp \
+    Filter/FilterMapper.cpp \
+    Model/ModelMapper.cpp \
+    Data/ColumnMapper.cpp \
+    Data/UnitMapper.cpp \
+    Data/ValueMapper.cpp \
+    Correlation/ArcFormulaMapper.cpp \
+    CLI/CmdAnalyzer.cpp \
+    CLI/CmdFilter.cpp \
+    CLI/CmdCorrelation.cpp
 

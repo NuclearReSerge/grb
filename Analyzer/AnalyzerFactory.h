@@ -1,5 +1,4 @@
 #include "Analyzer/Analyzer.h"
-#include "Common/Global.h"
 #include "Common/Singleton.h"
 
 #pragma once
@@ -7,16 +6,18 @@
 namespace grb
 {
 
-class AnalyzerFactoryType
+namespace factory
+{
+
+class AnalyzerFactory
 {
 public:
-  virtual Analyzer* create(type::CatalogType catType);
-
-protected:
-  friend class Singleton<AnalyzerFactoryType>;
-  AnalyzerFactoryType();
+  virtual Analyzer* create(type::AnalyzerType type);
+  virtual Analyzer* create(const std::string& name);
 };
 
-typedef Singleton<AnalyzerFactoryType> AnalyzerFactory;
+}
+
+typedef Singleton<factory::AnalyzerFactory> AnalyzerFactory;
 
 }

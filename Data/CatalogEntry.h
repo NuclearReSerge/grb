@@ -1,21 +1,22 @@
 #include "Common/Global.h"
+#include "Data/CatalogEntryMapper.h"
+#include "Data/DataType.h"
 
 #pragma once
 
 namespace grb
 {
 
-class Catalog;
 class NameMapper;
 
 class CatalogEntry
 {
 public:
   CatalogEntry() = delete;
-  CatalogEntry(const Catalog& catalog);
+  CatalogEntry(type::CatalogEntryType type = type::UNDEFINED_CATALOG_ENTRY);
   virtual ~CatalogEntry();
 
-  type::CatalogType getType() const;
+  type::CatalogEntryType getType() const;
 
 protected:
   friend class Parser;
@@ -35,7 +36,7 @@ protected:
   virtual bool isValid() = 0;
 
 private:
-  const Catalog& _catalog;
+  type::CatalogEntryType _type;
 };
 
 }

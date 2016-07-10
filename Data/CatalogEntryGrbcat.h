@@ -2,25 +2,21 @@
 
 #include "Data/Coordinates.h"
 #include "Data/Duration.h"
-#include "Data/TimePoint.h"
 
 #pragma once
 
 namespace grb
 {
 
-class Catalog;
-
-class CatalogEntryGRBCAT : public CatalogEntry
+class CatalogEntryGrbcat : public CatalogEntry
 {
 public:
-  CatalogEntryGRBCAT(const Catalog& catalog);
+  CatalogEntryGrbcat();
 
   type::Integer& getRecordNumber();
   type::Integer& getId();
   type::String& getName();
   type::StringList& getAltNames();
-  TimePoint& getTime();
   type::Index& getTimeDef();
   type::Index& getObservatory();
   type::Float& getCoordFlag();
@@ -57,7 +53,6 @@ private:
   type::Integer _id;
   type::String _name;
   type::StringList _alt_names;
-  TimePoint _time;
   type::Index _time_def;
   type::Index _observatory;
   type::Float _coord_flag;

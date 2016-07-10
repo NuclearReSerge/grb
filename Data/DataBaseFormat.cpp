@@ -1,16 +1,14 @@
 #include "Data/DataBaseFormat.h"
 
 #include "Common/Exception.h"
-#include "Common/GlobalName.h"
-#include "Data/DataType.h"
 
 #include <sstream>
 
 namespace grb
 {
 
-DataBaseFormat::DataBaseFormat(const type::DatabaseTableType dbType)
-  : _type(dbType)
+DataBaseFormat::DataBaseFormat(const type::DatabaseTableType type)
+  : _type(type)
 {
 }
 
@@ -35,42 +33,10 @@ DataBaseFormat::getRequiredColumns() const
   return _requiredFlags;
 }
 
-
-bool
-DataBaseFormat::empty() const
+std::vector<DataType*>&
+DataBaseFormat::getDataTypes()
 {
-  return _format.empty();
-}
-
-std::size_t
-DataBaseFormat::size() const
-{
-  return _format.size();
-}
-
-std::vector<DataType*>::const_iterator
-DataBaseFormat::begin() const
-{
-  return _format.begin();
-}
-
-std::vector<DataType*>::const_iterator
-DataBaseFormat::end() const
-{
-  return _format.end();
-}
-
-const DataType&
-DataBaseFormat::operator[](std::size_t index) const
-{
-  if (index < _format.size())
-    return *_format[index];
-
-  std::stringstream ss;
-  ss << "Database format type=" << _type << " [" << GlobalName::getDatabaseTable(_type)
-     << "]. Index=" << index << " is out of range.";
-  Exception exc(type::EXCEPTION_CRITICAL, ss.str(), PRETTY_FUNCTION);
-  throw exc;
+  return _format;
 }
 
 void

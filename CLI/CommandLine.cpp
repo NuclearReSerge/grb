@@ -1,6 +1,6 @@
-#include "CLI/Cmd.h"
 #include "CLI/CommandLine.h"
-#include "CLI/CommandFactory.h"
+
+#include "CLI/CmdFactory.h"
 
 #include <sstream>
 
@@ -54,22 +54,18 @@ CommandLine::getPrompt() const
 }
 
 Cmd*
-CommandLine::parse(const std::string& input) throw(Exception)
+CommandLine::parse(std::list<std::string>& tokens) throw(Exception)
 {
-  std::list<std::string> words;
-  tokenize(input, words);
+  Cmd* cmdObj = CmdFactory::instance()->create(*this, tokens.front());
 
-  Cmd* cmdObj = CommandFactory::instance()->create(*this, words.front());
-  if (cmdObj)
-  {
-    _commands.push_back(cmdObj);
-    words.pop_front();
-    if (!cmdObj->parse(words))
-    {
-      delete cmdObj;
-      return nullptr;
-    }
-  }
+  if (!cmdObj)
+    return nullptr;
+
+  tokens.pop_front();
+  _commands.push_back(cmdObj);
+
+  if (!cmdObj->parse(tokens))
+    return nullptr;
 
   return cmdObj;
 }
@@ -81,14 +77,14 @@ CommandLine::quit()
 }
 
 void
-CommandLine::tokenize(const std::string& input, std::list<std::string>& words)
+CommandLine::tokenize(const std::string& input, std::list<std::string>& tokens)
 {
   std::stringstream ss(input);
   for (std::string element; std::getline(ss, element, DELIMITER);)
   {
     element.erase(0, element.find_first_not_of(WHITESPACE));
     element.erase(element.find_last_not_of(WHITESPACE) + 1);
-    words.push_back(element);
+    tokens.push_back(element);
   }
 }
 

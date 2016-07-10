@@ -1,8 +1,7 @@
 #include "Tools/Parser.h"
 
-#include "Common/GlobalName.h"
 #include "Data/Catalog.h"
-#include "Data/CatalogEntry.h"
+#include "Data/CatalogEntryFactory.h"
 #include "Data/DataBaseFormat.h"
 #include "Data/DataType.h"
 #include "Tools/NameMapper.h"
@@ -22,17 +21,17 @@ const char  DELIM_LIST   = ',';
 const char  DELIM_RANGE  = '-';
 }
 
-Parser::Parser(const std::string& filename, const DataBaseFormat& format, Catalog& catalog)
+Parser::Parser(const std::string& filename, DataBaseFormat& format, Catalog& catalog)
   : _isSourceFile(false), _stream(nullptr), _row(0), _column(0),
-    _columnType(type::COLUMN_TYPE_UNDEFINED), _format(format),
+    _columnType(type::UNDEFINED_COLUMN), _format(format),
     _columnsRequired(_format.getRequiredColumns()), _catalog(catalog)
 {
   openFileStream(filename);
 }
 
-Parser::Parser(std::istream* stream, const DataBaseFormat& format, Catalog& catalog)
+Parser::Parser(std::istream* stream, DataBaseFormat& format, Catalog& catalog)
   : _isSourceFile(false), _stream(stream), _row(0), _column(0),
-    _columnType(type::COLUMN_TYPE_UNDEFINED), _format(format),
+    _columnType(type::UNDEFINED_COLUMN), _format(format),
     _columnsRequired(_format.getRequiredColumns()), _catalog(catalog)
 {
   if (!_stream)
@@ -71,8 +70,8 @@ Parser::openFileStream(const std::string& filename)
 std::size_t
 Parser::parse() throw(Exception)
 {
-  for (std::size_t column = 0; column < type::COLUMN_TYPE_UNDEFINED; ++column)
-    _catalog.setUnitType((type::ColumnType) _column, _format[_column].getUnitType());
+//  for (std::size_t column = 0; column < type::UNDEFINED_COLUMN; ++column)
+//    _catalog.setUnitType((type::ColumnType) _column, _format[_column].getUnitType());
 
 
   _row = 0;
@@ -82,7 +81,7 @@ Parser::parse() throw(Exception)
     if (line.empty() || line[0] == COMMENT)
       continue;
 
-    CatalogEntry* entry = _catalog.createEntry();
+    CatalogEntry* entry = CatalogEntryFactory::instance()->create(_catalog.getType());
     try
     {
       parseLine(line, entry);
@@ -93,11 +92,11 @@ Parser::parse() throw(Exception)
       throw;
     }
 
-    _catalog.addEntry(entry);
+    _catalog.getEntries().push_back(entry);
     ++_row;
   }
 
-  if (_row == 0 || _catalog.empty())
+  if (_row == 0 || _catalog.getEntries().empty())
   {
     Exception exc(type::EXCEPTION_WARNING, "Parsing failed. Stream or Catalog is empty.",
                   PRETTY_FUNCTION);
@@ -122,7 +121,7 @@ Parser::parseLine(const std::string& line, CatalogEntry* entry)
     bool result = false;
     try
     {
-      _columnType = _format[_column].getColumnType();
+      _columnType = _format.getDataTypes()[_column]->getColumnType();
       result = parseMapper(element, entry);
     }
     catch (Exception& grbExc)
@@ -160,7 +159,7 @@ void
 Parser::checkColumns(const type::ColumnFlags& columnFlags)
 {
   const bool allRequired = ((columnFlags & _columnsRequired) ^ _columnsRequired).none();
-  const bool allProcessed = _column == _format.size();
+  const bool allProcessed = _column == _format.getDataTypes().size();
 
   if (allProcessed && allRequired)
     return;
@@ -171,22 +170,22 @@ Parser::checkColumns(const type::ColumnFlags& columnFlags)
   if (!allProcessed)
   {
     std::size_t i = 0;
-    for (const DataType* dataType : _format)
+    for (const DataType* dataType : _format.getDataTypes())
     {
       if (i++ < _column)
         continue;
 
-      ss << i << " [" << GlobalName::getColumn(dataType->getColumnType()) << "] ";
+      ss << i << " [" << ColumnMapper::instance()->getKey(dataType->getColumnType()) << "] ";
     }
     ss << "} not processed.";
   }
   else
   {
     std::size_t i = 0;
-    for (const DataType* dataType : _format)
+    for (const DataType* dataType : _format.getDataTypes())
     {
       if (!columnFlags[dataType->getColumnType()])
-        ss << i << " [" << GlobalName::getColumn(dataType->getColumnType()) << "] ";
+        ss << i << " [" << ColumnMapper::instance()->getKey(dataType->getColumnType()) << "] ";
       ++i;
     }
     ss << "} require valid values.";
@@ -199,7 +198,7 @@ bool
 Parser::parseMapper(const std::string& raw, CatalogEntry* entry)
 {
   bool result = false;
-  _valueType = _format[_column].getValueType();
+  _valueType = _format.getDataTypes()[_column]->getValueType();
 
   switch (_valueType)
   {
@@ -469,8 +468,8 @@ Parser::getExceptionString(std::string cause)
 {
   std::stringstream ss;
   ss << "Parsing failed row=" << _row+1 << ", column=" << _column+1
-     << ", column type=" << _columnType << " [" << GlobalName::getColumn(_columnType)
-     << "], value type=" << _valueType << " [" << GlobalName::getValue(_valueType)
+     << ", column type=" << _columnType << " [" << ColumnMapper::instance()->getKey(_columnType)
+     << "], value type=" << _valueType << " [" << ValueMapper::instance()->getKey(_valueType)
      << "]. " << cause;
   return ss.str();
 }

@@ -1,5 +1,4 @@
 #include "Analyzer/Analyzer.h"
-#include "Common/Global.h"
 
 #include <string>
 #include <list>
@@ -17,7 +16,7 @@ public:
   AnalyzerGrbcat();
   ~AnalyzerGrbcat();
 
-  bool parse(std::list<std::string>& subcmd);
+  bool parse(std::list<std::string>& tokens);
   void run();
 
 protected:
@@ -26,6 +25,8 @@ protected:
   bool cmdBuild();
   bool cmdSave();
 
+private:
+  Correlation* _correlation;
 };
 
 }

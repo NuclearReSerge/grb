@@ -1,13 +1,15 @@
 #include "Model/IsotropicBallModel.h"
 
 #include "Data/Catalog.h"
+#include "Data/CatalogEntryFactory.h"
 #include "Data/CatalogEntryGrbcat.h"
+
 
 namespace grb
 {
 
 IsotropicBallModel::IsotropicBallModel()
-  : ModelBase(type::ISOTROPIC_BALL)
+  : Model(type::ISOTROPIC_BALL)
 {
   setTimeRange(0.0, 1.0);
   setRadiusRange(0.0, 2.0 * M_PIl);
@@ -20,23 +22,26 @@ IsotropicBallModel::~IsotropicBallModel()
 }
 
 bool
-IsotropicBallModel::parse(std::list<std::string>& subcmd)
+IsotropicBallModel::parse(std::list<std::string>& tokens)
 {
-  return subcmd.empty();
+  return tokens.empty();
 }
 
 void
-IsotropicBallModel::generate(Catalog& catalog, std::size_t entries)
+IsotropicBallModel::generate(Catalog& catalog)
 {
-  for (std::size_t i = 0; i < entries; ++i)
+  CatalogEntry* entryBase;
+  for (std::size_t i = 0; i < getNumberOfEntries(); ++i)
   {
-    CatalogEntryGRBCAT* entry = static_cast<CatalogEntryGRBCAT*>(catalog.createEntry());
+    entryBase = CatalogEntryFactory::instance()->create(type::GRBCAT_ENTRY);
+    CatalogEntryGrbcat* entry = static_cast<CatalogEntryGrbcat*>(entryBase);
+
     entry->getCoordFlag() = 0.0;
-    entry->getTime().getX0() = _time(getGenerator());
+    entry->getCoodinates().getX0() = _time(getGenerator());
     entry->getCoodinates().getX1() = _r(getGenerator());
     entry->getCoodinates().getX2() = _phi(getGenerator());
     entry->getCoodinates().getX3() = _theta(getGenerator());
-    catalog.addEntry(entry);
+    catalog.getEntries().push_back(entry);
   }
 }
 

@@ -2,15 +2,21 @@
 
 namespace grb
 {
+
+static std::vector<std::pair<std::string, std::string>> COLUMN_NAMES
+{
+
+};
+
 DataType::DataType()
-  : _columnType(type::COLUMN_TYPE_UNDEFINED), _isRequired(false),
-    _unitType(type::UNIT_TYPE_UNDEFINED), _valueType(type::VALUE_TYPE_UNDEFINED)
+  : _columnType(type::UNDEFINED_COLUMN), _valueType(type::UNDEFINED_VALUE),
+    _unitType(type::UNDEFINED_UNIT), _isRequired(false)
 {
 }
 
 DataType::DataType(type::ColumnType columnType, bool isRequired, type::UnitType unitType,
                    type::ValueType valueType)
-  : _columnType(columnType), _isRequired(isRequired), _unitType(unitType), _valueType(valueType)
+  : _columnType(columnType), _valueType(valueType), _unitType(unitType), _isRequired(isRequired)
 {
 }
 
