@@ -34,8 +34,12 @@ class CmdMapper : public Mapper<type::CommandType>
 public:
   CmdMapper();
 
+  size_t maxCmdLength() const;
 protected:
   const std::vector<std::string>& getList() const;
+
+private:
+  int8_t _len;
 };
 
 }

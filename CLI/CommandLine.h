@@ -19,7 +19,7 @@ public:
   ~CommandLine();
 
   std::string getBinaryName() const;
-  std::string getPrompt() const;
+  std::string getPrompt(bool counter = true) const;
 
   Cmd* parse(std::list<std::string>& tokens) throw(Exception);
   bool quit();

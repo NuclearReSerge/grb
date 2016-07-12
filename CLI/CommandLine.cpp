@@ -10,7 +10,7 @@ namespace grb
 namespace
 {
 
-const char* CMD_PROMPT = "GRB ";
+const char* CMD_PROMPT = "GRB";
 const char* WHITESPACE   = " \t\n\r\f\v";
 const char DELIMITER = ' ';
 
@@ -46,16 +46,24 @@ CommandLine::getBinaryName() const
 }
 
 std::string
-CommandLine::getPrompt() const
+CommandLine::getPrompt(bool counter) const
 {
   std::stringstream ss;
-  ss << CMD_PROMPT << '[' << _cmdIndex << "] > ";
+
+  ss << CMD_PROMPT;
+  if (counter)
+    ss << '[' << _cmdIndex << "]";
+  ss << "> ";
+
   return ss.str();
 }
 
 Cmd*
 CommandLine::parse(std::list<std::string>& tokens) throw(Exception)
 {
+  if (tokens.empty())
+    return nullptr;
+
   Cmd* cmdObj = CmdFactory::instance()->create(*this, tokens.front());
 
   if (!cmdObj)

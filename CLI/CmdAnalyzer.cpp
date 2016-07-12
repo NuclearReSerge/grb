@@ -10,8 +10,8 @@ namespace grb
 namespace
 {
 
-const char* HELP_SHORT = " - performs correlation analysis.";
-const char* HELP_LONG = " <SUB_COMMAND>";
+const char* HELP_SHORT = "performs correlation analysis.";
+const char* HELP_LONG = "<SUB_COMMAND>";
 
 }
 

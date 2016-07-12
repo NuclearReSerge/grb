@@ -10,10 +10,10 @@ namespace grb
 namespace
 {
 
-const char* HELP_SHORT = " - this help";
-const char* HELP_LONG = " [COMMAND] - specific help for a given COMMAND\n"
-                        "  COMMAND : existing command name"
-                        "";
+const char* HELP_SHORT = "list of all available commands or specific help for a given command.";
+const char* HELP_LONG = "[<COMMAND>]\n"
+"\n"
+"    COMMAND : existing command name";
 
 }
 

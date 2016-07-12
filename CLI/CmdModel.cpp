@@ -12,8 +12,8 @@ namespace grb
 namespace
 {
 
-const char* HELP_SHORT = " - theoretical model.";
-const char* HELP_LONG = " <SUB_COMMAND>";
+const char* HELP_SHORT = "theoretical model.";
+const char* HELP_LONG = "<SUB_COMMAND>";
 
 }
 

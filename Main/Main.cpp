@@ -101,6 +101,8 @@ main(int argc, char** argv)
     std::cout << cli.getPrompt();
     std::cin.getline(buff, buffSize);
     std::cin.clear();
+    if (!buff[0])
+      continue;
 
     std::list<std::string> tokens;
     grb::CommandLine::tokenize(buff, tokens);

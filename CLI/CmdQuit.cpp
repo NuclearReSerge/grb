@@ -9,7 +9,7 @@ namespace grb
 namespace
 {
 
-const char* HELP_SHORT = " - exits the program";
+const char* HELP_SHORT = "exits/quits the program.";
 const char* HELP_LONG = "";
 
 }

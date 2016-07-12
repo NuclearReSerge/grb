@@ -15,8 +15,8 @@ namespace
 {
 
 const char* TDAT_FILE_EXT = "tdat";
-const char* HELP_SHORT = " - reads the database file and creates a catalog.";
-const char* HELP_LONG = " <DB_FILE>.tdat";
+const char* HELP_SHORT = "reads the database file and creates a catalog.";
+const char* HELP_LONG = "<DB_FILE>.tdat";
 
 }
 

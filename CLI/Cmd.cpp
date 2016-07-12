@@ -58,11 +58,22 @@ Cmd::help(type::HelpType type)
 
   if (type == type::HELP_SHORT || type == type::HELP_FULL)
   {
-    ss << cmdName << doHelp(type::HELP_SHORT) << std::endl;
+    if (type == type::HELP_SHORT)
+    {
+      ss.width(CmdMapper::instance()->maxCmdLength() + 1);
+    }
+    else
+    {
+      ss << " ";
+    }
+    ss << cmdName << " - " << doHelp(type::HELP_SHORT) << std::endl;
   }
   if (type == type::HELP_LONG || type == type::HELP_FULL)
   {
-    ss << "Usage: " << cmdName << doHelp(type::HELP_LONG) << std::endl;
+    ss << std::endl
+       << "Usage: " << std::endl
+       << "  " << getCLI().getPrompt(false) << " " << cmdName
+       << " " << doHelp(type::HELP_LONG) << std::endl;
   }
   return ss.str();
 }
