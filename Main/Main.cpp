@@ -99,8 +99,11 @@ main(int argc, char** argv)
   while (!cli.quit())
   {
     std::cout << cli.getPrompt();
+    std::cout.flush();
+
     std::cin.getline(buff, buffSize);
     std::cin.clear();
+
     if (!buff[0])
       continue;
 
@@ -129,6 +132,7 @@ main(int argc, char** argv)
       }
     }
   }
+
 
   return grb::type::NO_ERROR;
 }

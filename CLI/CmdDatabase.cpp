@@ -16,8 +16,11 @@ namespace
 
 const char* TDAT_FILE_EXT = "tdat";
 const char* HELP_SHORT = "reads the database file and creates a catalog.";
-const char* HELP_LONG = "<DB_FILE>.tdat";
-
+const char* HELP_LONG = "[<DB_FILE>]\n"
+"\n"
+"    DB_FILE : name of the database file.\n"
+"\n"
+"Available databases:\n";
 }
 
 CmdDatabase::CmdDatabase(CommandLine& cli)
@@ -86,7 +89,7 @@ CmdDatabase::doExecute()
   std::size_t rows;
   try
   {
-    Parser parser(_dbFile, *dbFormat, *catalog);
+    Parser parser(_dbFilename, *dbFormat, *catalog);
     rows = parser.parse();
   }
   catch (grb::Exception& parseExc)
@@ -108,7 +111,16 @@ CmdDatabase::doHelp(type::HelpType type)
   if (type == type::HELP_SHORT)
     return HELP_SHORT;
 
-  return HELP_LONG;
+  std::stringstream ss;
+  ss << HELP_LONG;
+  for(int i = 0; i < type::UNDEFINED_DATABASE_TABLE; ++i)
+  {
+    ss << "  "
+       << DataBaseFormatMapper::instance()->getKey((type::DatabaseTableType) i)
+       << "."<< TDAT_FILE_EXT << std::endl;
+  }
+
+  return ss.str();
 }
 
 bool
@@ -123,9 +135,10 @@ CmdDatabase::filenameMapping(const std::string& filename)
     return false;
 
   _dbFile = filename.substr(0, pos);
+  _dbFilename = filename;
 
   std::printf("File:           %s\n",
-              _dbFile.c_str());
+              _dbFilename.c_str());
 
 
   return true;

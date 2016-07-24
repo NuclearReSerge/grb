@@ -11,10 +11,11 @@ public:
   IsotropicBallModel();
   ~IsotropicBallModel();
 
-  bool parse(std::list<std::string>& tokens);
-  void generate(Catalog& catalog);
-
 protected:
+  bool doParse(type::ModelCmdType cmd, std::list<std::string>& tokens);
+  void doGenerate(Catalog& catalog);
+  std::string doHelp();
+
   void setTimeRange(double min, double max);
   void setRadiusRange(double min, double max);
   void setPhiRange(double min, double max);

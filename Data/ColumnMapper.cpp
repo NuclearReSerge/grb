@@ -57,7 +57,7 @@ const std::vector<std::string> COLUMN_NAMES
   "test_column_string_list",	// Test column for string list
 
   // LAST
-  "undefined-column",		// Unknown column type
+  "undefined-column"		// Unknown column type
 };
 
 }

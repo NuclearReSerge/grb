@@ -1,4 +1,6 @@
 #include "CLI/Cmd.h"
+#include "Model/ModelFactory.h"
+#include "Model/ModelCmdMapper.h"
 
 #pragma once
 
@@ -15,7 +17,17 @@ protected:
   void doExecute();
   std::string doHelp(type::HelpType type);
 
-  void modelNameMapping(const std::string& name);
+  bool parseCreate(std::list<std::string>& tokens);
+  bool parseGenerate(std::list<std::string>& tokens);
+  bool parseHelp(std::list<std::string>& tokens);
+
+  void executeCreate();
+  void executeGenerate();
+  void executeHelp();
+
+private:
+  type::ModelCmdType _subCmd;
+  type::ModelType _modelType;
 };
 
 }

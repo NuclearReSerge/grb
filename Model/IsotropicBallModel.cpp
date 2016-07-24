@@ -22,13 +22,36 @@ IsotropicBallModel::~IsotropicBallModel()
 }
 
 bool
-IsotropicBallModel::parse(std::list<std::string>& tokens)
+IsotropicBallModel::doParse(type::ModelCmdType cmd, std::list<std::string>& tokens)
 {
-  return tokens.empty();
+  switch (cmd)
+  {
+    case type::MODEL_SET_TIME:
+    {
+      break;
+    }
+    case type::MODEL_SET_RADIUS:
+    {
+      break;
+    }
+    case type::MODEL_SET_PHI:
+    {
+      break;
+    }
+    case type::MODEL_SET_THETA:
+    {
+      break;
+    }
+    default:
+      break;
+  }
+
+  tokens.empty();
+  return true;
 }
 
 void
-IsotropicBallModel::generate(Catalog& catalog)
+IsotropicBallModel::doGenerate(Catalog& catalog)
 {
   CatalogEntry* entryBase;
   for (std::size_t i = 0; i < getNumberOfEntries(); ++i)
@@ -43,6 +66,12 @@ IsotropicBallModel::generate(Catalog& catalog)
     entry->getCoodinates().getX3() = _theta(getGenerator());
     catalog.getEntries().push_back(entry);
   }
+}
+
+std::string
+IsotropicBallModel::doHelp()
+{
+  return "IsotropicBallModel help";
 }
 
 void

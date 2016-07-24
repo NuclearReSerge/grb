@@ -1,5 +1,6 @@
 #include "Tools/Parser.h"
 
+#include "Data/Catalog.h"
 #include "Data/CatalogEntryGrbcat.h"
 #include "Data/DataBaseFormatFactory.h"
 #include "Data/DataBaseFormatGrbcat.h"
@@ -8,8 +9,6 @@
 #include "Data/Region.h"
 #include "Data/TimeDef.h"
 #include "Data/TimeMod.h"
-
-#include "test/Mock/CatalogMock.h"
 
 #include <gtest/gtest.h>
 #include <sstream>
@@ -37,13 +36,13 @@ protected:
   Parser* _parser;
 };
 
-void checkRecordGRBCAT_1(CatalogEntryGRBCAT& entry)
+void checkRecordGrbcat_1(CatalogEntryGrbcat& entry)
 {
   ASSERT_EQ(1, entry.getRecordNumber());
   ASSERT_EQ(1, entry.getId());
   ASSERT_STREQ("GRB 670702", entry.getName().c_str());
   ASSERT_EQ(0, entry.getAltNames().size());
-  ASSERT_FLOAT_EQ(39673.596851851798, entry.getTime().getTime());
+  ASSERT_FLOAT_EQ(39673.596851851798, entry.getCoodinates().getT());
   ASSERT_STREQ("Earth Crossing Time", TimeDef::instance()->getName(entry.getTimeDef()).c_str());
   ASSERT_STREQ("VELA", Observatory::instance()->getName(entry.getObservatory()).c_str());
   ASSERT_FLOAT_EQ(0.0, entry.getCoodinates().getCelLatitude());
@@ -73,13 +72,13 @@ void checkRecordGRBCAT_1(CatalogEntryGRBCAT& entry)
   ASSERT_EQ(1710, entry.getClassId());
 }
 
-void checkRecordGRBCAT_10119(CatalogEntryGRBCAT& entry)
+void checkRecordGrbcat_10119(CatalogEntryGrbcat& entry)
 {
   ASSERT_EQ(10119, entry.getRecordNumber());
   ASSERT_EQ(5831, entry.getId());
   ASSERT_STREQ("GRB 050309", entry.getName().c_str());
   ASSERT_EQ(0, entry.getAltNames().size());
-  ASSERT_FLOAT_EQ(53438.030104166697, entry.getTime().getTime());
+  ASSERT_FLOAT_EQ(53438.030104166697, entry.getCoodinates().getT());
   ASSERT_STREQ("BAT trigger", TimeDef::instance()->getName(entry.getTimeDef()).c_str());
   ASSERT_STREQ("SWIFT", Observatory::instance()->getName(entry.getObservatory()).c_str());
   ASSERT_FLOAT_EQ(182.62125, entry.getCoodinates().getCelLatitude());
@@ -112,14 +111,13 @@ void checkRecordGRBCAT_10119(CatalogEntryGRBCAT& entry)
 TEST_F(ParserFileTest, file_Grbcat)
 {
   std::string filename = "heasarc_grbcat_test.tdat";
-  CatalogMock catalog(type::CATALOG_TEST);
+  Catalog catalog(type::TEST_CATALOG_ENTRY);
+  DataBaseFormat* format = DataBaseFormatFactory::instance()->create(type::HEASARC_GRBCAT);
   std::size_t rows = 0;
 
   try
   {
-    _parser = new Parser(filename,
-                         DataBaseFormatFactory::instance()->getFormat(type::HEASARC_GRBCAT),
-                         catalog);
+    _parser = new Parser(filename, *format, catalog);
     rows = _parser->parse();
   }
   catch (Exception& exc)
@@ -127,9 +125,9 @@ TEST_F(ParserFileTest, file_Grbcat)
     std::cout << exc.what() << std::endl;
   }
   ASSERT_EQ(2, rows);
-  ASSERT_EQ(2, catalog.size());
-  checkRecordGRBCAT_1(static_cast<CatalogEntryGRBCAT&>(catalog[0]));
-  checkRecordGRBCAT_10119(static_cast<CatalogEntryGRBCAT&>(catalog[1]));
+  ASSERT_EQ(2, catalog.getEntries().size());
+  checkRecordGrbcat_1(*static_cast<CatalogEntryGrbcat*>(catalog.getEntries()[0]));
+  checkRecordGrbcat_10119(*static_cast<CatalogEntryGrbcat*>(catalog.getEntries()[1]));
 }
 
 }

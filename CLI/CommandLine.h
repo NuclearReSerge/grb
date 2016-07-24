@@ -24,7 +24,8 @@ public:
   Cmd* parse(std::list<std::string>& tokens) throw(Exception);
   bool quit();
 
-  static void tokenize(const std::string& input, std::list<std::string>& tokens);
+  static void tokenize(const std::string& input, std::list<std::string>& tokens,
+                       const char delim = ' ');
 protected:
   friend class Cmd;
   friend class CmdQuit;

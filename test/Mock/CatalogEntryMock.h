@@ -5,25 +5,23 @@
 namespace grb
 {
 
-class Catalog;
-
 namespace test
 {
 
 class CatalogEntryMock : public CatalogEntry
 {
 public:
-  CatalogEntryMock(const Catalog& catalog);
+  CatalogEntryMock();
   ~CatalogEntryMock();
 
-  const type::Flag& getFlag() const;
-  const type::Integer& getInteger() const;
-  const type::Index& getIndex() const;
-  const type::IntegerRange& getIntegerRange() const;
-  const type::IndexList& getIndexList() const;
-  const type::Float& getFloat() const;
-  const type::String& getString() const;
-  const type::StringList& getStringList() const;
+  type::Flag& getFlag();
+  type::Integer& getInteger();
+  type::Index& getIndex();
+  type::IntegerRange& getIntegerRange();
+  type::IndexList& getIndexList();
+  type::Float& getFloat();
+  type::String& getString();
+  type::StringList& getStringList();
 
 protected:
   type::Flag* getFlag(type::ColumnType column);

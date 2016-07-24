@@ -20,13 +20,32 @@ IsotropicSphereModel::~IsotropicSphereModel()
 }
 
 bool
-IsotropicSphereModel::parse(std::list<std::string>& tokens)
+IsotropicSphereModel::doParse(type::ModelCmdType cmd, std::list<std::string>& tokens)
 {
-  return tokens.empty();
+  switch (cmd)
+  {
+    case type::MODEL_SET_TIME:
+    {
+      break;
+    }
+    case type::MODEL_SET_PHI:
+    {
+      break;
+    }
+    case type::MODEL_SET_THETA:
+    {
+      break;
+    }
+    default:
+      break;
+  }
+
+  tokens.empty();
+  return true;
 }
 
 void
-IsotropicSphereModel::generate(Catalog& catalog)
+IsotropicSphereModel::doGenerate(Catalog& catalog)
 {
   CatalogEntry* entryBase;
   for (std::size_t i = 0; i < getNumberOfEntries(); ++i)
@@ -41,6 +60,12 @@ IsotropicSphereModel::generate(Catalog& catalog)
     entry->getCoodinates().getX3() = _theta(getGenerator());
     catalog.getEntries().push_back(entry);
   }
+}
+
+std::string
+IsotropicSphereModel::doHelp()
+{
+  return "IsotropicSphereModel help";
 }
 
 void

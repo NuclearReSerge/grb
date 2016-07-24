@@ -13,7 +13,9 @@ namespace
 const char* HELP_SHORT = "list of all available commands or specific help for a given command.";
 const char* HELP_LONG = "[<COMMAND>]\n"
 "\n"
-"    COMMAND : existing command name";
+"    COMMAND : existing command name\n"
+"\n"
+"Available commands:\n";
 
 }
 
@@ -29,8 +31,8 @@ CmdHelp::doParse(std::list<std::string>& tokens)
   {
     _specific = tokens.front();
     _showAll = false;
-    tokens.pop_front();
   }
+  tokens.clear();
   return true;
 }
 
@@ -73,7 +75,16 @@ CmdHelp::doHelp(type::HelpType type)
   if (type == type::HELP_SHORT)
     return HELP_SHORT;
 
-  return HELP_LONG;
+  std::stringstream ss;
+  ss << HELP_LONG;
+  for(int i = 0; i < type::UNDEFINED_COMMAND; ++i)
+  {
+    ss << "  "
+       << CmdMapper::instance()->getKey((type::CommandType) i)
+       << std::endl;
+  }
+
+  return ss.str();
 }
 
 }

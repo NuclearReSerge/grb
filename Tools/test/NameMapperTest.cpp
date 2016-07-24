@@ -12,7 +12,7 @@ class NameMapperDummyTest : public NameMapperCommon
   void SetUp()
   {
     _mapper = new NameMapperMock;
-    _columnType = type::COLUMN_TEST_INDEX;
+    _columnType = type::TEST_COLUMN_INDEX;
     _firstIdx = 0;
     _lastIdx = 1;
     _first = "NAME_LIST_FIRST";

@@ -29,11 +29,12 @@ Cmd::parse(std::list<std::string>& tokens) throw(Exception)
   {
     std::stringstream ss;
     ss << "Command " << CmdMapper::instance()->getKey(_type)
-       << " has "<< tokens.size() << " unparsed arguments ";
+       << " has "<< tokens.size() << " unparsed argument(s) '";
     for (std::string arg : tokens)
     {
       ss << arg << " ";
     }
+    ss << "'";
     Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
                   ss.str(), PRETTY_FUNCTION);
     throw exc;
@@ -72,7 +73,7 @@ Cmd::help(type::HelpType type)
   {
     ss << std::endl
        << "Usage: " << std::endl
-       << "  " << getCLI().getPrompt(false) << " " << cmdName
+       << "  " << getCLI().getPrompt(false) << cmdName
        << " " << doHelp(type::HELP_LONG) << std::endl;
   }
   return ss.str();

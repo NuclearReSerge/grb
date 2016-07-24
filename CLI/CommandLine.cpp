@@ -2,6 +2,7 @@
 
 #include "CLI/CmdFactory.h"
 
+#include <iostream>
 #include <sstream>
 
 namespace grb
@@ -10,9 +11,10 @@ namespace grb
 namespace
 {
 
-const char* CMD_PROMPT = "GRB";
-const char* WHITESPACE   = " \t\n\r\f\v";
-const char DELIMITER = ' ';
+const std::string CMD_PROMPT = "GRB";
+const std::string WHITESPACE   = " \t\n\r\f\v";
+const std::string DELIM = " ";
+const std::string SPECIAL = "=,[]()";
 
 }
 
@@ -85,14 +87,29 @@ CommandLine::quit()
 }
 
 void
-CommandLine::tokenize(const std::string& input, std::list<std::string>& tokens)
+CommandLine::tokenize(const std::string& input, std::list<std::string>& tokens, const char delim)
 {
-  std::stringstream ss(input);
-  for (std::string element; std::getline(ss, element, DELIMITER);)
+  std::string dummy(input);
+
+  for (size_t i = 0; i< SPECIAL.size(); ++i)
+  {
+    size_t pos = 0;
+    while ((pos = dummy.find(SPECIAL[i], pos)) != std::string::npos)
+    {
+      dummy.insert(pos+1, DELIM);
+      dummy.insert(pos, DELIM);
+      pos += 2;
+    }
+  }
+
+  std::stringstream ss(dummy);
+  for (std::string element; std::getline(ss, element, delim);)
   {
     element.erase(0, element.find_first_not_of(WHITESPACE));
     element.erase(element.find_last_not_of(WHITESPACE) + 1);
-    tokens.push_back(element);
+
+    if (!element.empty())
+      tokens.push_back(element);
   }
 }
 

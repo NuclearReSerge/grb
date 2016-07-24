@@ -12,7 +12,7 @@ class DataBaseFormat
 {
 public:
   DataBaseFormat() = delete;
-  DataBaseFormat(const type::DatabaseTableType dbType);
+  DataBaseFormat(const type::DatabaseTableType dbType = type::UNDEFINED_DATABASE_TABLE);
   virtual ~DataBaseFormat();
 
   type::DatabaseTableType getType() const;

@@ -1,6 +1,6 @@
+#include "Data/Catalog.h"
 #include "Tools/Parser.h"
 
-#include "test/Mock/CatalogMock.h"
 #include "test/Mock/CatalogEntryMock.h"
 #include "test/Mock/DataBaseFormatMock.h"
 
@@ -28,14 +28,14 @@ namespace
 {
 const TypeValueVector DEFAULT_ROW
 {
-  { type::COLUMN_TEST_FLAG,          true, type::FLAG,          "N" },
-  { type::COLUMN_TEST_INTEGER,       true, type::INTEGER,       "9999" },
-  { type::COLUMN_TEST_INDEX,         true, type::INDEX,         "NAME_LIST_FIRST" },
-  { type::COLUMN_TEST_INTEGER_RANGE, true, type::INTEGER_RANGE, "9999-9999" },
-  { type::COLUMN_TEST_INDEX_LIST,    true, type::INDEX_LIST,    "NAME_LIST_FIRST,NAME_LIST_LAST" },
-  { type::COLUMN_TEST_FLOAT,         true, type::FLOAT,         "9999.9999" },
-  { type::COLUMN_TEST_STRING,        true, type::STRING,        "STRING" },
-  { type::COLUMN_TEST_STRING_LIST,   true, type::STRING_LIST,   "STRING1,STRING2" }
+  { type::TEST_COLUMN_FLAG,          true, type::FLAG,          "N" },
+  { type::TEST_COLUMN_INTEGER,       true, type::INTEGER,       "9999" },
+  { type::TEST_COLUMN_INDEX,         true, type::INDEX,         "NAME_LIST_FIRST" },
+  { type::TEST_COLUMN_INTEGER_RANGE, true, type::INTEGER_RANGE, "9999-9999" },
+  { type::TEST_COLUMN_INDEX_LIST,    true, type::INDEX_LIST,    "NAME_LIST_FIRST,NAME_LIST_LAST" },
+  { type::TEST_COLUMN_FLOAT,         true, type::FLOAT,         "9999.9999" },
+  { type::TEST_COLUMN_STRING,        true, type::STRING,        "STRING" },
+  { type::TEST_COLUMN_STRING_LIST,   true, type::STRING_LIST,   "STRING1,STRING2" }
 };
 }
 
@@ -99,17 +99,17 @@ protected:
     }
     ASSERT_EQ(isThrowExpected, isThrown);
     ASSERT_EQ((std::size_t) linesExpected, (std::size_t) linesParsed);
-    ASSERT_EQ((std::size_t) linesExpected, _catalog.size());
+    ASSERT_EQ((std::size_t) linesExpected, _catalog.getEntries().size());
   }
 
-  const CatalogEntryMock& getCatalogEntry(std::size_t index = 0) const
+  CatalogEntryMock& getCatalogEntry(std::size_t index = 0)
   {
-    return static_cast<const CatalogEntryMock&>(_catalog[index]);
+    return * static_cast<CatalogEntryMock*>(_catalog.getEntries()[index]);
   }
 
   std::stringstream* _stream;
   Parser* _parser;
-  CatalogMock _catalog;
+  Catalog _catalog;
   DataBaseFormatMock _format;
 };
 
@@ -198,7 +198,7 @@ namespace formats
 TEST_F(ParserTest, parse_Format_OneColumn)
 {
   TypeValueVector line;
-  TypeAndValue column { type::COLUMN_TEST_FLAG, true, type::FLAG, "N" };
+  TypeAndValue column { type::TEST_COLUMN_FLAG, true, type::FLAG, "N" };
   line.push_back(column);
   stringsToStream(line);
 
@@ -217,7 +217,7 @@ TEST_F(ParserTest, parse_Format_OneLessColumn)
 TEST_F(ParserTest, parse_Format_OneMoreColumn)
 {
   TypeValueVector line = DEFAULT_ROW;
-  TypeAndValue column { type::COLUMN_TEST_FLAG, true, type::FLAG, "N" };
+  TypeAndValue column { type::TEST_COLUMN_FLAG, true, type::FLAG, "N" };
   line.push_back(column);
 
   stringsToStream(line);

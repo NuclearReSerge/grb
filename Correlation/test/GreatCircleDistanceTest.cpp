@@ -1,4 +1,4 @@
-#include "Analyzer/GreatCircleDistance.h"
+#include "Correlation/GreatCircleDistance.h"
 
 #include "test/Mock/CoordinatesMock.h"
 
@@ -73,7 +73,7 @@ TEST_F(GreatCircleDistanceTest, defaultPoints_VincentyFormula)
 
 TEST_F(GreatCircleDistanceTest, defaultPoints_UnknownFormula)
 {
-  GreatCircleDistance distance(type::UNKNOWN_ARC_FORMULA_TYPE);
+  GreatCircleDistance distance(type::UNDEFINED_ARC_FORMULA);
   CoordinatesMock P1, P2;
 
   EXPECT_DOUBLE_EQ((type::Float) 0.0, distance(P1, P2));

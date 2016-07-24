@@ -12,7 +12,7 @@ namespace test
 class CoordinatesMock : public Coordinates
 {
 public:
-  CoordinatesMock(type::CoordinateSystemType type = type::COORDINATE_SYSTEM_UNDEFINED);
+  CoordinatesMock(type::CoordinateSystemType type = type::UNDEFINED_COORDINATE_SYSTEM);
 
 protected:
   MOCK_METHOD0(isValid, bool());

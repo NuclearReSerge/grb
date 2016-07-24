@@ -18,7 +18,7 @@ namespace
 
 
 NameMapperMock::NameMapperMock()
-  : NameMapper(type::COLUMN_TEST_INDEX, DESCRIPTION)
+  : NameMapper(type::TEST_COLUMN_INDEX, DESCRIPTION)
 {
   initiate();
 }

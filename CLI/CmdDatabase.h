@@ -21,6 +21,7 @@ protected:
 
 private:
   std::string _dbFile;
+  std::string _dbFilename;
 
 };
 
