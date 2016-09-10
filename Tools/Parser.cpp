@@ -1,7 +1,6 @@
 #include "Tools/Parser.h"
 
 #include "Data/Catalog.h"
-#include "Data/CatalogEntryFactory.h"
 #include "Data/ColumnMapper.h"
 #include "Data/DataBaseFormat.h"
 #include "Data/DataBaseColumn.h"
@@ -83,7 +82,18 @@ Parser::parse() throw(Exception)
     if (line.empty() || line[0] == COMMENT)
       continue;
 
-    CatalogEntry* entry = CatalogEntryFactory::instance()->createType(_catalog.getType());
+    CatalogEntry* entry = _catalog.createEntry();
+    if (!entry)
+    {
+      std::stringstream ss;
+      ss << "Parsing failed. Catalog of type "
+         << CatalogEntryMapper::instance()->getKey(_catalog.getType())
+         << " creates invalid entries.";
+
+      Exception exc(type::EXCEPTION_WARNING, ss.str(), PRETTY_FUNCTION);
+      throw exc;
+    }
+
     try
     {
       parseLine(line, entry);

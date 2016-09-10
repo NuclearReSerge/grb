@@ -5,23 +5,51 @@
 namespace grb
 {
 
-namespace test
-{
-
 class CatalogEntryMock : public CatalogEntry
 {
 public:
   CatalogEntryMock();
   ~CatalogEntryMock();
 
-  type::Flag& getFlag();
-  type::Integer& getInteger();
-  type::Index& getIndex();
-  type::IntegerRange& getIntegerRange();
-  type::IndexList& getIndexList();
-  type::Float& getFloat();
-  type::String& getString();
-  type::StringList& getStringList();
+  type::Flag& getFlag()
+  {
+    return _flag;
+  }
+
+  type::Integer& getInteger()
+  {
+    return _integer;
+  }
+
+  type::Index& getIndex()
+  {
+    return _index;
+  }
+
+  type::IntegerRange& getIntegerRange()
+  {
+    return _integerRange;
+  }
+
+  type::IndexList& getIndexList()
+  {
+    return _indexList;
+  }
+
+  type::Float& getFloat()
+  {
+    return _float;
+  }
+
+  type::String& getString()
+  {
+    return _string;
+  }
+
+  type::StringList& getStringList()
+  {
+    return _stringList;
+  }
 
 protected:
   type::Flag* getFlag(type::ColumnType column);
@@ -33,7 +61,7 @@ protected:
   type::String* getString(type::ColumnType column);
   type::StringList* getStringList(type::ColumnType column);
 
-  NameMapper* getMapper(type::ColumnType column);
+  mapper::NameMapper* getMapper(type::ColumnType column);
 
   void setUnitType(type::ColumnType column, type::UnitType unitType);
 
@@ -50,8 +78,7 @@ private:
   type::StringList _stringList;
   type::UnitType _integerUnitType;
   type::UnitType _floatUnitType;
-  NameMapper* _mapper;
+  mapper::NameMapper* _mapper;
 };
 
-}
-}
+} // namespace grb

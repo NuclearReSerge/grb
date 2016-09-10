@@ -2,19 +2,4 @@
 
 #pragma once
 
-namespace grb
-{
-namespace test
-{
-
-class NameMapperMock : public NameMapper
-{
-public:
-  NameMapperMock();
-
-protected:
-  const std::vector<std::string>& getList() const;
-};
-
-}
-}
+NAME_MAPPER_CLASS_H(NameMapperMock, type::TEST_COLUMN_INDEX)

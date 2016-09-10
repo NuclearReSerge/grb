@@ -4,23 +4,21 @@
 
 #pragma once
 
-namespace grb
-{
-namespace test
+namespace testing
 {
 
-class NameMapperCommon : public ::testing::Test
+class NameMapperTestBase : public Test
 {
 public:
   bool tryToGetIndex(const std::string& name);
-  bool tryToGetName(const type::Index index);
+  bool tryToGetName(const grb::type::Index index);
 
 protected:
-  NameMapper* _mapper;
+  grb::mapper::NameMapper* _mapper;
 
-  type::ColumnType _columnType;
-  type::Index _firstIdx;
-  type::Index _lastIdx;
+  grb::type::ColumnType _columnType;
+  grb::type::Index _firstIdx;
+  grb::type::Index _lastIdx;
   std::string _first;
   std::string _last;
 
@@ -28,7 +26,11 @@ protected:
   static const std::string _invalid;
 };
 
+} // namespace testing
+
 #define NAME_MAPPER_TESTS(_TEST_CASE_)\
+namespace testing\
+{\
 TEST_F(_TEST_CASE_, isPresent_Positive)\
 {\
   ASSERT_EQ(true, _mapper->isPresent(_first));\
@@ -73,7 +75,5 @@ TEST_F(_TEST_CASE_, getColumnType)\
 TEST_F(_TEST_CASE_, getDescription)\
 {\
   ASSERT_EQ(false, _mapper->getDescription().empty());\
-}
-
-}
+}\
 }

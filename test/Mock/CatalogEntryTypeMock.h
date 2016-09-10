@@ -5,12 +5,12 @@ namespace grb
 namespace type
 {
 
-enum CatalogEntryType
+enum CatalogEntryTypeMock
 {
-  GRBCAT_ENTRY,
+  CATALOG_ENTRY_MOCK,
 
   // LAST
-  UNDEFINED_CATALOG_ENTRY
+  UNDEFINED_CATALOG_ENTRY_MOCK
 };
 
 } // namespace type

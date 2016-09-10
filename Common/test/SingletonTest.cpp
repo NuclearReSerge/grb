@@ -2,11 +2,7 @@
 
 #include <gtest/gtest.h>
 
-using namespace ::testing;
-
-namespace grb
-{
-namespace test
+namespace
 {
 
 class TestClass
@@ -31,27 +27,31 @@ private:
   int _test;
 };
 
+} // namespace
+
+namespace testing
+{
+
 class SingletonTest : public Test
 {
 };
 
 TEST_F(SingletonTest, instance_BasicType)
 {
-  ASSERT_NE(nullptr, Singleton<int>::instance());
+  ASSERT_NE(nullptr, grb::Singleton<int>::instance());
 }
 
 TEST_F(SingletonTest, instance_StdClassType)
 {
-  ASSERT_NE(nullptr, Singleton<std::string>::instance());
+  ASSERT_NE(nullptr, grb::Singleton<std::string>::instance());
 }
 
 TEST_F(SingletonTest, instance_UserType)
 {
-  ASSERT_NE(nullptr, Singleton<TestClass>::instance());
-  ASSERT_EQ((int) 0, Singleton<TestClass>::instance()->get());
-  Singleton<TestClass>::instance()->set(-1);
-  ASSERT_EQ((int) -1, Singleton<TestClass>::instance()->get());
+  ASSERT_NE(nullptr, grb::Singleton<TestClass>::instance());
+  ASSERT_EQ((int) 0, grb::Singleton<TestClass>::instance()->get());
+  grb::Singleton<TestClass>::instance()->set(-1);
+  ASSERT_EQ((int) -1, grb::Singleton<TestClass>::instance()->get());
 }
 
-}
-}
+} // namespace testing

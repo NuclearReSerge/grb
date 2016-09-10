@@ -3,68 +3,18 @@
 
 namespace grb
 {
-namespace test
-{
 
 CatalogEntryMock::CatalogEntryMock()
-  : CatalogEntry(type::TEST_CATALOG_ENTRY),
+  : CatalogEntry(),
     _flag(false), _integer(0), _index(-1), _float(0.0),
     _integerUnitType(type::UNDEFINED_UNIT), _floatUnitType(type::UNDEFINED_UNIT)
 {
-  _mapper = new NameMapperMock;
+  _mapper = new mapper::NameMapperMock;
 }
 
 CatalogEntryMock::~CatalogEntryMock()
 {
   delete _mapper;
-}
-
-type::Flag&
-CatalogEntryMock::getFlag()
-{
-  return _flag;
-}
-
-type::Integer&
-CatalogEntryMock::getInteger()
-{
-  return _integer;
-}
-
-type::Index&
-CatalogEntryMock::getIndex()
-{
-  return _index;
-}
-
-type::IntegerRange&
-CatalogEntryMock::getIntegerRange()
-{
-  return _integerRange;
-}
-
-type::IndexList&
-CatalogEntryMock::getIndexList()
-{
-  return _indexList;
-}
-
-type::Float&
-CatalogEntryMock::getFloat()
-{
-  return _float;
-}
-
-type::String&
-CatalogEntryMock::getString()
-{
-  return _string;
-}
-
-type::StringList&
-CatalogEntryMock::getStringList()
-{
-  return _stringList;
 }
 
 type::Flag*
@@ -133,7 +83,7 @@ CatalogEntryMock::getStringList(type::ColumnType column)
   return nullptr;
 }
 
-NameMapper*
+mapper::NameMapper*
 CatalogEntryMock::getMapper(type::ColumnType column)
 {
   switch (column)
@@ -163,5 +113,4 @@ CatalogEntryMock::isValid()
   return true;
 }
 
-}
-}
+} // namespace grb

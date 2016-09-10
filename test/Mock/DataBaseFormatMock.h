@@ -4,18 +4,21 @@
 
 namespace grb
 {
-namespace test
-{
 
 class DataBaseFormatMock : public DataBaseFormat
 {
 public:
-  DataBaseFormatMock();
+  DataBaseFormatMock()
+    : DataBaseFormat(type::TEST_DATABASE_TABLE)
+  {
+  }
+
+  void setColumnFlag(std::size_t column, bool required = true)
+  {
+    DataBaseFormat::setColumnFlag(column, required);
+  }
+
   void initialize();
-
-  void setColumnFlag(std::size_t column, bool required = true);
-
 };
 
-}
-}
+} // namespace grb

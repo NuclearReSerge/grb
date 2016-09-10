@@ -20,6 +20,7 @@ namespace mapper
 class NameMapper;
 }
 
+
 class Parser
 {
 public:

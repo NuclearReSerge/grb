@@ -1,4 +1,4 @@
-#include "Data/CatalogEntry.h"
+#include "Data/CatalogEntryFactory.h"
 #include "Data/CatalogEntryType.h"
 
 #include <vector>
@@ -16,7 +16,7 @@ public:
   {
   }
 
-  ~Catalog()
+  virtual ~Catalog()
   {
     for(CatalogEntry* entry : _catalog)
     {
@@ -28,6 +28,11 @@ public:
   type::CatalogEntryType getType() const
   {
     return _type;
+  }
+
+  virtual CatalogEntry* createEntry()
+  {
+    return CatalogEntryFactory::instance()->createType(_type);
   }
 
   std::vector<CatalogEntry*>& getEntries()

@@ -1,18 +1,16 @@
-#include "test/Mock/NameMapperCommon.h"
+#include "test/Mock/NameMapperTestBase.h"
 #include "test/Mock/NameMapperMock.h"
 
 
-namespace grb
-{
-namespace test
+namespace testing
 {
 
-class NameMapperDummyTest : public NameMapperCommon
+class NameMapperTest : public NameMapperTestBase
 {
   void SetUp()
   {
-    _mapper = new NameMapperMock;
-    _columnType = type::TEST_COLUMN_INDEX;
+    _mapper = new grb::mapper::NameMapperMock;
+    _columnType = grb::type::TEST_COLUMN_INDEX;
     _firstIdx = 0;
     _lastIdx = 1;
     _first = "NAME_LIST_FIRST";
@@ -25,7 +23,6 @@ class NameMapperDummyTest : public NameMapperCommon
   }
 };
 
-NAME_MAPPER_TESTS(NameMapperDummyTest)
+} // namespace testing
 
-}
-}
+NAME_MAPPER_TESTS(NameMapperTest)

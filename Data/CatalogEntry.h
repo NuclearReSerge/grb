@@ -17,7 +17,6 @@ class NameMapper;
 class CatalogEntry
 {
 public:
-  CatalogEntry() = delete;
   CatalogEntry(type::CatalogEntryType type = type::UNDEFINED_CATALOG_ENTRY)
     : _type(type)
   {

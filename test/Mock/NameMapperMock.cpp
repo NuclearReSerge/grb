@@ -1,10 +1,5 @@
 #include "test/Mock/NameMapperMock.h"
 
-namespace grb
-{
-namespace test
-{
-
 namespace
 {
   const std::vector<std::string> NAME_LIST
@@ -16,17 +11,22 @@ namespace
   const std::string DESCRIPTION = "DESCRIPTION";
 }
 
-
-NameMapperMock::NameMapperMock()
-  : NameMapper(type::TEST_COLUMN_INDEX, DESCRIPTION)
+namespace grb
 {
-  initiate();
+namespace mapper
+{
+
+const std::string&
+NameMapperMock::getDescription() const
+{
+  return DESCRIPTION;
 }
 
-const std::vector<std::string>& NameMapperMock::getList() const
+const std::vector<std::string>&
+NameMapperMock::getList() const
 {
   return NAME_LIST;
 }
 
-}
-}
+} // namespace mapper
+} // namespace grb

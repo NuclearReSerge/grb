@@ -4,27 +4,20 @@
 
 #include <gtest/gtest.h>
 
-using namespace ::testing;
-
-namespace grb
-{
-namespace test
-{
-
 namespace
 {
 
 struct Point
 {
-  type::Float lambda; // longnitude
-  type::Float phi;    // latitude
+  grb::type::Float lambda; // longnitude
+  grb::type::Float phi;    // latitude
 };
 
 struct Distance
 {
-  type::Float spherical;
-  type::Float haversine;
-  type::Float vincenty;
+  grb::type::Float spherical;
+  grb::type::Float haversine;
+  grb::type::Float vincenty;
 };
 
 struct TestData
@@ -34,10 +27,12 @@ struct TestData
   Distance result;
 };
 
-}
+} // namespace
 
+namespace grb
+{
 
-class GreatCircleDistanceTest : public Test
+class GreatCircleDistanceTest : public ::testing::Test
 {
 protected:
   void SetUp()
@@ -49,44 +44,44 @@ protected:
 
 TEST_F(GreatCircleDistanceTest, defaultPoints_SphericalLawFormula)
 {
-  GreatCircleDistance distance(type::SPHERICAL_LAW_OF_COSINES);
+  GreatCircleDistance distance(grb::type::SPHERICAL_LAW_OF_COSINES);
   CoordinatesMock P1, P2;
 
-  EXPECT_DOUBLE_EQ((type::Float) 0.0, distance(P1, P2));
+  EXPECT_DOUBLE_EQ((grb::type::Float) 0.0, distance(P1, P2));
 }
 
 TEST_F(GreatCircleDistanceTest, defaultPoints_HaversineFormula)
 {
-  GreatCircleDistance distance(type::HAVERSINE_FORMULA);
+  GreatCircleDistance distance(grb::type::HAVERSINE_FORMULA);
   CoordinatesMock P1, P2;
 
-  EXPECT_DOUBLE_EQ((type::Float) 0.0, distance(P1, P2));
+  EXPECT_DOUBLE_EQ((grb::type::Float) 0.0, distance(P1, P2));
 }
 
 TEST_F(GreatCircleDistanceTest, defaultPoints_VincentyFormula)
 {
-  GreatCircleDistance distance(type::VINCENTY_FORMULAE);
+  GreatCircleDistance distance(grb::type::VINCENTY_FORMULAE);
   CoordinatesMock P1, P2;
 
-  EXPECT_DOUBLE_EQ((type::Float) 0.0, distance(P1, P2));
+  EXPECT_DOUBLE_EQ((grb::type::Float) 0.0, distance(P1, P2));
 }
 
 TEST_F(GreatCircleDistanceTest, defaultPoints_UnknownFormula)
 {
-  GreatCircleDistance distance(type::UNDEFINED_ARC_FORMULA);
+  GreatCircleDistance distance(grb::type::UNDEFINED_ARC_FORMULA);
   CoordinatesMock P1, P2;
 
-  EXPECT_DOUBLE_EQ((type::Float) 0.0, distance(P1, P2));
+  EXPECT_DOUBLE_EQ((grb::type::Float) 0.0, distance(P1, P2));
 }
 
 TEST_F(GreatCircleDistanceTest, points_RandomCoordinates)
 {
-  GreatCircleDistance distSpherical(type::SPHERICAL_LAW_OF_COSINES);
-  GreatCircleDistance distHaversine(type::HAVERSINE_FORMULA);
-  GreatCircleDistance distVincenty(type::VINCENTY_FORMULAE);
+  GreatCircleDistance distSpherical(grb::type::SPHERICAL_LAW_OF_COSINES);
+  GreatCircleDistance distHaversine(grb::type::HAVERSINE_FORMULA);
+  GreatCircleDistance distVincenty(grb::type::VINCENTY_FORMULAE);
 
-  CoordinatesMock P1(type::GALACTIC);
-  CoordinatesMock P2(type::GALACTIC);
+  CoordinatesMock P1(grb::type::GALACTIC);
+  CoordinatesMock P2(grb::type::GALACTIC);
 
   std::vector<TestData> testData
   {
@@ -110,14 +105,13 @@ TEST_F(GreatCircleDistanceTest, points_RandomCoordinates)
   for (const TestData& data : testData)
   {
     P1.getX2() = data.point1.lambda;
-    P1.getX3()   = data.point1.phi;
+    P1.getX3() = data.point1.phi;
     P2.getX2() = data.point2.lambda;
-    P2.getX3()   = data.point2.phi;
-    EXPECT_DOUBLE_EQ((type::Float) data.result.spherical, distSpherical(P1, P2));
-    EXPECT_DOUBLE_EQ((type::Float) data.result.haversine, distHaversine(P1, P2));
-    EXPECT_DOUBLE_EQ((type::Float) data.result.vincenty,  distVincenty(P1, P2));
+    P2.getX3() = data.point2.phi;
+    EXPECT_DOUBLE_EQ((grb::type::Float) data.result.spherical, distSpherical(P1, P2));
+    EXPECT_DOUBLE_EQ((grb::type::Float) data.result.haversine, distHaversine(P1, P2));
+    EXPECT_DOUBLE_EQ((grb::type::Float) data.result.vincenty,  distVincenty(P1, P2));
   }
 }
 
-}
-}
+} // namespace grb

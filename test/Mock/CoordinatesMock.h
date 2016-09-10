@@ -6,17 +6,17 @@
 
 namespace grb
 {
-namespace test
-{
 
 class CoordinatesMock : public Coordinates
 {
 public:
-  CoordinatesMock(type::CoordinateSystemType type = type::UNDEFINED_COORDINATE_SYSTEM);
+  CoordinatesMock(type::CoordinateSystemType type = type::UNDEFINED_COORDINATE_SYSTEM)
+    : Coordinates(type)
+  {
+  }
 
 protected:
   MOCK_METHOD0(isValid, bool());
 };
 
-}
-}
+} // namespace grb
