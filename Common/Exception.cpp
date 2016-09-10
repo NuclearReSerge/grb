@@ -8,7 +8,7 @@ namespace grb
 {
 
 Exception::Exception(type::ExceptionLevel level, std::string message, std::string function)
-  : _level(level), _message(message)
+  : _level(level), _message("")
 {
   if (!(_level & type::EXCEPTION_MOD_NO_PREFIX))
   {

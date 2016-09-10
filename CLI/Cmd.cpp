@@ -56,6 +56,7 @@ Cmd::help(type::CommandHelpType type)
     }
     ss << cmdName << " - " << doHelp(type::HELP_SHORT) << std::endl;
   }
+
   if (type == type::HELP_LONG || type == type::HELP_FULL)
   {
     ss << std::endl
