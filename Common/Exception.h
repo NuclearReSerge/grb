@@ -1,14 +1,12 @@
 #include <exception>
-#include <string>
 
 #pragma once
 
 namespace grb
 {
-
-
 namespace type
 {
+
 enum ExceptionLevel
 {
   EXCEPTION_CRITICAL      = 0x00,
@@ -25,8 +23,8 @@ enum ExceptionLevel
   // LAST
   EXCEPTION_LEVEL_UNKNOWN = 0xFF
 };
-}
-//#define INCLUDE_FUNCTION_IN_EXC
+
+} // namespace
 
 #ifdef INCLUDE_FUNCTION_IN_EXC
   #define PRETTY_FUNCTION __PRETTY_FUNCTION__
@@ -38,15 +36,14 @@ class Exception : public std::exception
 {
 public:
   Exception(type::ExceptionLevel level = type::EXCEPTION_LEVEL_UNKNOWN,
-            const std::string& message = "",
-            const std::string& function = "");
+            const char* message = 0,
+            const char* function = 0);
+
   const char* what() const noexcept;
   type::ExceptionLevel getLevel() const;
+  static const char* getPrefix();
 
-  static const std::string& getPrefix();
 private:
-  static const std::string _prefix;
-  std::string _message;
   type::ExceptionLevel _level;
 };
 

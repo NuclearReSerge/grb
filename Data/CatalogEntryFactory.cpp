@@ -4,12 +4,11 @@
 
 namespace grb
 {
-
 namespace factory
 {
 
 CatalogEntry*
-CatalogEntryFactory::create(type::CatalogEntryType type)
+CatalogEntryFactory::createType(const type::CatalogEntryType& type)
 {
   switch (type)
   {
@@ -21,21 +20,5 @@ CatalogEntryFactory::create(type::CatalogEntryType type)
   return nullptr;
 }
 
-CatalogEntry*
-CatalogEntryFactory::create(const std::string& name)
-{
-  type::CatalogEntryType type;
-  try
-  {
-    type = CatalogEntryMapper::instance()->getValue(name);
-  }
-  catch (Exception& exc)
-  {
-    return nullptr;
-  }
-  return create(type);
-}
-
-}
-
-}
+} // namespace factory
+} // namespace grb

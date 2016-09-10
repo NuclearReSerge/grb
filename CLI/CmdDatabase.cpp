@@ -1,15 +1,14 @@
 #include "CLI/CmdDatabase.h"
 
+#include "CLI/CommandMapper.h"
 #include "Data/Catalog.h"
+#include "Data/CatalogEntryType.h"
 #include "Data/DataBaseFormatFactory.h"
 #include "Main/AnalysisData.h"
 #include "Tools/Parser.h"
 
 #include <iostream>
 #include <sstream>
-
-namespace grb
-{
 
 namespace
 {
@@ -21,10 +20,37 @@ const char* HELP_LONG = "[<DB_FILE>]\n"
 "    DB_FILE : name of the database file.\n"
 "\n"
 "Available databases:\n";
+
+} // namespace
+
+namespace grb
+{
+
+type::CatalogEntryType
+convertDataBaseFormat(type::DatabaseFormatType dbType)
+{
+  switch (dbType)
+  {
+    case type::HEASARC_GRBCAT:
+      return type::GRBCAT_ENTRY;
+
+    case type::HEASARC_GRBCATAG:
+    case type::HEASARC_GRBCATANN:
+    case type::HEASARC_GRBCATBOX:
+    case type::HEASARC_GRBCATCIRC:
+    case type::HEASARC_GRBCATDUAL:
+    case type::HEASARC_GRBCATFLUX:
+    case type::HEASARC_GRBCATINT:
+    case type::HEASARC_GRBCATINTA:
+    case type::HEASARC_GRBCATIRR:
+    default:
+      break;
+  }
+  return type::UNDEFINED_CATALOG_ENTRY;
 }
 
-CmdDatabase::CmdDatabase(CommandLine& cli)
-  : Cmd(cli, type::CMD_DATABASE)
+CmdDatabase::CmdDatabase()
+  : Cmd(type::CMD_DATABASE)
 {
 }
 
@@ -34,17 +60,17 @@ CmdDatabase::doParse(std::list<std::string>& tokens)
   if (tokens.empty())
   {
     Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
-                  help(type::HELP_LONG), PRETTY_FUNCTION);
+                  help(type::HELP_LONG).c_str(), PRETTY_FUNCTION);
     throw exc;
   }
 
   if (!filenameMapping(tokens.front()))
   {
     std::stringstream ss;
-    ss << "Error while parsing command " << CmdMapper::instance()->getKey(getType())
+    ss << "Error while parsing command " << CommandMapper::instance()->getKey(getType())
        << ". Filename " << tokens.front() << " not recognized.";
     Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
-                  ss.str(), PRETTY_FUNCTION);
+                  ss.str().c_str(), PRETTY_FUNCTION);
     throw exc;
   }
   tokens.pop_front();
@@ -55,32 +81,32 @@ CmdDatabase::doParse(std::list<std::string>& tokens)
 void
 CmdDatabase::doExecute()
 {
-  DataBaseFormat* dbFormat = DataBaseFormatFactory::instance()->create(_dbFile);
+  DataBaseFormat* dbFormat = DataBaseFormatFactory::instance()->createName(_dbFile);
 
   if (!dbFormat)
   {
     std::stringstream ss;
-    ss << "Error while executing command " << CmdMapper::instance()->getKey(getType())
+    ss << "Error while executing command " << CommandMapper::instance()->getKey(getType())
        << ". Database format for file " << _dbFile << " unavailable.";
     Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
-                  ss.str(), PRETTY_FUNCTION);
+                  ss.str().c_str(), PRETTY_FUNCTION);
     throw exc;
   }
 
-  type::DatabaseTableType dbType = dbFormat->getType();
+  type::DatabaseFormatType dbType = dbFormat->getType();
   std::printf("Database table: %s\n",
               DataBaseFormatMapper::instance()->getKey(dbType).c_str());
 
-  type::CatalogEntryType catType = CatalogEntryMapper::instance()->convertDataBaseFormat(dbType);
+  type::CatalogEntryType catType = convertDataBaseFormat(dbType);
 
   if (catType == type::UNDEFINED_CATALOG_ENTRY)
   {
     std::stringstream ss;
-    ss << "Error while executing command " << CmdMapper::instance()->getKey(getType())
+    ss << "Error while executing command " << CommandMapper::instance()->getKey(getType())
        << ". Catalog for database format " << DataBaseFormatMapper::instance()->getKey(dbType)
        << " unavailable.";
     Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
-                  ss.str(), PRETTY_FUNCTION);
+                  ss.str().c_str(), PRETTY_FUNCTION);
     throw exc;
   }
 
@@ -95,9 +121,9 @@ CmdDatabase::doExecute()
   catch (grb::Exception& parseExc)
   {
     std::stringstream ss;
-    ss << "Error while executing command " << CmdMapper::instance()->getKey(getType())
+    ss << "Error while executing command " << CommandMapper::instance()->getKey(getType())
        << ". Parser exception." << std::endl << parseExc.what();
-    Exception exc(parseExc.getLevel(), ss.str(), PRETTY_FUNCTION);
+    Exception exc(parseExc.getLevel(), ss.str().c_str(), PRETTY_FUNCTION);
     throw exc;
   }
   std::cout << "Parsing of database successful. Extraced " << rows << " rows." << std::endl;
@@ -106,7 +132,7 @@ CmdDatabase::doExecute()
 }
 
 std::string
-CmdDatabase::doHelp(type::HelpType type)
+CmdDatabase::doHelp(type::CommandHelpType type)
 {
   if (type == type::HELP_SHORT)
     return HELP_SHORT;
@@ -116,7 +142,7 @@ CmdDatabase::doHelp(type::HelpType type)
   for(int i = 0; i < type::UNDEFINED_DATABASE_TABLE; ++i)
   {
     ss << "  "
-       << DataBaseFormatMapper::instance()->getKey((type::DatabaseTableType) i)
+       << DataBaseFormatMapper::instance()->getKey((type::DatabaseFormatType) i)
        << "."<< TDAT_FILE_EXT << std::endl;
   }
 
@@ -144,4 +170,4 @@ CmdDatabase::filenameMapping(const std::string& filename)
   return true;
 }
 
-}
+} // namespace grb

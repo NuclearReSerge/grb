@@ -8,12 +8,12 @@ namespace grb
 class CmdCorrelation : public Cmd
 {
 public:
-  CmdCorrelation(CommandLine& cli);
+  CmdCorrelation();
 
 protected:
   bool doParse(std::list<std::string>& tokens);
   void doExecute();
-  std::string doHelp(type::HelpType type);
+  std::string doHelp(type::CommandHelpType type);
 };
 
-}
+} // namespace grb

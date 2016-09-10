@@ -1,6 +1,7 @@
 ﻿#include "Common/Exception.h"
 #include "Common/Global.h"
-#include "Data/DataType.h"
+#include "Data/ColumnType.h"
+#include "Data/DataBaseColumn.h"
 
 #include <istream>
 #include <string>
@@ -13,8 +14,11 @@ namespace grb
 class Catalog;
 class CatalogEntry;
 class DataBaseFormat;
-class Exception;
+
+namespace mapper
+{
 class NameMapper;
+}
 
 class Parser
 {
@@ -35,9 +39,9 @@ protected:
 
   bool parseValue(const std::string& raw, type::Flag* value);
   bool parseValue(const std::string& raw, type::Integer* value);
-  bool parseValue(const std::string& raw, const NameMapper* mapper, type::Index* value);
+  bool parseValue(const std::string& raw, const mapper::NameMapper* mapper, type::Index* value);
   bool parseValue(const std::string& raw, type::IntegerRange* value);
-  bool parseValue(const std::string& raw, const NameMapper* mapper, type::IndexList* valueList);
+  bool parseValue(const std::string& raw, const mapper::NameMapper* mapper, type::IndexList* valueList);
   bool parseValue(const std::string& raw, type::Float* value);
   bool parseValue(const std::string& raw, type::String* value);
   bool parseValue(const std::string& raw, type::StringList* valueList);
@@ -57,4 +61,4 @@ private:
   Catalog& _catalog;
 };
 
-}
+} // namespace grb

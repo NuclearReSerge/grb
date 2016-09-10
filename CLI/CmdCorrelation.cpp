@@ -1,10 +1,4 @@
 #include "CLI/CmdCorrelation.h"
-#include "CLI/CommandLine.h"
-
-#include <iostream>
-
-namespace grb
-{
 
 namespace
 {
@@ -12,10 +6,13 @@ namespace
 const char* HELP_SHORT = "generates correlation function.";
 const char* HELP_LONG = "<SUB_COMMAND>";
 
-}
+} // namespace
 
-CmdCorrelation::CmdCorrelation(CommandLine& cli)
-  : Cmd(cli, type::CMD_CORRELATION)
+namespace grb
+{
+
+CmdCorrelation::CmdCorrelation()
+  : Cmd(type::CMD_CORRELATION)
 {
 }
 
@@ -32,11 +29,12 @@ CmdCorrelation::doExecute()
 }
 
 std::string
-CmdCorrelation::doHelp(type::HelpType type)
+CmdCorrelation::doHelp(type::CommandHelpType type)
 {
   if (type == type::HELP_SHORT)
     return HELP_SHORT;
 
   return HELP_LONG;
 }
-}
+
+} // namespace grb

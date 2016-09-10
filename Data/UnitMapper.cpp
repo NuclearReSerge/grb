@@ -1,8 +1,5 @@
 #include "Data/UnitMapper.h"
 
-namespace grb
-{
-
 namespace
 {
 
@@ -17,21 +14,18 @@ const std::vector<std::string> UNIT_NAMES
   "undefined-unit"
 };
 
-}
+} // namespace
 
+
+namespace grb
+{
 namespace mapper
 {
-
-UnitMapper::UnitMapper()
-{
-  initiate();
-}
 
 const std::vector<std::string>& UnitMapper::getList() const
 {
   return UNIT_NAMES;
 }
 
-}
-
-}
+} // namespace mapper
+} // namespace grb

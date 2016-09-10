@@ -4,12 +4,11 @@
 
 namespace grb
 {
-
 namespace factory
 {
 
 Correlation*
-CorrelationFactory::create(type::CorrelationType type)
+CorrelationFactory::createType(const type::CorrelationType& type)
 {
   switch (type)
   {
@@ -21,21 +20,5 @@ CorrelationFactory::create(type::CorrelationType type)
   return nullptr;
 }
 
-Correlation*
-CorrelationFactory::create(const std::string& name)
-{
-  type::CorrelationType type;
-  try
-  {
-    type = CorrelationMapper::instance()->getValue(name);
-  }
-  catch (Exception& exc)
-  {
-    return nullptr;
-  }
-  return create(type);
-}
-
-}
-
-}
+} // namespace factory
+} // namespace grb

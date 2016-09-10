@@ -1,23 +1,7 @@
-#include "Common/Singleton.h"
+#include "Common/Factory.h"
 #include "Filter/Filter.h"
+#include "Filter/FilterMapper.h"
 
 #pragma once
 
-namespace grb
-{
-
-namespace factory
-{
-
-class FilterFactory
-{
-public:
-  virtual Filter* create(type::FilterType type);
-  virtual Filter* create(const std::string& name);
-};
-
-}
-
-typedef Singleton<factory::FilterFactory> FilterFactory;
-
-}
+FACTORY_CLASS_H(FilterFactory, type::FilterType, Filter, FilterMapper)

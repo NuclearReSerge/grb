@@ -9,9 +9,9 @@ template <typename T>
 class Singleton
 {
 public:
-  virtual ~Singleton()
-  {
-  }
+  Singleton(const Singleton& ) = delete;
+  Singleton& operator=(const Singleton& ) = delete;
+  virtual ~Singleton() = default;
 
   static T* instance()
   {
@@ -21,9 +21,7 @@ public:
   }
 
 protected:
-  Singleton()
-  {
-  }
+  Singleton() = default;
 
   static std::unique_ptr<T> _instance;
 };

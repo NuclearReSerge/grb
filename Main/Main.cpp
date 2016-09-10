@@ -15,7 +15,6 @@
 
 namespace grb
 {
-
 namespace type
 {
 
@@ -29,7 +28,7 @@ enum ErrorLevelCode
   ERROR_LEVEL_CODE_UNDEFINED
 };
 
-}
+} // namespace type
 
 extern void intro();
 extern void usage(const std::string& binaryName);
@@ -75,21 +74,21 @@ G_Model()
   return _model;
 }
 
-}
-
-namespace
-{
-
-const std::size_t buffSize = 256;
-char buff[buffSize];
-
-}
+} // namespace grb
 
 /** ************************************************************************************************
  *
  * MAIN
  *
  **************************************************************************************************/
+namespace
+{
+
+const std::size_t buffSize = 256;
+char buff[buffSize];
+
+} // namespace
+
 int
 main(int argc, char** argv)
 {
@@ -132,7 +131,6 @@ main(int argc, char** argv)
       }
     }
   }
-
 
   return grb::type::NO_ERROR;
 }

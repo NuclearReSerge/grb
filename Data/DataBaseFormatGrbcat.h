@@ -10,14 +10,20 @@ namespace grb
 class DataBaseFormatGrbcat : public DataBaseFormat
 {
 public:
-  DataBaseFormatGrbcat();
+  DataBaseFormatGrbcat()
+    : DataBaseFormat(type::HEASARC_GRBCAT), _coordSys(type::EQUATORIAL_J2000)
+  {
+  }
+
+  type::CoordinateSystemType getCoordinateSystem() const
+  {
+    return _coordSys;
+  }
 
   void initialize();
-  type::CoordinateSystemType getCoordinateSystem() const;
-
 
 private:
   type::CoordinateSystemType _coordSys;
 };
 
-}
+} // namespace grb

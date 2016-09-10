@@ -1,23 +1,5 @@
-#include "Common/Singleton.h"
+#include "Common/Factory.h"
 #include "Correlation/Correlation.h"
+#include "Correlation/CorrelationMapper.h"
 
-#pragma once
-
-namespace grb
-{
-
-namespace factory
-{
-
-class CorrelationFactory
-{
-public:
-  virtual Correlation* create(type::CorrelationType type);
-  virtual Correlation* create(const std::string& name);
-};
-
-}
-
-typedef Singleton<factory::CorrelationFactory> CorrelationFactory;
-
-}
+FACTORY_CLASS_H(CorrelationFactory, type::CorrelationType, Correlation, CorrelationMapper)

@@ -1,5 +1,4 @@
 #include "Data/CatalogEntry.h"
-
 #include "Data/Coordinates.h"
 #include "Data/Duration.h"
 
@@ -11,26 +10,104 @@ namespace grb
 class CatalogEntryGrbcat : public CatalogEntry
 {
 public:
-  CatalogEntryGrbcat();
+  CatalogEntryGrbcat()
+    : CatalogEntry(type::GRBCAT_ENTRY),
+      _record_number(0), _id(0), _time_def(-1),
+      _observatory(-1), _coordinates(type::EQUATORIAL_J2000, type::MODIFIED_JULIAN_DATE),
+      _region(-1),
+      _afterglow_flag(false), _t50(), _t90(), _t_other(), _flux_flag(false), _class_id(0)
+  {
+  }
 
-  type::Integer& getRecordNumber();
-  type::Integer& getId();
-  type::String& getName();
-  type::StringList& getAltNames();
-  type::Index& getTimeDef();
-  type::Index& getObservatory();
-  type::Float& getCoordFlag();
-  Coordinates& getCoodinates();
-  type::Index& getRegion();
-  type::Flag& getAfterglowFlag();
-  type::IndexList& getReference();
-  Duration& getT50();
-  Duration& getT90();
-  DurationOther& getTOther();
-  type::Flag& getFluxFlag();
-  type::String& getFluxNotes();
-  type::String& getLocalNotes();
-  type::Integer& getClassId();
+  type::Integer& getRecordNumber()
+  {
+    return _record_number;
+  }
+
+  type::Integer& getId()
+  {
+    return _id;
+  }
+
+  type::String& getName()
+  {
+    return _name;
+  }
+
+  type::StringList& getAltNames()
+  {
+    return _alt_names;
+  }
+
+  type::Index& getTimeDef()
+  {
+    return _time_def;
+  }
+
+  type::Index& getObservatory()
+  {
+    return _observatory;
+  }
+
+  type::Float& getCoordFlag()
+  {
+    return _coord_flag;
+  }
+
+  Coordinates& getCoodinates()
+  {
+    return _coordinates;
+  }
+
+  type::Index& getRegion()
+  {
+    return _region;
+  }
+
+  type::Flag& getAfterglowFlag()
+  {
+    return _afterglow_flag;
+  }
+
+  type::IndexList& getReference()
+  {
+    return _reference;
+  }
+
+  Duration& getT50()
+  {
+    return _t50;
+  }
+
+  Duration& getT90()
+  {
+    return _t90;
+  }
+
+  DurationOther& getTOther()
+  {
+    return _t_other;
+  }
+
+  type::Flag& getFluxFlag()
+  {
+    return _flux_flag;
+  }
+
+  type::String& getFluxNotes()
+  {
+    return _flux_notes;
+  }
+
+  type::String& getLocalNotes()
+  {
+    return _local_notes;
+  }
+
+  type::Integer& getClassId()
+  {
+    return _class_id;
+  }
 
 protected:
   type::Flag* getFlag(type::ColumnType column);
@@ -42,7 +119,7 @@ protected:
   type::String* getString(type::ColumnType column);
   type::StringList* getStringList(type::ColumnType column);
 
-  NameMapper* getMapper(type::ColumnType column);
+  mapper::NameMapper* getMapper(type::ColumnType column);
 
   void setUnitType(type::ColumnType column, type::UnitType unitType);
 
@@ -69,4 +146,4 @@ private:
   type::Integer _class_id;
 };
 
-}
+} // namespace grb

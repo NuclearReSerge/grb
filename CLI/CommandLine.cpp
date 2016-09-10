@@ -1,6 +1,6 @@
 #include "CLI/CommandLine.h"
 
-#include "CLI/CmdFactory.h"
+#include "CLI/CommandFactory.h"
 
 #include <iostream>
 #include <sstream>
@@ -16,7 +16,7 @@ const std::string WHITESPACE   = " \t\n\r\f\v";
 const std::string DELIM = " ";
 const std::string SPECIAL = "=,[]()";
 
-}
+} // namespace
 
 CommandLine::CommandLine(int argc, char** argv)
   : _quit(false), _cmdIndex(0)
@@ -66,11 +66,12 @@ CommandLine::parse(std::list<std::string>& tokens) throw(Exception)
   if (tokens.empty())
     return nullptr;
 
-  Cmd* cmdObj = CmdFactory::instance()->create(*this, tokens.front());
+  Cmd* cmdObj = CommandFactory::instance()->createName(tokens.front());
 
   if (!cmdObj)
     return nullptr;
 
+  cmdObj->setCLI(this);
   tokens.pop_front();
   _commands.push_back(cmdObj);
 
@@ -78,12 +79,6 @@ CommandLine::parse(std::list<std::string>& tokens) throw(Exception)
     return nullptr;
 
   return cmdObj;
-}
-
-bool
-CommandLine::quit()
-{
-  return _quit;
 }
 
 void
@@ -113,16 +108,4 @@ CommandLine::tokenize(const std::string& input, std::list<std::string>& tokens, 
   }
 }
 
-void
-CommandLine::setQuit()
-{
-  _quit = true;
-}
-
-void
-CommandLine::incCmdIdx()
-{
-  ++_cmdIndex;
-}
-
-}
+} // namespace grb

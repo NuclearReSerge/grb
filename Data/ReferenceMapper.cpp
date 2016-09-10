@@ -1,7 +1,4 @@
-#include "Data/Reference.h"
-
-namespace grb
-{
+#include "Data/ReferenceMapper.h"
 
 namespace
 {
@@ -345,16 +342,22 @@ const std::string DESCRIPTION = "\
 Report the reference that report the GRB information in the table. It is given as ADS format.";
 }
 
-ReferenceType::ReferenceType()
-  : NameMapper(type::REFERENCE, DESCRIPTION)
+namespace grb
 {
-  initiate();
+namespace mapper
+{
+
+const std::string&
+ReferenceMapper::getDescription() const
+{
+  return DESCRIPTION;
 }
 
-const std::vector<std::string>& ReferenceType::getList() const
+const std::vector<std::string>&
+ReferenceMapper::getList() const
 {
   return NAME_LIST;
 }
 
+} // namespace mapper
 } // namespace grb
-

@@ -18,5 +18,4 @@ std::unique_ptr<Catalog>& G_CatalogModel();
 std::unique_ptr<Filter>& G_Filter();
 std::unique_ptr<Model>& G_Model();
 
-
-}
+} // namespace grb

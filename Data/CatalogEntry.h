@@ -1,22 +1,34 @@
 #include "Common/Global.h"
-#include "Data/CatalogEntryMapper.h"
-#include "Data/DataType.h"
+#include "Data/CatalogEntryType.h"
+#include "Data/DataBaseColumn.h"
 
 #pragma once
 
 namespace grb
 {
 
+namespace mapper
+{
+
 class NameMapper;
+
+}
 
 class CatalogEntry
 {
 public:
   CatalogEntry() = delete;
-  CatalogEntry(type::CatalogEntryType type = type::UNDEFINED_CATALOG_ENTRY);
-  virtual ~CatalogEntry();
+  CatalogEntry(type::CatalogEntryType type = type::UNDEFINED_CATALOG_ENTRY)
+    : _type(type)
+  {
+  }
 
-  type::CatalogEntryType getType() const;
+  virtual ~CatalogEntry() = default;
+
+  type::CatalogEntryType getType() const
+  {
+    return _type;
+  }
 
 protected:
   friend class Parser;
@@ -29,7 +41,7 @@ protected:
   virtual type::String* getString(type::ColumnType column) = 0;
   virtual type::StringList* getStringList(type::ColumnType column) = 0;
 
-  virtual NameMapper* getMapper(type::ColumnType column) = 0;
+  virtual mapper::NameMapper* getMapper(type::ColumnType column) = 0;
 
   virtual void setUnitType(type::ColumnType column, type::UnitType unitType) = 0;
 
@@ -39,4 +51,4 @@ private:
   type::CatalogEntryType _type;
 };
 
-}
+} // namespace grb

@@ -1,11 +1,12 @@
 #include "Common/Global.h"
-#include "Correlation/ArcFormulaMapper.h"
-#include "Data/Coordinates.h"
+#include "Correlation/ArcFormulaType.h"
 
 #pragma once
 
 namespace grb
 {
+
+class Coordinates;
 
 class GreatCircleDistance
 {
@@ -30,4 +31,4 @@ private:
   type::ArcFormulaType _type;
 };
 
-}
+} // namespace grb

@@ -1,7 +1,4 @@
-#include "Data/Region.h"
-
-namespace grb
-{
+#include "Data/RegionMapper.h"
 
 namespace
 {
@@ -22,17 +19,25 @@ const std::vector<std::string> NAME_LIST
 const std::string DESCRIPTION = "\
 This parameter contains the name of the region. The possible regions are: circle, annulus, box, \
 dual, annulus intersect, irregular, intersect.";
-}
 
-RegionType::RegionType()
-  : NameMapper(type::REGION, DESCRIPTION)
+} // mapper
+
+namespace grb
 {
-  initiate();
+namespace mapper
+{
+
+const std::string&
+RegionMapper::getDescription() const
+{
+  return DESCRIPTION;
 }
 
-const std::vector<std::string>& RegionType::getList() const
+const std::vector<std::string>&
+RegionMapper::getList() const
 {
   return NAME_LIST;
 }
 
+} // namespace mapper
 } // namespace grb

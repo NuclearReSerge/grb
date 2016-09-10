@@ -1,8 +1,5 @@
 #include "Data/ColumnMapper.h"
 
-namespace grb
-{
-
 namespace
 {
 
@@ -60,21 +57,17 @@ const std::vector<std::string> COLUMN_NAMES
   "undefined-column"		// Unknown column type
 };
 
-}
+} // namespace
 
+namespace grb
+{
 namespace mapper
 {
-
-ColumnMapper::ColumnMapper()
-{
-  initiate();
-}
 
 const std::vector<std::string>& ColumnMapper::getList() const
 {
   return COLUMN_NAMES;
 }
 
-}
-
-}
+} // namespace mapper
+} // namespace grb

@@ -1,4 +1,5 @@
 #include "Correlation/GreatCircleDistance.h"
+#include "Data/Coordinates.h"
 
 #include <cmath>
 
@@ -80,4 +81,4 @@ GreatCircleDistance::getZero(Coordinates& p1, Coordinates& p2) const
   return 0.0 * p1.getCarX() * p2.getCarX();
 }
 
-}
+} // namespace grb

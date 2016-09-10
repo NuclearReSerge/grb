@@ -12,4 +12,4 @@ FilterNone::~FilterNone()
 {
 }
 
-}
+} // namespace grb

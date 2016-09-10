@@ -4,12 +4,11 @@
 
 namespace grb
 {
-
 namespace factory
 {
 
 DataBaseFormat*
-DataBaseFormatFactory::create(type::DatabaseTableType type)
+DataBaseFormatFactory::createType(const type::DatabaseFormatType& type)
 {
   DataBaseFormat* format = nullptr;
   switch (type)
@@ -38,21 +37,5 @@ DataBaseFormatFactory::create(type::DatabaseTableType type)
   return format;
 }
 
-DataBaseFormat*
-DataBaseFormatFactory::create(const std::string& name)
-{
-  type::DatabaseTableType type;
-  try
-  {
-    type = DataBaseFormatMapper::instance()->getValue(name);
-  }
-  catch (Exception& exc)
-  {
-    return nullptr;
-  }
-  return create(type);
-}
-
-}
-
-}
+} // namespace factory
+} // namespace grb

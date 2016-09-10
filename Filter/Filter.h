@@ -1,7 +1,5 @@
 #include "Filter/FilterMapper.h"
 
-#include <string>
-
 #pragma once
 
 namespace grb
@@ -10,13 +8,20 @@ namespace grb
 class Filter
 {
 public:
-  Filter(type::FilterType type = type::UNDEFINED_FILTER);
-  virtual ~Filter();
+  Filter(type::FilterType type = type::UNDEFINED_FILTER)
+    : _type(type)
+  {
+  }
 
-  type::FilterType getType() const;
+  virtual ~Filter() = default;
+
+  type::FilterType getType() const
+  {
+    return _type;
+  }
 
 private:
   type::FilterType _type;
 };
 
-}
+} // namespace grb

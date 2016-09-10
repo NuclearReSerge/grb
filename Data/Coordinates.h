@@ -1,96 +1,71 @@
 #include "Common/Global.h"
-#include "Data/CoordinateSystemMapper.h"
-#include "Data/DateMapper.h"
-#include "Data/UnitMapper.h"
+#include "Data/CoordinateStructures.h"
+#include "Data/CoordinateSystemType.h"
+#include "Data/DateType.h"
+#include "Data/UnitType.h"
 
 #pragma once
 
 namespace grb
 {
 
-namespace type
-{
-
-enum CoordinateIndex
-{
-  X0,
-  X1,
-  X2,
-  X3,
-
-  NUMBER_OF_COORDINATES
-};
-
-struct CommonSystem
-{
-  type::Float x0;
-  type::Float x1;
-  type::Float x2;
-  type::Float x3;
-};
-
-struct CartesianSystem
-{
-  type::Float t;
-  type::Float x;
-  type::Float y;
-  type::Float z;
-};
-
-struct CylindricalSystem
-{
-  type::Float t;
-  type::Float rho;
-  type::Float phi;
-  type::Float z;
-};
-
-struct SphericalSystem
-{
-  type::Float t;
-  type::Float r;
-  type::Float phi;
-  type::Float theta;
-};
-
-struct CelestialSystem
-{
-  type::Float t;
-  type::Float dummy;
-  type::Float longitude;
-  type::Float latitude;
-};
-
-}
-
 class Coordinates
 {
 public:
   Coordinates(type::CoordinateSystemType coorType = type::UNDEFINED_COORDINATE_SYSTEM,
-              type::DateType dateType = type::UNDEFINED_DATE);
-  virtual ~Coordinates();
+              type::DateType dateType = type::UNDEFINED_DATE)
+    : _coorType(coorType), _dateType(dateType)
+  {
+    _u.common.x0 = 0.0;
+    _u.common.x1 = 0.0;
+    _u.common.x2 = 0.0;
+    _u.common.x3 = 0.0;
 
-  type::CoordinateSystemType getCoorType() const;
-  type::DateType getDateType() const;
+    for (int i = 0; i < type::NUMBER_OF_COORDINATES; ++i)
+      _unitTypes[i] = type::UNDEFINED_UNIT;
+  }
 
-  /** **********************************************************************************************
-   *
-   *
-   *
-   ************************************************************************************************/
-  void setUnitType(const type::CoordinateIndex idx, const type::UnitType type);
+  virtual ~Coordinates() = default;
 
-  type::UnitType getUnitType(const type::CoordinateIndex idx) const;
+  type::CoordinateSystemType getCoorType() const
+  {
+    return _coorType;
+  }
 
-  /** **********************************************************************************************
-   *
-   *
-   *
-   ************************************************************************************************/
-  type::Float& getX0();
-  type::Float& getX1();
-  type::Float& getX2();
-  type::Float& getX3();
+  type::DateType getDateType() const
+  {
+    return _dateType;
+  }
+
+  void setUnitType(const type::CoordinateIndex idx, const type::UnitType type)
+  {
+    _unitTypes[idx] = type;
+  }
+
+  type::UnitType getUnitType(const type::CoordinateIndex idx) const
+  {
+    return _unitTypes[idx];
+  }
+
+  type::Float& getX0()
+  {
+    return _u.common.x0;
+  }
+
+  type::Float& getX1()
+  {
+    return _u.common.x1;
+  }
+
+  type::Float& getX2()
+  {
+    return _u.common.x2;
+  }
+
+  type::Float& getX3()
+  {
+    return _u.common.x3;
+  }
 
   /** **********************************************************************************************
    *
@@ -128,7 +103,7 @@ public:
   type::Float getCelLongnitude();
   type::Float getCelLatitude();
 
-  virtual bool isValid();
+  bool isValid();
 
 private:
   type::CoordinateSystemType _coorType;
@@ -145,4 +120,4 @@ private:
   } _u;
 };
 
-}
+} // namespace grb

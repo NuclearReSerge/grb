@@ -1,8 +1,5 @@
 #include "Model/ModelCmdMapper.h"
 
-namespace grb
-{
-
 namespace
 {
 
@@ -16,21 +13,17 @@ const std::vector<std::string> MODEL_CMD_NAMES
   "undefined-model-command"
 };
 
-}
+} // namespace
 
+namespace grb
+{
 namespace mapper
 {
-
-ModelCmdMapper::ModelCmdMapper()
-{
-  initiate();
-}
 
 const std::vector<std::string>& ModelCmdMapper::getList() const
 {
   return MODEL_CMD_NAMES;
 }
 
-}
-
-}
+} // namespace mapper
+} // namespace grb

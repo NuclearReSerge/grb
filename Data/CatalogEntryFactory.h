@@ -1,23 +1,7 @@
-#include "Common/Singleton.h"
+#include "Common/Factory.h"
 #include "Data/CatalogEntry.h"
+#include "Data/CatalogEntryMapper.h"
 
 #pragma once
 
-namespace grb
-{
-
-namespace factory
-{
-
-class CatalogEntryFactory
-{
-public:
-  virtual CatalogEntry* create(type::CatalogEntryType type);
-  virtual CatalogEntry* create(const std::string& name);
-};
-
-}
-
-typedef Singleton<factory::CatalogEntryFactory> CatalogEntryFactory;
-
-}
+FACTORY_CLASS_H(CatalogEntryFactory, type::CatalogEntryType, CatalogEntry, CatalogEntryMapper)

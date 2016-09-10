@@ -3,19 +3,19 @@
 
 #include <iostream>
 
-namespace grb
-{
-
 namespace
 {
 
 const char* HELP_SHORT = "exits/quits the program.";
 const char* HELP_LONG = "";
 
-}
+} // namespace
 
-CmdQuit::CmdQuit(CommandLine& cli, type::CommandType cmdType)
-  : Cmd(cli, cmdType)
+namespace grb
+{
+
+CmdQuit::CmdQuit(type::CommandType cmdType)
+  : Cmd(cmdType)
 {
 }
 
@@ -29,16 +29,18 @@ CmdQuit::doParse(std::list<std::string>& tokens)
 void
 CmdQuit::doExecute()
 {
-  getCLI().setQuit();
+  if(getCLI())
+    getCLI()->setQuit();
   std::cout << "Bye!" << std::endl;
 }
 
 std::string
-CmdQuit::doHelp(type::HelpType type)
+CmdQuit::doHelp(type::CommandHelpType type)
 {
   if (type == type::HELP_SHORT)
     return HELP_SHORT;
 
   return HELP_LONG;
 }
-}
+
+} // namespace grb

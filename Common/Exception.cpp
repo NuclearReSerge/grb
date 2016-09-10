@@ -1,24 +1,29 @@
 #include "Common/Exception.h"
 
+#include <string>
+
+static std::string _prefix = "GRB exception: ";
+static std::string _message = "";
+
 namespace grb
 {
 
-const std::string Exception::_prefix = "GRB exception: ";
-
-Exception::Exception(type::ExceptionLevel level, const std::string& message,
-                     const std::string& function)
+Exception::Exception(type::ExceptionLevel level, const char* message, const char* function)
   : _level(level)
 {
   if (!(_level & type::EXCEPTION_MOD_NO_PREFIX))
   {
     _message = _prefix;
   }
-  if (!function.empty())
+  if (function)
   {
-    _message += "[" + function + "] ";
+    _message += "[";
+    _message += function;
+    _message += "] ";
   }
   _message += message;
 }
+
 
 const char*
 Exception::what() const noexcept
@@ -32,10 +37,10 @@ Exception::getLevel() const
   return (type::ExceptionLevel) (_level & type::EXCEPTION_MASK);
 }
 
-const std::string& Exception::getPrefix()
+const char*
+Exception::getPrefix()
 {
-  return _prefix;
+  return _prefix.c_str();
 }
 
-
-}
+} // namespace grb

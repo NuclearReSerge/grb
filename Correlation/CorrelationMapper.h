@@ -1,38 +1,6 @@
-#include "Common/Singleton.h"
-#include "Tools/Mapper.h"
+#include "Common/Mapper.h"
+#include "Correlation/CorrelationType.h"
 
 #pragma once
 
-namespace grb
-{
-
-namespace type
-{
-
-enum CorrelationType
-{
-  CORRELATION_GRBCAT_DTDARC,
-
-  // LAST
-  UNDEFINED_CORRELATION
-};
-
-}
-
-namespace mapper
-{
-
-class CorrelationMapper : public Mapper<type::CorrelationType>
-{
-public:
-  CorrelationMapper();
-
-protected:
-  const std::vector<std::string>& getList() const;
-};
-
-}
-
-typedef Singleton<mapper::CorrelationMapper> CorrelationMapper;
-
-}
+MAPPER_CLASS_H(CorrelationMapper, type::CorrelationType)

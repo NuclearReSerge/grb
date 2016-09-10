@@ -36,4 +36,4 @@ private:
   std::vector< std::vector<std::size_t> > _histModel;
 };
 
-}
+} // namespace grb

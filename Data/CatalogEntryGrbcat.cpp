@@ -1,129 +1,13 @@
 #include "Data/CatalogEntryGrbcat.h"
 
-#include "Data/Observatory.h"
-#include "Data/Reference.h"
-#include "Data/Region.h"
-#include "Data/TimeDef.h"
-#include "Data/TimeMod.h"
+#include "Data/ObservatoryMapper.h"
+#include "Data/ReferenceMapper.h"
+#include "Data/RegionMapper.h"
+#include "Data/TimeDefMapper.h"
+#include "Data/TimeModMapper.h"
 
 namespace grb
 {
-
-CatalogEntryGrbcat::CatalogEntryGrbcat()
-  : CatalogEntry(type::GRBCAT_ENTRY),
-    _record_number(0), _id(0), _time_def(-1),
-    _observatory(-1), _coordinates(type::EQUATORIAL_J2000, type::MODIFIED_JULIAN_DATE),
-    _region(-1),
-    _afterglow_flag(false), _t50(), _t90(), _t_other(), _flux_flag(false), _class_id(0)
-{ }
-
-type::Integer&
-CatalogEntryGrbcat::getRecordNumber()
-{
-  return _record_number;
-}
-
-type::Integer&
-CatalogEntryGrbcat::getId()
-{
-  return _id;
-}
-
-type::String&
-CatalogEntryGrbcat::getName()
-{
-  return _name;
-}
-
-type::StringList&
-CatalogEntryGrbcat::getAltNames()
-{
-  return _alt_names;
-}
-
-type::Index&
-CatalogEntryGrbcat::getTimeDef()
-{
-  return _time_def;
-}
-
-type::Index&
-CatalogEntryGrbcat::getObservatory()
-{
-  return _observatory;
-}
-
-type::Float&
-CatalogEntryGrbcat::getCoordFlag()
-{
-  return _coord_flag;
-}
-
-Coordinates&
-CatalogEntryGrbcat::getCoodinates()
-{
-  return _coordinates;
-}
-
-type::Index&
-CatalogEntryGrbcat::getRegion()
-{
-  return _region;
-}
-
-type::Flag&
-CatalogEntryGrbcat::getAfterglowFlag()
-{
-  return _afterglow_flag;
-}
-
-type::IndexList&
-CatalogEntryGrbcat::getReference()
-{
-  return _reference;
-}
-
-Duration&
-CatalogEntryGrbcat::getT50()
-{
-  return _t50;
-}
-
-Duration&
-CatalogEntryGrbcat::getT90()
-{
-  return _t90;
-}
-
-DurationOther&
-CatalogEntryGrbcat::getTOther()
-{
-  return _t_other;
-}
-
-type::Flag&
-CatalogEntryGrbcat::getFluxFlag()
-{
-  return _flux_flag;
-}
-
-type::String&
-CatalogEntryGrbcat::getFluxNotes()
-{
-  return _flux_notes;
-}
-
-type::String&
-CatalogEntryGrbcat::getLocalNotes()
-{
-  return _local_notes;
-}
-
-type::Integer&
-CatalogEntryGrbcat::getClassId()
-{
-  return _class_id;
-}
 
 type::Flag*
 CatalogEntryGrbcat::getFlag(type::ColumnType column)
@@ -275,23 +159,23 @@ CatalogEntryGrbcat::getStringList(type::ColumnType column)
   return nullptr;
 }
 
-NameMapper*
+mapper::NameMapper*
 CatalogEntryGrbcat::getMapper(type::ColumnType column)
 {
   switch (column)
   {
     case type::OBSERVATORY:
-      return Observatory::instance();
+      return ObservatoryMapper::instance();
     case type::REFERENCE:
-      return Reference::instance();
+      return ReferenceMapper::instance();
     case type::REGION:
-      return Region::instance();
+      return RegionMapper::instance();
     case type::TIME_DEF:
-      return TimeDef::instance();
+      return TimeDefMapper::instance();
     case type::T50_MOD:
-      return Time50Mod::instance();
+      return Time50ModMapper::instance();
     case type::T90_MOD:
-      return Time90Mod::instance();
+      return Time90ModMapper::instance();
     default:
       break;
   }
@@ -347,4 +231,4 @@ CatalogEntryGrbcat::isValid()
       _t_other.isValid();
 }
 
-}
+} // namespace grb

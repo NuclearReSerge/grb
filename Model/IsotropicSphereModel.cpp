@@ -50,7 +50,7 @@ IsotropicSphereModel::doGenerate(Catalog& catalog)
   CatalogEntry* entryBase;
   for (std::size_t i = 0; i < getNumberOfEntries(); ++i)
   {
-    entryBase = CatalogEntryFactory::instance()->create(type::GRBCAT_ENTRY);
+    entryBase = CatalogEntryFactory::instance()->createType(type::GRBCAT_ENTRY);
     CatalogEntryGrbcat* entry = static_cast<CatalogEntryGrbcat*>(entryBase);
 
     entry->getCoordFlag() = 0.0;

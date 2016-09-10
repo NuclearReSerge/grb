@@ -2,10 +2,6 @@
 
 #include <cmath>
 
-namespace grb
-{
-
-
 //typedef std::chrono::time_point<std::chrono::high_resolution_clock> TimePoint;
 /*
 JD(0) = -4713-01-01 12:00:00.000
@@ -18,86 +14,17 @@ MJD(JD) = JD − 2400000.5
 namespace
 {
 
-constexpr type::Float DAY_IN_SEC       = 86400.0;
-constexpr type::Float DAY_IN_MICROSEC  = DAY_IN_SEC * 1000000.0;
-constexpr type::Float DAY_IN_NANOSEC   = DAY_IN_SEC * 1000000000.0;
-constexpr type::Float UNIX_EPOCH_IN_JD = 2440587.5; // days
-constexpr type::Float JD_TO_MJD        = 2400000.5; // days
-constexpr type::Float EPSILON          = 0.0000000000001; // 10^-13
+constexpr grb::type::Float DAY_IN_SEC       = 86400.0;
+constexpr grb::type::Float DAY_IN_MICROSEC  = DAY_IN_SEC * 1000000.0;
+constexpr grb::type::Float DAY_IN_NANOSEC   = DAY_IN_SEC * 1000000000.0;
+constexpr grb::type::Float UNIX_EPOCH_IN_JD = 2440587.5; // days
+constexpr grb::type::Float JD_TO_MJD        = 2400000.5; // days
+constexpr grb::type::Float EPSILON          = 0.0000000000001; // 10^-13
 
-}
+} // namespace
 
-Coordinates::Coordinates(type::CoordinateSystemType coorType, type::DateType dateType)
-  : _coorType(coorType), _dateType(dateType)
+namespace grb
 {
-  _u.common.x0 = 0.0;
-  _u.common.x1 = 0.0;
-  _u.common.x2 = 0.0;
-  _u.common.x3 = 0.0;
-
-  for (int i = 0; i < type::NUMBER_OF_COORDINATES; ++i)
-    _unitTypes[i] = type::UNDEFINED_UNIT;
-}
-
-Coordinates::~Coordinates()
-{
-
-}
-
-type::CoordinateSystemType
-Coordinates::getCoorType() const
-{
-  return _coorType;
-}
-
-type::DateType
-Coordinates::getDateType() const
-{
-  return _dateType;
-}
-
-/** **********************************************************************************************
- *
- *
- *
- ************************************************************************************************/
-void
-Coordinates::setUnitType(const type::CoordinateIndex idx, const type::UnitType type)
-{
-  _unitTypes[idx] = type;
-}
-
-type::UnitType
-Coordinates::getUnitType(const type::CoordinateIndex idx) const
-{
-  return _unitTypes[idx];
-}
-
-/** ***********************************************************************************************/
-
-type::Float&
-Coordinates::getX0()
-{
-  return _u.common.x0;
-}
-
-type::Float&
-Coordinates::getX1()
-{
-  return _u.common.x1;
-}
-
-type::Float&
-Coordinates::getX2()
-{
-  return _u.common.x2;
-}
-
-type::Float&
-Coordinates::getX3()
-{
-  return _u.common.x3;
-}
 
 /** ***********************************************************************************************/
 
@@ -234,4 +161,4 @@ Coordinates::isValid()
   return false;
 }
 
-}
+} // namespace grb

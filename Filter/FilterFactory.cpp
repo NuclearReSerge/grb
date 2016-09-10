@@ -4,12 +4,11 @@
 
 namespace grb
 {
-
 namespace factory
 {
 
 Filter*
-FilterFactory::create(type::FilterType type)
+FilterFactory::createType(const type::FilterType& type)
 {
   switch (type)
   {
@@ -21,21 +20,5 @@ FilterFactory::create(type::FilterType type)
   return nullptr;
 }
 
-Filter*
-FilterFactory::create(const std::string& name)
-{
-  type::FilterType type;
-  try
-  {
-    type = FilterMapper::instance()->getValue(name);
-  }
-  catch (Exception& exc)
-  {
-    return nullptr;
-  }
-  return create(type);
-}
-
-}
-
-}
+} // namespace factory
+} // namespace grb

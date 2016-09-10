@@ -3,14 +3,13 @@
 
 namespace grb
 {
-
 namespace
 {
 
 const char* LINE_78_ASTER = "******************************************************************************";
 const char* PROGRAM_NAME = "Gamma-Ray Burst Correlation Analyzer";
 
-}
+} // namespace
 
 void
 intro()
@@ -31,4 +30,4 @@ usage(const std::string& binaryName)
               binaryName.c_str());
 }
 
-}
+} // namespace grb

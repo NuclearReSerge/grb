@@ -12,4 +12,4 @@ public:
   ~FilterNone();
 };
 
-}
+} // namespace grb

@@ -1,40 +1,6 @@
-#include "Common/Singleton.h"
-#include "Tools/Mapper.h"
+#include "Common/Mapper.h"
+#include "Correlation/ArcFormulaType.h"
 
 #pragma once
 
-namespace grb
-{
-
-namespace type
-{
-
-enum ArcFormulaType
-{
-  SPHERICAL_LAW_OF_COSINES,
-  HAVERSINE_FORMULA,
-  VINCENTY_FORMULAE,
-
-  // LAST
-  UNDEFINED_ARC_FORMULA
-};
-
-}
-
-namespace mapper
-{
-
-class ArcFormulaMapper : public Mapper<type::ArcFormulaType>
-{
-public:
-  ArcFormulaMapper();
-
-protected:
-  const std::vector<std::string>& getList() const;
-};
-
-}
-
-typedef Singleton<mapper::ArcFormulaMapper> ArcFormulaMapper;
-
-}
+MAPPER_CLASS_H(ArcFormulaMapper, type::ArcFormulaType)

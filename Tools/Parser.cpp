@@ -2,8 +2,10 @@
 
 #include "Data/Catalog.h"
 #include "Data/CatalogEntryFactory.h"
+#include "Data/ColumnMapper.h"
 #include "Data/DataBaseFormat.h"
-#include "Data/DataType.h"
+#include "Data/DataBaseColumn.h"
+#include "Data/ValueMapper.h"
 #include "Tools/NameMapper.h"
 
 #include <sstream>
@@ -61,7 +63,7 @@ Parser::openFileStream(const std::string& filename)
 
     std::stringstream ss;
     ss << "Parsing failed. Unable to open file=" << filename << ".";
-    Exception exc(type::EXCEPTION_CRITICAL, ss.str(), PRETTY_FUNCTION);
+    Exception exc(type::EXCEPTION_CRITICAL, ss.str().c_str(), PRETTY_FUNCTION);
     throw exc;
   }
   _isSourceFile = true;
@@ -81,7 +83,7 @@ Parser::parse() throw(Exception)
     if (line.empty() || line[0] == COMMENT)
       continue;
 
-    CatalogEntry* entry = CatalogEntryFactory::instance()->create(_catalog.getType());
+    CatalogEntry* entry = CatalogEntryFactory::instance()->createType(_catalog.getType());
     try
     {
       parseLine(line, entry);
@@ -131,7 +133,7 @@ Parser::parseLine(const std::string& line, CatalogEntry* entry)
         std::stringstream ss;
         ss << std::endl << grbExc.what();
         Exception exc(type::EXCEPTION_CRITICAL,
-                      getExceptionString(ss.str()),
+                      getExceptionString(ss.str()).c_str(),
                       PRETTY_FUNCTION);
         throw exc;
       }
@@ -150,7 +152,7 @@ Parser::parseLine(const std::string& line, CatalogEntry* entry)
   {
     std::stringstream ss;
     ss << "Parsing failed row=" << _row+1 << ". Data not valid.";
-    Exception exc(type::EXCEPTION_WARNING, ss.str(), PRETTY_FUNCTION);
+    Exception exc(type::EXCEPTION_WARNING, ss.str().c_str(), PRETTY_FUNCTION);
     throw exc;
   }
 }
@@ -170,7 +172,7 @@ Parser::checkColumns(const type::ColumnFlags& columnFlags)
   if (!allProcessed)
   {
     std::size_t i = 0;
-    for (const DataType* dataType : _format.getDataTypes())
+    for (const DataBaseColumn* dataType : _format.getDataTypes())
     {
       if (i++ < _column)
         continue;
@@ -182,7 +184,7 @@ Parser::checkColumns(const type::ColumnFlags& columnFlags)
   else
   {
     std::size_t i = 0;
-    for (const DataType* dataType : _format.getDataTypes())
+    for (const DataBaseColumn* dataType : _format.getDataTypes())
     {
       if (!columnFlags[dataType->getColumnType()])
         ss << i << " [" << ColumnMapper::instance()->getKey(dataType->getColumnType()) << "] ";
@@ -190,7 +192,7 @@ Parser::checkColumns(const type::ColumnFlags& columnFlags)
     }
     ss << "} require valid values.";
   }
-  Exception exc(type::EXCEPTION_WARNING, ss.str(), PRETTY_FUNCTION);
+  Exception exc(type::EXCEPTION_WARNING, ss.str().c_str(), PRETTY_FUNCTION);
   throw exc;
 }
 
@@ -229,7 +231,7 @@ Parser::parseMapper(const std::string& raw, CatalogEntry* entry)
     default:
     {
       Exception exc(type::EXCEPTION_WARNING,
-                    getExceptionString("Value type is not supported."),
+                    getExceptionString("Value type is not supported.").c_str(),
                     PRETTY_FUNCTION);
       throw exc;
     }
@@ -243,7 +245,7 @@ Parser::parseValue(const std::string& raw, type::Flag* value)
   if (!value)
   {
     Exception exc(type::EXCEPTION_WARNING,
-                  getExceptionString("Column-Value mapping failed."),
+                  getExceptionString("Column-Value mapping failed.").c_str(),
                   PRETTY_FUNCTION);
     throw exc;
   }
@@ -266,7 +268,7 @@ Parser::parseValue(const std::string& raw, type::Flag* value)
 
  std::stringstream ss;
   ss << "Raw string=" << raw << ".";
-  Exception exc(type::EXCEPTION_WARNING, getExceptionString(ss.str()), PRETTY_FUNCTION);
+  Exception exc(type::EXCEPTION_WARNING, getExceptionString(ss.str()).c_str(), PRETTY_FUNCTION);
   throw exc;
 }
 
@@ -276,7 +278,7 @@ Parser::parseValue(const std::string& raw, type::Integer* value)
   if (!value)
   {
     Exception exc(type::EXCEPTION_WARNING,
-                  getExceptionString("Column-Value mapping failed."),
+                  getExceptionString("Column-Value mapping failed.").c_str(),
                   PRETTY_FUNCTION);
     throw exc;
   }
@@ -295,20 +297,20 @@ Parser::parseValue(const std::string& raw, type::Integer* value)
     std::stringstream ss;
     ss << "Raw string=" << raw << ".";
     ss << std::endl << "std::exception.what()=" << stdExc.what() << ".";
-    Exception exc(type::EXCEPTION_WARNING, getExceptionString(ss.str()), PRETTY_FUNCTION);
+    Exception exc(type::EXCEPTION_WARNING, getExceptionString(ss.str()).c_str(), PRETTY_FUNCTION);
     throw exc;
   }
   return true;
 }
 
 bool
-Parser::parseValue(const std::string& raw, const NameMapper* mapper, type::Index* value)
+Parser::parseValue(const std::string& raw, const mapper::NameMapper* mapper, type::Index* value)
 {
   if (!mapper || !value)
   {
     Exception exc(type::EXCEPTION_WARNING,
                   getExceptionString(!value ? "Column-Value mapping failed." :
-                                              "NameMapper not found."),
+                                              "NameMapper not found.").c_str(),
                   PRETTY_FUNCTION);
     throw exc;
   }
@@ -322,7 +324,7 @@ Parser::parseValue(const std::string& raw, const NameMapper* mapper, type::Index
     std::stringstream ss;
     ss << "Raw string=" << raw << ".";
     ss << std::endl << mapExc.what();
-    Exception exc(type::EXCEPTION_WARNING, getExceptionString(ss.str()), PRETTY_FUNCTION);
+    Exception exc(type::EXCEPTION_WARNING, getExceptionString(ss.str()).c_str(), PRETTY_FUNCTION);
     throw exc;
   }
   return true;
@@ -334,7 +336,7 @@ Parser::parseValue(const std::string& raw, type::IntegerRange* value)
   if (!value)
   {
     Exception exc(type::EXCEPTION_WARNING,
-                  getExceptionString("Column-Value mapping failed."),
+                  getExceptionString("Column-Value mapping failed.").c_str(),
                   PRETTY_FUNCTION);
     throw exc;
   }
@@ -353,20 +355,21 @@ Parser::parseValue(const std::string& raw, type::IntegerRange* value)
   {
     std::stringstream ss;
     ss << "Raw string=" << raw << ".";
-    Exception exc(type::EXCEPTION_WARNING, getExceptionString(ss.str()), PRETTY_FUNCTION);
+    Exception exc(type::EXCEPTION_WARNING, getExceptionString(ss.str()).c_str(), PRETTY_FUNCTION);
     throw exc;
   }
   return true;
 }
 
 bool
-Parser::parseValue(const std::string& raw, const NameMapper* mapper, type::IndexList* valueList)
+Parser::parseValue(const std::string& raw, const mapper::NameMapper* mapper,
+                   type::IndexList* valueList)
 {
   if (!valueList)
   {
     Exception exc(type::EXCEPTION_WARNING,
                   getExceptionString(!valueList ? "Column-Value mapping failed." :
-                                                  "NameMapper not found."),
+                                                  "NameMapper not found.").c_str(),
                   PRETTY_FUNCTION);
     throw exc;
   }
@@ -391,7 +394,7 @@ Parser::parseValue(const std::string& raw, const NameMapper* mapper, type::Index
   {
     std::stringstream ss;
     ss << "Raw string=" << raw << ".";
-    Exception exc(type::EXCEPTION_WARNING, getExceptionString(ss.str()), PRETTY_FUNCTION);
+    Exception exc(type::EXCEPTION_WARNING, getExceptionString(ss.str()).c_str(), PRETTY_FUNCTION);
     throw exc;
   }
   return true;
@@ -403,7 +406,7 @@ Parser::parseValue(const std::string& raw, type::Float* value)
   if (!value)
   {
     Exception exc(type::EXCEPTION_WARNING,
-                  getExceptionString("Column-Value mapping failed."),
+                  getExceptionString("Column-Value mapping failed.").c_str(),
                   PRETTY_FUNCTION);
     throw exc;
   }
@@ -417,7 +420,7 @@ Parser::parseValue(const std::string& raw, type::Float* value)
     std::stringstream ss;
     ss << "Raw string=" << raw << ".";
     ss << std::endl << "std::exception.what()=" << stdExc.what() << ".";
-    Exception exc(type::EXCEPTION_WARNING, getExceptionString(ss.str()), PRETTY_FUNCTION);
+    Exception exc(type::EXCEPTION_WARNING, getExceptionString(ss.str()).c_str(), PRETTY_FUNCTION);
     throw exc;
   }
   return true;
@@ -429,7 +432,7 @@ Parser::parseValue(const std::string& raw, type::String* value)
   if (!value)
   {
     Exception exc(type::EXCEPTION_WARNING,
-                  getExceptionString("Column-Value mapping failed."),
+                  getExceptionString("Column-Value mapping failed.").c_str(),
                   PRETTY_FUNCTION);
     throw exc;
   }
@@ -444,7 +447,7 @@ Parser::parseValue(const std::string& raw, type::StringList* valueList)
   if (!valueList)
   {
     Exception exc(type::EXCEPTION_WARNING,
-                  getExceptionString("Column-Value mapping failed."),
+                  getExceptionString("Column-Value mapping failed.").c_str(),
                   PRETTY_FUNCTION);
     throw exc;
   }

@@ -1,23 +1,7 @@
 #include "Analyzer/Analyzer.h"
-#include "Common/Singleton.h"
+#include "Analyzer/AnalyzerMapper.h"
+#include "Common/Factory.h"
 
 #pragma once
 
-namespace grb
-{
-
-namespace factory
-{
-
-class AnalyzerFactory
-{
-public:
-  virtual Analyzer* create(type::AnalyzerType type);
-  virtual Analyzer* create(const std::string& name);
-};
-
-}
-
-typedef Singleton<factory::AnalyzerFactory> AnalyzerFactory;
-
-}
+FACTORY_CLASS_H(AnalyzerFactory, type::AnalyzerType, Analyzer, AnalyzerMapper)

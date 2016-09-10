@@ -112,7 +112,7 @@ TEST_F(ParserFileTest, file_Grbcat)
 {
   std::string filename = "heasarc_grbcat_test.tdat";
   Catalog catalog(type::TEST_CATALOG_ENTRY);
-  DataBaseFormat* format = DataBaseFormatFactory::instance()->create(type::HEASARC_GRBCAT);
+  DataBaseFormat* format = DataBaseFormatFactory::instance()->createType(type::HEASARC_GRBCAT);
   std::size_t rows = 0;
 
   try

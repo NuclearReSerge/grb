@@ -5,12 +5,11 @@
 
 namespace grb
 {
-
 namespace factory
 {
 
 Model*
-ModelFactory::create(type::ModelType modelType)
+ModelFactory::createType(const type::ModelType& modelType)
 {
   switch (modelType)
   {
@@ -36,21 +35,5 @@ ModelFactory::create(type::ModelType modelType)
   return nullptr;
 }
 
-Model*
-ModelFactory::create(const std::string& name)
-{
-  type::ModelType type;
-  try
-  {
-    type = ModelMapper::instance()->getValue(name);
-  }
-  catch (Exception& exc)
-  {
-    return nullptr;
-  }
-  return create(type);
-}
-
-}
-
-}
+} // namespace factory
+} // namespace grb

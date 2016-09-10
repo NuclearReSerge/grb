@@ -1,7 +1,4 @@
-#include "Data/TimeDef.h"
-
-namespace grb
-{
+#include "Data/TimeDefMapper.h"
 
 namespace
 {
@@ -22,17 +19,25 @@ const std::vector<std::string> NAME_LIST
 const std::string DESCRIPTION = "\
 The time of a GRB occurrence has different definition depending on how has been detected. This \
 field records a string related to the method of detection.";
-}
 
-TimeDefType::TimeDefType()
-  : NameMapper(type::TIME_DEF, DESCRIPTION)
+} // namespace
+
+namespace grb
 {
-  initiate();
+namespace mapper
+{
+
+const std::string&
+TimeDefMapper::getDescription() const
+{
+  return DESCRIPTION;
 }
 
-const std::vector<std::string>& TimeDefType::getList() const
+const std::vector<std::string>&
+TimeDefMapper::getList() const
 {
   return NAME_LIST;
 }
 
+} // namespace mapper
 } // namespace grb

@@ -1,8 +1,5 @@
 #include "Data/ValueMapper.h"
 
-namespace grb
-{
-
 namespace
 {
 
@@ -21,21 +18,17 @@ const std::vector<std::string> VALUE_NAMES
   "undefined-value"
 };
 
-}
+} // namespace
 
+namespace grb
+{
 namespace mapper
 {
-
-ValueMapper::ValueMapper()
-{
-  initiate();
-}
 
 const std::vector<std::string>& ValueMapper::getList() const
 {
   return VALUE_NAMES;
 }
 
-}
-
-}
+} // namespace mapper
+} // namespace grb

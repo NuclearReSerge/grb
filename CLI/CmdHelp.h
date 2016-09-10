@@ -2,24 +2,22 @@
 
 #pragma once
 
-
 namespace grb
 {
-
 
 class CmdHelp : public Cmd
 {
 public:
-  CmdHelp(CommandLine& cli);
+  CmdHelp();
 
 protected:
   bool doParse(std::list<std::string>& tokens);
   void doExecute();
-  std::string doHelp(type::HelpType type);
+  std::string doHelp(type::CommandHelpType type);
 
 private:
   bool _showAll;
   std::string _specific;
 };
 
-}
+} // namespace grb

@@ -1,13 +1,11 @@
 #include "CLI/CmdModel.h"
 
-#include "CLI/CmdMapper.h"
+#include "CLI/CommandMapper.h"
 #include "Main/AnalysisData.h"
+#include "Model/ModelCmdMapper.h"
+#include "Model/ModelFactory.h"
 
 #include <sstream>
-
-
-namespace grb
-{
 
 namespace
 {
@@ -23,19 +21,22 @@ const char* HELP_LONG = "[create <MODEL_NAME>] | [genetate] | [help [<MODEL_NAME
 "\n"
 "Available models:\n";
 
+} // namespace
+
+namespace grb
+{
+
 void
 errorHeader(std::stringstream& ss, type::ModelCmdType subCmd = type::UNDEFINED_MODEL_CMD)
 {
-  ss << "Command " << CmdMapper::instance()->getKey(type::CMD_MODEL) << " ";
+  ss << "Command " << CommandMapper::instance()->getKey(type::CMD_MODEL) << " ";
   if (subCmd != type::UNDEFINED_MODEL_CMD)
     ss << ModelCmdMapper::instance()->getKey(subCmd) << " ";
   ss << "failed. ";
 }
 
-}
-
-CmdModel::CmdModel(CommandLine& cli)
-  : Cmd(cli, type::CMD_MODEL), _subCmd(type::UNDEFINED_MODEL_CMD),
+CmdModel::CmdModel()
+  : Cmd(type::CMD_MODEL), _subCmd(type::UNDEFINED_MODEL_CMD),
     _modelType(type::UNDEFINED_MODEL)
 {
 }
@@ -46,7 +47,7 @@ CmdModel::doParse(std::list<std::string>& tokens)
   if (tokens.empty())
   {
     Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
-                  help(type::HELP_LONG), PRETTY_FUNCTION);
+                  help(type::HELP_LONG).c_str(), PRETTY_FUNCTION);
     throw exc;
   }
 
@@ -61,7 +62,7 @@ CmdModel::doParse(std::list<std::string>& tokens)
     errorHeader(ss);
     ss << "Received unknown subcommand " << tokens.front();
     Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
-                  ss.str(), PRETTY_FUNCTION);
+                  ss.str().c_str(), PRETTY_FUNCTION);
   }
 
   switch (_subCmd)
@@ -115,7 +116,7 @@ CmdModel::doExecute()
 }
 
 std::string
-CmdModel::doHelp(type::HelpType type)
+CmdModel::doHelp(type::CommandHelpType type)
 {
   if (type == type::HELP_SHORT)
     return HELP_SHORT;
@@ -143,7 +144,7 @@ CmdModel::parseCreate(std::list<std::string>& tokens)
        << ModelMapper::instance()->getKey(G_Model().get()->getType())
        << " already exists.";
     Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
-                  ss.str(), PRETTY_FUNCTION);
+                  ss.str().c_str(), PRETTY_FUNCTION);
     throw exc;
   }
 
@@ -153,7 +154,7 @@ CmdModel::parseCreate(std::list<std::string>& tokens)
     errorHeader(ss, type::MODEL_CREATE);
     ss << "Arguments required.";
     Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
-                  ss.str(), PRETTY_FUNCTION);
+                  ss.str().c_str(), PRETTY_FUNCTION);
     throw exc;
   }
 
@@ -168,7 +169,7 @@ CmdModel::parseCreate(std::list<std::string>& tokens)
     errorHeader(ss, type::MODEL_CREATE);
     ss << "Unknown model " << tokens.front();
     Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
-                  ss.str(), PRETTY_FUNCTION);
+                  ss.str().c_str(), PRETTY_FUNCTION);
   }
 
   return true;
@@ -193,7 +194,7 @@ CmdModel::parseHelp(std::list<std::string>& tokens)
     errorHeader(ss, type::MODEL_HELP);
     ss << "Arguments required.";
     Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
-                  ss.str(), PRETTY_FUNCTION);
+                  ss.str().c_str(), PRETTY_FUNCTION);
     throw exc;
   }
 
@@ -208,7 +209,7 @@ CmdModel::parseHelp(std::list<std::string>& tokens)
     errorHeader(ss, type::MODEL_HELP);
     ss << "Unknown model " << tokens.front();
     Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
-                  ss.str(), PRETTY_FUNCTION);
+                  ss.str().c_str(), PRETTY_FUNCTION);
   }
   return true;
 }
@@ -216,14 +217,14 @@ CmdModel::parseHelp(std::list<std::string>& tokens)
 void
 CmdModel::executeCreate()
 {
-  Model* model = ModelFactory::instance()->create(_modelType);
+  Model* model = ModelFactory::instance()->createType(_modelType);
   if (!model)
   {
     std::stringstream ss;
     errorHeader(ss, type::MODEL_CREATE);
     ss << "Model " << ModelMapper::instance()->getKey(_modelType) << " not created.";
     Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
-                  ss.str(), PRETTY_FUNCTION);
+                  ss.str().c_str(), PRETTY_FUNCTION);
     throw exc;
   }
 
@@ -239,7 +240,7 @@ CmdModel::executeGenerate()
     errorHeader(ss, _subCmd);
     ss << "Create a model first.";
     Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
-                  ss.str(), PRETTY_FUNCTION);
+                  ss.str().c_str(), PRETTY_FUNCTION);
     throw exc;
   }
 
@@ -250,7 +251,7 @@ CmdModel::executeGenerate()
     errorHeader(ss, type::MODEL_GENERATE);
     ss << "Model is not configured.";
     Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
-                  ss.str(), PRETTY_FUNCTION);
+                  ss.str().c_str(), PRETTY_FUNCTION);
     throw exc;
   }
 
@@ -260,7 +261,7 @@ CmdModel::executeGenerate()
     errorHeader(ss, type::MODEL_GENERATE);
     ss << "Noting to model. Provide a databse first.";
     Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
-                  ss.str(), PRETTY_FUNCTION);
+                  ss.str().c_str(), PRETTY_FUNCTION);
     throw exc;
   }
 
@@ -282,7 +283,7 @@ CmdModel::executeHelp()
   }
   else
   {
-    model = ModelFactory::instance()->create(_modelType);
+    model = ModelFactory::instance()->createType(_modelType);
     if (model)
     {
       ss << model->help();
@@ -290,8 +291,8 @@ CmdModel::executeHelp()
     }
   }
   Exception exc((type::ExceptionLevel) (type::EXCEPTION_LOW + type::EXCEPTION_MOD_NO_PREFIX),
-                ss.str(), PRETTY_FUNCTION);
+                ss.str().c_str(), PRETTY_FUNCTION);
   throw exc;
 }
 
-}
+} // namespace grb

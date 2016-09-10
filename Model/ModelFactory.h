@@ -1,24 +1,7 @@
-#include "Common/Singleton.h"
+#include "Common/Factory.h"
 #include "Model/Model.h"
+#include "Model/ModelMapper.h"
 
 #pragma once
 
-namespace grb
-{
-
-namespace factory
-{
-
-class ModelFactory
-{
-public:
-  virtual Model* create(type::ModelType type);
-  virtual Model* create(const std::string& name);
-};
-
-}
-
-typedef Singleton<factory::ModelFactory> ModelFactory;
-
-}
-
+FACTORY_CLASS_H(ModelFactory, type::ModelType, Model, ModelMapper)

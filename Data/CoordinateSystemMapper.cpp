@@ -1,8 +1,5 @@
 #include "Data/CoordinateSystemMapper.h"
 
-namespace grb
-{
-
 namespace
 {
 
@@ -22,21 +19,18 @@ const std::vector<std::string> COORDINATE_SYSTEM_NAMES
   "undefined-coordinate-system"
 };
 
-}
+} // namespace
 
+namespace grb
+{
 namespace mapper
 {
 
-CoordinateSystemMapper::CoordinateSystemMapper()
-{
-  initiate();
-}
-
-const std::vector<std::string>& CoordinateSystemMapper::getList() const
+const std::vector<std::string>&
+CoordinateSystemMapper::getList() const
 {
   return COORDINATE_SYSTEM_NAMES;
 }
 
-}
-
-}
+} // namespace mapper
+} // namespace grb

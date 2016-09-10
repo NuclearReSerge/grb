@@ -1,8 +1,5 @@
 #include "Model/ModelMapper.h"
 
-namespace grb
-{
-
 namespace
 {
 
@@ -23,21 +20,17 @@ const std::vector<std::string> MODEL_NAMES
   "undefined-model"
 };
 
-}
+} // namespace
 
+namespace grb
+{
 namespace mapper
 {
-
-ModelMapper::ModelMapper()
-{
-  initiate();
-}
 
 const std::vector<std::string>& ModelMapper::getList() const
 {
   return MODEL_NAMES;
 }
 
-}
-
-}
+} // namespace mapper
+} // namespace grb

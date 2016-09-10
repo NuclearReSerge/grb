@@ -1,7 +1,4 @@
-#include "Data/Observatory.h"
-
-namespace grb
-{
+#include "Data/ObservatoryMapper.h"
 
 namespace
 {
@@ -53,17 +50,25 @@ Name of the observatory that detected the burst. If the observatory has more tha
 capable of detecting GRB, this is reported with the following convention 'observatory-instrument'. \
 If the detection of a GRB was determined by the contribution of different observatories, this is \
 reported using the following convention 'observatory1/observatory2/...'.";
-}
 
-ObservatoryType::ObservatoryType()
-  : NameMapper(type::OBSERVATORY, DESCRIPTION)
+} // namespace
+
+namespace grb
 {
-  initiate();
+namespace mapper
+{
+
+const std::string&
+ObservatoryMapper::getDescription() const
+{
+  return DESCRIPTION;
 }
 
-const std::vector<std::string>& ObservatoryType::getList() const
+const std::vector<std::string>&
+ObservatoryMapper::getList() const
 {
   return NAME_LIST;
 }
 
+} // namespace mapper
 } // namespace grb

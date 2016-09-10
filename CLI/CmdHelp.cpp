@@ -1,11 +1,10 @@
 #include "CLI/CmdHelp.h"
-#include "CLI/CmdFactory.h"
+
+#include "CLI/CommandFactory.h"
+#include "CLI/CommandMapper.h"
 #include "CLI/CommandLine.h"
 
 #include <iostream>
-
-namespace grb
-{
 
 namespace
 {
@@ -17,10 +16,13 @@ const char* HELP_LONG = "[<COMMAND>]\n"
 "\n"
 "Available commands:\n";
 
-}
+} // namespace
 
-CmdHelp::CmdHelp(CommandLine& cli)
-  : Cmd(cli, type::CMD_HELP), _showAll(true)
+namespace grb
+{
+
+CmdHelp::CmdHelp()
+  : Cmd(type::CMD_HELP), _showAll(true)
 {
 }
 
@@ -44,11 +46,11 @@ CmdHelp::doExecute()
     std::cout << "Available commands:" << std::endl;
     for (int i = 0; i < type::UNDEFINED_COMMAND; ++i)
     {
-      Cmd* cmd = CmdFactory::instance()->create(getCLI(), (type::CommandType) i);
+      Cmd* cmd = CommandFactory::instance()->createType((type::CommandType) i);
       if (!cmd)
       {
         std::cout << "No help for command "
-                  << CmdMapper::instance()->getKey((type::CommandType) i) << std::endl;
+                  << CommandMapper::instance()->getKey((type::CommandType) i) << std::endl;
         return;
       }
       std::cout << cmd->help(type::HELP_SHORT);
@@ -57,7 +59,7 @@ CmdHelp::doExecute()
   }
   else
   {
-    Cmd* cmd = CmdFactory::instance()->create(getCLI(), _specific);
+    Cmd* cmd = CommandFactory::instance()->createName(_specific);
     if (!cmd)
     {
       std::cout << "No help for command " << _specific << " or wrong command name." << std::endl;
@@ -70,7 +72,7 @@ CmdHelp::doExecute()
 }
 
 std::string
-CmdHelp::doHelp(type::HelpType type)
+CmdHelp::doHelp(type::CommandHelpType type)
 {
   if (type == type::HELP_SHORT)
     return HELP_SHORT;
@@ -80,11 +82,11 @@ CmdHelp::doHelp(type::HelpType type)
   for(int i = 0; i < type::UNDEFINED_COMMAND; ++i)
   {
     ss << "  "
-       << CmdMapper::instance()->getKey((type::CommandType) i)
+       << CommandMapper::instance()->getKey((type::CommandType) i)
        << std::endl;
   }
 
   return ss.str();
 }
 
-}
+} // namespace grb

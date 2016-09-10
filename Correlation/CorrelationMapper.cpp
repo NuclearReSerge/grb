@@ -1,8 +1,5 @@
 #include "Correlation/CorrelationMapper.h"
 
-namespace grb
-{
-
 namespace
 {
 
@@ -14,21 +11,17 @@ static std::vector<std::string> CORRELATION_NAMES
   "undefined-correlation"
 };
 
-}
+} // namespace
 
+namespace grb
+{
 namespace mapper
 {
-
-CorrelationMapper::CorrelationMapper()
-{
-  initiate();
-}
 
 const std::vector<std::string>& CorrelationMapper::getList() const
 {
   return CORRELATION_NAMES;
 }
 
-}
-
-}
+} // namespace mapper
+} // namespace grb

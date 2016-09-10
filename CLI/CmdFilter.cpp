@@ -1,10 +1,4 @@
 #include "CLI/CmdFilter.h"
-#include "CLI/CommandLine.h"
-
-#include <iostream>
-
-namespace grb
-{
 
 namespace
 {
@@ -12,10 +6,13 @@ namespace
 const char* HELP_SHORT = "filters catalog entries.";
 const char* HELP_LONG = "<SUB_COMMAND>";
 
-}
+} // namespace
 
-CmdFilter::CmdFilter(CommandLine& cli)
-  : Cmd(cli, type::CMD_FILTER)
+namespace grb
+{
+
+CmdFilter::CmdFilter()
+  : Cmd(type::CMD_FILTER)
 {
 }
 
@@ -32,11 +29,12 @@ CmdFilter::doExecute()
 }
 
 std::string
-CmdFilter::doHelp(type::HelpType type)
+CmdFilter::doHelp(type::CommandHelpType type)
 {
   if (type == type::HELP_SHORT)
     return HELP_SHORT;
 
   return HELP_LONG;
 }
-}
+
+} // namespace grb

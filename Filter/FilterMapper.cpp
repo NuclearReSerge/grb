@@ -1,8 +1,5 @@
 #include "Filter/FilterMapper.h"
 
-namespace grb
-{
-
 namespace
 {
 
@@ -14,21 +11,17 @@ const std::vector<std::string> FILTER_NAMES
   "undefined-filter"
 };
 
-}
+} // namespace
 
+namespace grb
+{
 namespace mapper
 {
-
-FilterMapper::FilterMapper()
-{
-  initiate();
-}
 
 const std::vector<std::string>& FilterMapper::getList() const
 {
   return FILTER_NAMES;
 }
 
-}
-
-}
+} // namespace mapper
+} // namespace grb

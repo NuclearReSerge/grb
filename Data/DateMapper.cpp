@@ -1,8 +1,5 @@
 #include "Data/DateMapper.h"
 
-namespace grb
-{
-
 namespace
 {
 
@@ -16,21 +13,18 @@ const std::vector<std::string> DATE_NAMES
   "undefined-date"
 };
 
-}
+} // namespace
 
+
+namespace grb
+{
 namespace mapper
 {
-
-DateMapper::DateMapper()
-{
-  initiate();
-}
 
 const std::vector<std::string>& DateMapper::getList() const
 {
   return DATE_NAMES;
 }
 
-}
-
-}
+} // namespace mapper
+} // namespace grb

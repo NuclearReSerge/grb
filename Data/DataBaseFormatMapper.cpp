@@ -1,12 +1,9 @@
 #include "Data/DataBaseFormatMapper.h"
 
-namespace grb
-{
-
 namespace
 {
 
-static std::vector<std::string> DATABASE_TABLE_NAMES
+static std::vector<std::string> DATABASE_FORMAT_NAMES
 {
   // HEASARC
   "heasarc_grbcat",
@@ -26,21 +23,17 @@ static std::vector<std::string> DATABASE_TABLE_NAMES
   "undefined-database-table"
 };
 
-}
+} // namespace
 
+namespace grb
+{
 namespace mapper
 {
 
-DataBaseFormatMapper::DataBaseFormatMapper()
-{
-  initiate();
-}
-
 const std::vector<std::string>& DataBaseFormatMapper::getList() const
 {
-  return DATABASE_TABLE_NAMES;
+  return DATABASE_FORMAT_NAMES;
 }
 
-}
-
-}
+} // namespace mapper
+} // namespace grb
