@@ -101,7 +101,7 @@ AnalyzerGrbcat::parse(std::list<std::string>& tokens)
     {
       std::stringstream ss;
       ss << "Unknown subcommand '"<< token <<"' passed to AnalyzerGrbcat." << std::endl;
-      Exception exc(type::EXCEPTION_CRITICAL, ss.str().c_str(), PRETTY_FUNCTION);
+      Exception exc(type::EXCEPTION_CRITICAL, ss.str(), PRETTY_FUNCTION);
       throw exc;
     }
 
@@ -109,7 +109,7 @@ AnalyzerGrbcat::parse(std::list<std::string>& tokens)
     {
       std::stringstream ss;
       ss << "AnalyzerGrbcat failed at subcommand '" << token << "'" << std::endl;
-      Exception exc(type::EXCEPTION_CRITICAL, ss.str().c_str(), PRETTY_FUNCTION);
+      Exception exc(type::EXCEPTION_CRITICAL, ss.str(), PRETTY_FUNCTION);
       throw exc;
     }
   }

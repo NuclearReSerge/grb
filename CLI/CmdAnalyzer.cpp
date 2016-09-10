@@ -27,7 +27,7 @@ CmdAnalyzer::doParse(std::list<std::string>& tokens)
   if (tokens.empty())
   {
     Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
-                  help(type::HELP_LONG).c_str(), PRETTY_FUNCTION);
+                  help(type::HELP_LONG), PRETTY_FUNCTION);
     throw exc;
   }
 
@@ -38,7 +38,7 @@ CmdAnalyzer::doParse(std::list<std::string>& tokens)
       std::stringstream ss;
       ss << "Noting to analyse. Provide a databse first.";
       Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
-                    ss.str().c_str(), PRETTY_FUNCTION);
+                    ss.str(), PRETTY_FUNCTION);
       throw exc;
     }
 
@@ -47,7 +47,7 @@ CmdAnalyzer::doParse(std::list<std::string>& tokens)
     {
       std::stringstream ss;
       ss << "Analyzer not available." << std::endl;
-      Exception exc(type::EXCEPTION_CRITICAL, ss.str().c_str(), PRETTY_FUNCTION);
+      Exception exc(type::EXCEPTION_CRITICAL, ss.str(), PRETTY_FUNCTION);
       throw exc;
     }
     G_Analyzer().reset(analyzer);
@@ -66,7 +66,7 @@ CmdAnalyzer::doExecute()
     std::stringstream ss;
     ss << "Noting to analyse. Provide a model first.";
     Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
-                  ss.str().c_str(), PRETTY_FUNCTION);
+                  ss.str(), PRETTY_FUNCTION);
     throw exc;
   }
 

@@ -22,7 +22,7 @@ Cmd::parse(std::list<std::string>& tokens) throw(Exception)
     }
     ss << "'";
     Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
-                  ss.str().c_str(), PRETTY_FUNCTION);
+                  ss.str(), PRETTY_FUNCTION);
     throw exc;
   }
 

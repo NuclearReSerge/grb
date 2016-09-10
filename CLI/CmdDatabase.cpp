@@ -60,7 +60,7 @@ CmdDatabase::doParse(std::list<std::string>& tokens)
   if (tokens.empty())
   {
     Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
-                  help(type::HELP_LONG).c_str(), PRETTY_FUNCTION);
+                  help(type::HELP_LONG), PRETTY_FUNCTION);
     throw exc;
   }
 
@@ -70,7 +70,7 @@ CmdDatabase::doParse(std::list<std::string>& tokens)
     ss << "Error while parsing command " << CommandMapper::instance()->getKey(getType())
        << ". Filename " << tokens.front() << " not recognized.";
     Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
-                  ss.str().c_str(), PRETTY_FUNCTION);
+                  ss.str(), PRETTY_FUNCTION);
     throw exc;
   }
   tokens.pop_front();
@@ -89,7 +89,7 @@ CmdDatabase::doExecute()
     ss << "Error while executing command " << CommandMapper::instance()->getKey(getType())
        << ". Database format for file " << _dbFile << " unavailable.";
     Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
-                  ss.str().c_str(), PRETTY_FUNCTION);
+                  ss.str(), PRETTY_FUNCTION);
     throw exc;
   }
 
@@ -106,7 +106,7 @@ CmdDatabase::doExecute()
        << ". Catalog for database format " << DataBaseFormatMapper::instance()->getKey(dbType)
        << " unavailable.";
     Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
-                  ss.str().c_str(), PRETTY_FUNCTION);
+                  ss.str(), PRETTY_FUNCTION);
     throw exc;
   }
 
@@ -123,7 +123,7 @@ CmdDatabase::doExecute()
     std::stringstream ss;
     ss << "Error while executing command " << CommandMapper::instance()->getKey(getType())
        << ". Parser exception." << std::endl << parseExc.what();
-    Exception exc(parseExc.getLevel(), ss.str().c_str(), PRETTY_FUNCTION);
+    Exception exc(parseExc.getLevel(), ss.str(), PRETTY_FUNCTION);
     throw exc;
   }
   std::cout << "Parsing of database successful. Extraced " << rows << " rows." << std::endl;

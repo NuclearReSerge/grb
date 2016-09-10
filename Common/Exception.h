@@ -1,4 +1,5 @@
 #include <exception>
+#include <string>
 
 #pragma once
 
@@ -36,15 +37,24 @@ class Exception : public std::exception
 {
 public:
   Exception(type::ExceptionLevel level = type::EXCEPTION_LEVEL_UNKNOWN,
-            const char* message = 0,
-            const char* function = 0);
+            std::string message = "",
+            std::string function = "");
 
-  const char* what() const noexcept;
-  type::ExceptionLevel getLevel() const;
-  static const char* getPrefix();
+  const char* what() const noexcept
+  {
+    return _message.c_str();
+  }
+
+  type::ExceptionLevel getLevel() const
+  {
+    return (type::ExceptionLevel) (_level & type::EXCEPTION_MASK);
+  }
+
+  static const std::string& getPrefix();
 
 private:
   type::ExceptionLevel _level;
+  std::string _message;
 };
 
 }

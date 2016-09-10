@@ -47,7 +47,7 @@ CmdModel::doParse(std::list<std::string>& tokens)
   if (tokens.empty())
   {
     Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
-                  help(type::HELP_LONG).c_str(), PRETTY_FUNCTION);
+                  help(type::HELP_LONG), PRETTY_FUNCTION);
     throw exc;
   }
 
@@ -62,7 +62,7 @@ CmdModel::doParse(std::list<std::string>& tokens)
     errorHeader(ss);
     ss << "Received unknown subcommand " << tokens.front();
     Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
-                  ss.str().c_str(), PRETTY_FUNCTION);
+                  ss.str(), PRETTY_FUNCTION);
   }
 
   switch (_subCmd)
@@ -144,7 +144,7 @@ CmdModel::parseCreate(std::list<std::string>& tokens)
        << ModelMapper::instance()->getKey(G_Model().get()->getType())
        << " already exists.";
     Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
-                  ss.str().c_str(), PRETTY_FUNCTION);
+                  ss.str(), PRETTY_FUNCTION);
     throw exc;
   }
 
@@ -154,7 +154,7 @@ CmdModel::parseCreate(std::list<std::string>& tokens)
     errorHeader(ss, type::MODEL_CREATE);
     ss << "Arguments required.";
     Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
-                  ss.str().c_str(), PRETTY_FUNCTION);
+                  ss.str(), PRETTY_FUNCTION);
     throw exc;
   }
 
@@ -169,7 +169,7 @@ CmdModel::parseCreate(std::list<std::string>& tokens)
     errorHeader(ss, type::MODEL_CREATE);
     ss << "Unknown model " << tokens.front();
     Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
-                  ss.str().c_str(), PRETTY_FUNCTION);
+                  ss.str(), PRETTY_FUNCTION);
   }
 
   return true;
@@ -194,7 +194,7 @@ CmdModel::parseHelp(std::list<std::string>& tokens)
     errorHeader(ss, type::MODEL_HELP);
     ss << "Arguments required.";
     Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
-                  ss.str().c_str(), PRETTY_FUNCTION);
+                  ss.str(), PRETTY_FUNCTION);
     throw exc;
   }
 
@@ -209,7 +209,7 @@ CmdModel::parseHelp(std::list<std::string>& tokens)
     errorHeader(ss, type::MODEL_HELP);
     ss << "Unknown model " << tokens.front();
     Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
-                  ss.str().c_str(), PRETTY_FUNCTION);
+                  ss.str(), PRETTY_FUNCTION);
   }
   return true;
 }
@@ -224,7 +224,7 @@ CmdModel::executeCreate()
     errorHeader(ss, type::MODEL_CREATE);
     ss << "Model " << ModelMapper::instance()->getKey(_modelType) << " not created.";
     Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
-                  ss.str().c_str(), PRETTY_FUNCTION);
+                  ss.str(), PRETTY_FUNCTION);
     throw exc;
   }
 
@@ -240,7 +240,7 @@ CmdModel::executeGenerate()
     errorHeader(ss, _subCmd);
     ss << "Create a model first.";
     Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
-                  ss.str().c_str(), PRETTY_FUNCTION);
+                  ss.str(), PRETTY_FUNCTION);
     throw exc;
   }
 
@@ -251,7 +251,7 @@ CmdModel::executeGenerate()
     errorHeader(ss, type::MODEL_GENERATE);
     ss << "Model is not configured.";
     Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
-                  ss.str().c_str(), PRETTY_FUNCTION);
+                  ss.str(), PRETTY_FUNCTION);
     throw exc;
   }
 
@@ -261,7 +261,7 @@ CmdModel::executeGenerate()
     errorHeader(ss, type::MODEL_GENERATE);
     ss << "Noting to model. Provide a databse first.";
     Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
-                  ss.str().c_str(), PRETTY_FUNCTION);
+                  ss.str(), PRETTY_FUNCTION);
     throw exc;
   }
 
@@ -291,7 +291,7 @@ CmdModel::executeHelp()
     }
   }
   Exception exc((type::ExceptionLevel) (type::EXCEPTION_LOW + type::EXCEPTION_MOD_NO_PREFIX),
-                ss.str().c_str(), PRETTY_FUNCTION);
+                ss.str(), PRETTY_FUNCTION);
   throw exc;
 }
 

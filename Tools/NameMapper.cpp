@@ -21,7 +21,7 @@ NameMapper::getIndex(const std::string& name) const  throw(Exception)
     ss << "NameMapper type=" << _columnType
        << " [" << grb::ColumnMapper::instance()->getKey(_columnType) << "].";
     ss << std::endl << baseExc.what();
-    Exception exc(baseExc.getLevel(), ss.str().c_str(), PRETTY_FUNCTION);
+    Exception exc(baseExc.getLevel(), ss.str(), PRETTY_FUNCTION);
     throw exc;
   }
 }
@@ -39,7 +39,7 @@ NameMapper::getName(const type::Index& index) const  throw(Exception)
     ss << "NameMapper type=" << _columnType
        << " [" << grb::ColumnMapper::instance()->getKey(_columnType) << "].";
     ss << std::endl << baseExc.what();
-    Exception exc(baseExc.getLevel(), ss.str().c_str(), PRETTY_FUNCTION);
+    Exception exc(baseExc.getLevel(), ss.str(), PRETTY_FUNCTION);
     throw exc;
   }
 }

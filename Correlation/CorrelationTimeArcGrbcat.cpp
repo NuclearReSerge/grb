@@ -86,7 +86,7 @@ CorrelationTimeArcGrbcat::saveCF(const std::string& filename)
   {
     std::stringstream ss;
     ss << "Failed to save CF. Unable to create file=" << filename << "-*.tsv";
-    Exception exc(type::EXCEPTION_CRITICAL, ss.str().c_str(), PRETTY_FUNCTION);
+    Exception exc(type::EXCEPTION_CRITICAL, ss.str(), PRETTY_FUNCTION);
     throw exc;
   }
 

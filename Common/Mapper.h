@@ -40,7 +40,7 @@ public:
       std::stringstream ss;
       ss << "Mapper::getValue for key=" << key << " not found.";
       ss << std::endl << "std::exception.what()=" << stdExc.what() << ".";
-      Exception exc(type::EXCEPTION_WARNING, ss.str().c_str(), PRETTY_FUNCTION);
+      Exception exc(type::EXCEPTION_WARNING, ss.str(), PRETTY_FUNCTION);
       throw exc;
     }
   }
@@ -55,7 +55,7 @@ public:
     {
       std::stringstream ss;
       ss << "Mapper::getKey for value=" << value << " not found.";
-      Exception exc(type::EXCEPTION_WARNING, ss.str().c_str(), PRETTY_FUNCTION);
+      Exception exc(type::EXCEPTION_WARNING, ss.str(), PRETTY_FUNCTION);
       throw exc;
     }
 
