@@ -11,8 +11,7 @@ namespace grb
 class DataBaseFormat
 {
 public:
-  DataBaseFormat() = delete;
-  DataBaseFormat(const type::DatabaseFormatType dbType = type::UNDEFINED_DATABASE_TABLE)
+  DataBaseFormat(type::DatabaseFormatType dbType = type::UNDEFINED_DATABASE_FORMAT)
     : _type(dbType)
   {
   }

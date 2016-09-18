@@ -10,17 +10,19 @@ namespace grb
 bool
 Cmd::parse(std::list<std::string>& tokens) throw(Exception)
 {
-  doParse(tokens);
+  if (!doParse(tokens))
+    return false;
+
   if (!tokens.empty())
   {
     std::stringstream ss;
-    ss << "Command " << CommandMapper::instance()->getKey(_type)
-       << " has "<< tokens.size() << " unparsed argument(s) '";
+    ss << "Command '" << CommandMapper::instance()->getKey(_type)
+       << "' has "<< tokens.size() << " unparsed argument(s) { ";
     for (std::string arg : tokens)
     {
       ss << arg << " ";
     }
-    ss << "'";
+    ss << "}";
     Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
                   ss.str(), PRETTY_FUNCTION);
     throw exc;

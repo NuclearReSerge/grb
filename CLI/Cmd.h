@@ -14,8 +14,6 @@ class CommandLine;
 class Cmd
 {
 public:
-  Cmd() = delete;
-
   Cmd(type::CommandType cmdType = type::UNDEFINED_COMMAND)
     : _type(cmdType), _cli(nullptr), _wasExecuted(false)
   {
@@ -33,6 +31,10 @@ public:
     return _wasExecuted;
   }
 
+  CommandLine* getCLI()
+  {
+    return _cli;
+  }
   void setCLI(CommandLine* cli)
   {
     _cli = cli;
@@ -47,10 +49,7 @@ protected:
   virtual void doExecute() = 0;
   virtual std::string doHelp(type::CommandHelpType type) = 0;
 
-  virtual CommandLine* getCLI()
-  {
-    return _cli;
-  }
+
 
 private:
   type::CommandType _type;

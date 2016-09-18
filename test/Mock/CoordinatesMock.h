@@ -10,8 +10,9 @@ namespace grb
 class CoordinatesMock : public Coordinates
 {
 public:
-  CoordinatesMock(type::CoordinateSystemType type = type::UNDEFINED_COORDINATE_SYSTEM)
-    : Coordinates(type)
+  CoordinatesMock(type::CoordinateSystemType coorType = type::UNDEFINED_COORDINATE_SYSTEM,
+                  type::DateType dateType = type::UNDEFINED_DATE)
+    : Coordinates(coorType, dateType)
   {
   }
 

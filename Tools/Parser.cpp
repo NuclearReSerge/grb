@@ -1,6 +1,8 @@
 #include "Tools/Parser.h"
 
 #include "Data/Catalog.h"
+#include "Data/CatalogEntry.h"
+#include "Data/CatalogEntryMapper.h"
 #include "Data/ColumnMapper.h"
 #include "Data/DataBaseFormat.h"
 #include "Data/DataBaseColumn.h"

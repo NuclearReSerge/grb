@@ -1,5 +1,7 @@
 #include "Data/CatalogEntry.h"
 
+#include <gmock/gmock.h>
+
 #pragma once
 
 namespace grb
@@ -8,77 +10,26 @@ namespace grb
 class CatalogEntryMock : public CatalogEntry
 {
 public:
-  CatalogEntryMock();
-  ~CatalogEntryMock();
-
-  type::Flag& getFlag()
+  CatalogEntryMock(type::CatalogEntryType type = type::UNDEFINED_CATALOG_ENTRY)
+    : CatalogEntry(type)
   {
-    return _flag;
-  }
-
-  type::Integer& getInteger()
-  {
-    return _integer;
-  }
-
-  type::Index& getIndex()
-  {
-    return _index;
-  }
-
-  type::IntegerRange& getIntegerRange()
-  {
-    return _integerRange;
-  }
-
-  type::IndexList& getIndexList()
-  {
-    return _indexList;
-  }
-
-  type::Float& getFloat()
-  {
-    return _float;
-  }
-
-  type::String& getString()
-  {
-    return _string;
-  }
-
-  type::StringList& getStringList()
-  {
-    return _stringList;
   }
 
 protected:
-  type::Flag* getFlag(type::ColumnType column);
-  type::Integer* getInteger(type::ColumnType column);
-  type::Index* getIndex(type::ColumnType column);
-  type::IntegerRange* getIntegerRange(type::ColumnType column);
-  type::IndexList* getIndexList(type::ColumnType column);
-  type::Float* getFloat(type::ColumnType column);
-  type::String* getString(type::ColumnType column);
-  type::StringList* getStringList(type::ColumnType column);
+  MOCK_METHOD1(getFlag, type::Flag*(type::ColumnType column));
+  MOCK_METHOD1(getInteger, type::Integer*(type::ColumnType column));
+  MOCK_METHOD1(getIndex, type::Index*(type::ColumnType column));
+  MOCK_METHOD1(getIntegerRange, type::IntegerRange*(type::ColumnType column));
+  MOCK_METHOD1(getIndexList, type::IndexList*(type::ColumnType column));
+  MOCK_METHOD1(getFloat, type::Float*(type::ColumnType column));
+  MOCK_METHOD1(getString, type::String*(type::ColumnType column));
+  MOCK_METHOD1(getStringList, type::StringList*(type::ColumnType column));
 
-  mapper::NameMapper* getMapper(type::ColumnType column);
+  MOCK_METHOD1(getMapper, mapper::NameMapper*(type::ColumnType column));
 
-  void setUnitType(type::ColumnType column, type::UnitType unitType);
+  MOCK_METHOD2(setUnitType, void(type::ColumnType column, type::UnitType unitType));
 
-  bool isValid();
-
-private:
-  type::Flag _flag;
-  type::Integer _integer;
-  type::Index _index;
-  type::IntegerRange _integerRange;
-  type::IndexList _indexList;
-  type::Float _float;
-  type::String _string;
-  type::StringList _stringList;
-  type::UnitType _integerUnitType;
-  type::UnitType _floatUnitType;
-  mapper::NameMapper* _mapper;
+  MOCK_METHOD0(isValid, bool());
 };
 
 } // namespace grb

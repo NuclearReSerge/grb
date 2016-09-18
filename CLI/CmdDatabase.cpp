@@ -139,7 +139,7 @@ CmdDatabase::doHelp(type::CommandHelpType type)
 
   std::stringstream ss;
   ss << HELP_LONG;
-  for(int i = 0; i < type::UNDEFINED_DATABASE_TABLE; ++i)
+  for(int i = 0; i < type::UNDEFINED_DATABASE_FORMAT; ++i)
   {
     ss << "  "
        << DataBaseFormatMapper::instance()->getKey((type::DatabaseFormatType) i)

@@ -11,37 +11,36 @@ namespace grb
 
 class Cmd;
 
+extern const std::string CMD_PROMPT;
+
 class CommandLine
 {
 public:
   CommandLine() = delete;
   CommandLine(int argc, char** argv);
-  ~CommandLine();
+  virtual ~CommandLine();
 
   std::string getBinaryName() const;
   std::string getPrompt(bool counter = true) const;
-
   Cmd* parse(std::list<std::string>& tokens) throw(Exception);
+  static void tokenize(const std::string& input, std::list<std::string>& tokens,
+                       const char delim = ' ');
+
   bool quit()
   {
     return _quit;
   }
-
-  static void tokenize(const std::string& input, std::list<std::string>& tokens,
-                       const char delim = ' ');
-protected:
-  friend class Cmd;
-  friend class CmdQuit;
-
+  void setQuit()
+  {
+    _quit = true;
+  }
   void incCmdIdx()
   {
     ++_cmdIndex;
   }
 
-  void setQuit()
-  {
-    _quit = true;
-  }
+protected:
+  virtual Cmd* createCommand(const std::string& name);
 
 private:
   bool _quit;

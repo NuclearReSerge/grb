@@ -11,6 +11,50 @@
 
 namespace grb
 {
+namespace type
+{
+
+/* *************************************************************************************************
+ *
+ * Pre and post incremental operators for enums defined inside type nemespace.
+ *
+ * ************************************************************************************************/
+template <typename T>
+T& operator++(T& arg)
+{
+  return arg = static_cast<T>( static_cast<int>(arg) + 1 );
+}
+
+template <typename T>
+T operator++(T& arg, int)
+{
+  T temp(arg);
+  arg = static_cast<T>( static_cast<int>(arg) + 1 );
+  return temp;
+}
+
+} // namespace type
+
+/* *************************************************************************************************
+ *
+ * Mapper class can map any class T to std::string.
+ * The only requirement is that the class T has the following public operators:
+ * - comparison --
+ * - pre and post incremental ++
+ * - out stream <<
+ *
+ * Eg:
+ *   class T
+ *   {
+ *   public:
+ *     bool operator==(const T&) const;
+ *     T& operator++();
+ *     T operator++(int);
+ *     friend std::ostream& operator<<(std::ostream&, const T&);
+ *   };
+ *
+ * ************************************************************************************************/
+
 namespace mapper
 {
 
@@ -67,10 +111,10 @@ protected:
 
   void initiate()
   {
-    std::size_t i = 0;
+    T idx = T();
     for (const std::string& name : getList())
     {
-      _map.insert({name, (T) i++});
+      _map.insert({name, idx++});
     }
   }
 
@@ -81,7 +125,12 @@ private:
 } // namespace mapper
 } // namespace grb
 
-
+/* *************************************************************************************************
+ *
+ * Macro for fast Singleton with Mapper class creation.
+ * User just needs to define the getList() method.
+ *
+ * ************************************************************************************************/
 #define MAPPER_CLASS_H(_mapperClass_, _typeMapped_)\
 namespace grb\
 {\

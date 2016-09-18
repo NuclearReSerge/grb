@@ -8,10 +8,11 @@
 namespace grb
 {
 
+const std::string CMD_PROMPT = "GRB";
+
 namespace
 {
 
-const std::string CMD_PROMPT = "GRB";
 const std::string WHITESPACE   = " \t\n\r\f\v";
 const std::string DELIM = " ";
 const std::string SPECIAL = "=,[]()";
@@ -66,18 +67,33 @@ CommandLine::parse(std::list<std::string>& tokens) throw(Exception)
   if (tokens.empty())
     return nullptr;
 
-  Cmd* cmdObj = CommandFactory::instance()->createName(tokens.front());
+  Cmd* cmdObj = createCommand(tokens.front());
 
   if (!cmdObj)
     return nullptr;
 
   cmdObj->setCLI(this);
   tokens.pop_front();
-  _commands.push_back(cmdObj);
 
-  if (!cmdObj->parse(tokens))
+  bool res = false;
+
+  try
+  {
+    res = cmdObj->parse(tokens);
+  }
+  catch (Exception& exc)
+  {
+    delete cmdObj;
+    throw;
+  }
+
+  if (!res)
+  {
+    delete cmdObj;
     return nullptr;
+  }
 
+  _commands.push_back(cmdObj);
   return cmdObj;
 }
 
@@ -106,6 +122,12 @@ CommandLine::tokenize(const std::string& input, std::list<std::string>& tokens, 
     if (!element.empty())
       tokens.push_back(element);
   }
+}
+
+Cmd*
+CommandLine::createCommand(const std::string& name)
+{
+  return CommandFactory::instance()->createName(name);
 }
 
 } // namespace grb

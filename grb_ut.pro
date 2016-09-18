@@ -14,38 +14,34 @@ QMAKE_LFLAGS = -g
 QMAKE_LIBS = -lgtest -lgmock -pthread
 
 HEADERS += \
-    test/Mock/CatalogEntryFactoryMock.h \
-    test/Mock/CatalogEntryMapperMock.h \
     test/Mock/CatalogEntryMock.h \
-    test/Mock/CatalogEntryTypeMock.h \
+    test/Mock/CatalogMock.h \
     test/Mock/CoordinatesMock.h \
     test/Mock/DataBaseFormatMock.h \
+    test/Mock/FactoryMock.h \
     test/Mock/NameMapperMock.h \
-    test/Mock/NameMapperTestBase.h
+    test/Mock/MapperMock.h \
+    test/Mock/CmdMock.h
+
+
+HEADERS += \
+    test/UnitTest/Data/test/CatalogEntryMockSample.h
 
 SOURCES += \
-    test/Mock/CatalogEntryFactoryMock.cpp \
-    test/Mock/CatalogEntryMapperMock.cpp \
-    test/Mock/CatalogEntryMock.cpp \
-    test/Mock/DataBaseFormatMock.cpp \
-    test/Mock/NameMapperMock.cpp \
-    test/Mock/NameMapperTestBase.cpp
+    test/UnitTest/CLI/test/CmdTest.cpp \
+    test/UnitTest/CLI/test/CommandLineTest.cpp \
+    test/UnitTest/Common/test/ExceptionTest.cpp \
+    test/UnitTest/Common/test/FactoryTest.cpp \
+    test/UnitTest/Common/test/MapperTest.cpp \
+    test/UnitTest/Common/test/SingletonTest.cpp \
+    test/UnitTest/Correlation/test/GreatCircleDistanceTest.cpp \
+    test/UnitTest/Data/test/CatalogEntryTest.cpp
+#    test/UnitTest/Tools/test/NameMapperTest.cpp
+#    test/UnitTest/Tools/test/ParserFileTest.cpp \
+#    test/UnitTest/Tools/test/ParserTest.cpp
 
 SOURCES += \
     test/UnitTests.cpp
-
-SOURCES += \
-    test/UnitTest/Common/test/ExceptionTest.cpp \
-    test/UnitTest/Common/test/SingletonTest.cpp \
-    test/UnitTest/Correlation/test/GreatCircleDistanceTest.cpp \
-    test/UnitTest/Data/test/ObservatoryMapperTest.cpp \
-    test/UnitTest/Data/test/ReferenceMapperTest.cpp \
-    test/UnitTest/Data/test/RegionMapperTest.cpp \
-    test/UnitTest/Data/test/TimeDefMapperTest.cpp \
-    test/UnitTest/Data/test/TimeModMapperTest.cpp \
-    test/UnitTest/Tools/test/NameMapperTest.cpp \
-    test/UnitTest/Tools/test/ParserFileTest.cpp \
-    test/UnitTest/Tools/test/ParserTest.cpp
 
 HEADERS += \
     Analyzer/Analyzer.h \
@@ -149,6 +145,7 @@ SOURCES += \
     Correlation/CorrelationMapper.cpp \
     Correlation/CorrelationTimeArcGrbcat.cpp \
     Correlation/GreatCircleDistance.cpp \
+    Data/Catalog.cpp \
     Data/CatalogEntryFactory.cpp \
     Data/CatalogEntryGrbcat.cpp \
     Data/CatalogEntryMapper.cpp \
@@ -181,3 +178,6 @@ SOURCES += \
     Tools/ConvertSpaceTime.cpp \
     Tools/NameMapper.cpp \
     Tools/Parser.cpp
+
+DISTFILES += \
+    test/UnitTest/Tools/test/heasarc_grbcat_test.tdat

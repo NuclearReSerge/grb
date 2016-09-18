@@ -1,6 +1,6 @@
-#include "Data/Catalog.h"
 #include "Tools/Parser.h"
 
+#include "test/Mock/CatalogMock.h"
 #include "test/Mock/CatalogEntryMock.h"
 #include "test/Mock/DataBaseFormatMock.h"
 
@@ -12,7 +12,7 @@ namespace
 
 struct TypeAndValue
 {
-  grb::type::ColumnType column;
+  grb::type::ColumnTypeMock column;
   bool required;
   grb::type::ValueType value;
   std::string raw;
@@ -108,7 +108,7 @@ protected:
 
   std::stringstream* _stream;
   grb::Parser* _parser;
-  grb::Catalog _catalog;
+  grb::CatalogMock _catalog;
   grb::DataBaseFormatMock _format;
 };
 
@@ -220,7 +220,7 @@ TEST_F(ParserTest, parse_Format_OneMoreColumn)
   line.push_back(column);
 
   stringsToStream(line);
-
+// SIGSEGV
   tryToParseStream(0, true);
 }
 

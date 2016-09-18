@@ -1,5 +1,7 @@
 #include "Data/DataBaseFormat.h"
 
+#include <gmock/gmock.h>
+
 #pragma once
 
 namespace grb
@@ -8,17 +10,12 @@ namespace grb
 class DataBaseFormatMock : public DataBaseFormat
 {
 public:
-  DataBaseFormatMock()
-    : DataBaseFormat(type::TEST_DATABASE_TABLE)
+  DataBaseFormatMock(type::DatabaseFormatType dbType = type::UNDEFINED_DATABASE_FORMAT)
+    : DataBaseFormat(dbType)
   {
   }
 
-  void setColumnFlag(std::size_t column, bool required = true)
-  {
-    DataBaseFormat::setColumnFlag(column, required);
-  }
-
-  void initialize();
+  MOCK_METHOD0(initialize, void());
 };
 
 } // namespace grb

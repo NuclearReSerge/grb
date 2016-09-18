@@ -1,4 +1,4 @@
-#include "Data/CatalogEntryFactory.h"
+#include "Data/CatalogEntry.h"
 #include "Data/CatalogEntryType.h"
 
 #include <vector>
@@ -11,7 +11,7 @@ namespace grb
 class Catalog
 {
 public:
-  Catalog(type::CatalogEntryType type = type::UNDEFINED_CATALOG_ENTRY)
+  Catalog(const type::CatalogEntryType& type = type::UNDEFINED_CATALOG_ENTRY)
     : _type(type)
   {
   }
@@ -30,20 +30,15 @@ public:
     return _type;
   }
 
-  virtual CatalogEntry* createEntry()
-  {
-    return CatalogEntryFactory::instance()->createType(_type);
-  }
-
   std::vector<CatalogEntry*>& getEntries()
   {
     return _catalog;
   }
 
-protected:
-  std::vector<CatalogEntry*> _catalog;
+  virtual CatalogEntry* createEntry();
 
 private:
+  std::vector<CatalogEntry*> _catalog;
   type::CatalogEntryType _type;
 
 };

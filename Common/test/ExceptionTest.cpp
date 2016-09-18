@@ -22,7 +22,11 @@ protected:
   }
   void TearDown()
   {
-    std::cout << _what << std::endl;
+  }
+
+  void printWhat(grb::Exception& /*exc*/)
+  {
+    //std::cout << exc.what() << std::endl;
   }
 
   grb::type::ExceptionLevel _level;
@@ -36,6 +40,7 @@ TEST_F(ExceptionTest, noLevel_no_Message_no_Function)
   grb::Exception exc;
   ASSERT_EQ(grb::type::EXCEPTION_MASK, exc.getLevel());
   ASSERT_STREQ("", exc.what());
+  printWhat(exc);
 }
 
 TEST_F(ExceptionTest, Level_noMessage_no_Function)
@@ -43,8 +48,8 @@ TEST_F(ExceptionTest, Level_noMessage_no_Function)
   grb::Exception exc(_level);
   ASSERT_EQ(_level, exc.getLevel());
   ASSERT_STREQ(_what.c_str(), exc.what());
+  printWhat(exc);
 }
-
 
 TEST_F(ExceptionTest, Level_Message_no_Function)
 {
@@ -53,6 +58,7 @@ TEST_F(ExceptionTest, Level_Message_no_Function)
   grb::Exception exc(_level, MESSAGE);
   ASSERT_EQ(_level, exc.getLevel());
   ASSERT_STREQ(_what.c_str(), exc.what());
+  printWhat(exc);
 }
 
 TEST_F(ExceptionTest, Level_Message_Function)
@@ -63,6 +69,7 @@ TEST_F(ExceptionTest, Level_Message_Function)
   grb::Exception exc(_level, MESSAGE, func);
   ASSERT_EQ(_level, exc.getLevel());
   ASSERT_STREQ(_what.c_str(), exc.what());
+  printWhat(exc);
 }
 
 } // namespace testing

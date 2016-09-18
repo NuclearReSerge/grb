@@ -31,6 +31,7 @@ public:
 
 protected:
   friend class Parser;
+
   virtual type::Flag* getFlag(type::ColumnType column) = 0;
   virtual type::Integer* getInteger(type::ColumnType column) = 0;
   virtual type::Index* getIndex(type::ColumnType column) = 0;

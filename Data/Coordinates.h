@@ -103,7 +103,7 @@ public:
   type::Float getCelLongnitude();
   type::Float getCelLatitude();
 
-  bool isValid();
+  virtual bool isValid();
 
 private:
   type::CoordinateSystemType _coorType;
