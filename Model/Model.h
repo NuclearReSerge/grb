@@ -40,9 +40,19 @@ public:
     return _entries;
   }
 
+  void setNumberOfEntries(const std::size_t entries)
+  {
+    _entries = entries;
+  }
+
   bool isConfigured() const
   {
     return _configured;
+  }
+
+  void setConfigured(const bool configured = true)
+  {
+    _configured = configured;
   }
 
   bool parse(type::ModelCmdType cmd, std::list<std::string>& tokens)
@@ -50,7 +60,9 @@ public:
     switch (cmd)
     {
       case type::MODEL_CREATE:
+        break;
       case type::MODEL_HELP:
+        break;
       case type::MODEL_GENERATE:
       {
         tokens.clear();
@@ -76,16 +88,6 @@ protected:
   virtual bool doParse(type::ModelCmdType cmd, std::list<std::string>& tokens) = 0;
   virtual void doGenerate(Catalog& catalog) = 0;
   virtual std::string doHelp() = 0;
-
-  void setNumberOfEntries(const std::size_t entries)
-  {
-    _entries = entries;
-  }
-
-  void setConfigured(const bool configured = true)
-  {
-    _configured = configured;
-  }
 
 private:
   type::ModelType _type;

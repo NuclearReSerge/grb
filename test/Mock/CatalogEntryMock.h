@@ -10,8 +10,8 @@ namespace grb
 class CatalogEntryMock : public CatalogEntry
 {
 public:
-  CatalogEntryMock(type::CatalogEntryType type = type::UNDEFINED_CATALOG_ENTRY)
-    : CatalogEntry(type)
+  CatalogEntryMock()
+    : CatalogEntry()
   {
   }
 

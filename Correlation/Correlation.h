@@ -1,6 +1,7 @@
 #include "Common/Global.h"
 #include "Correlation/CorrelationType.h"
 
+#include <cmath>
 #include <string>
 
 #pragma once
@@ -14,7 +15,7 @@ class Correlation
 {
 public:
   Correlation(type::CorrelationType type = type::UNDEFINED_CORRELATION)
-  : _xRange(0.0), _xPoints(0), _xDelta(0.0), _yRange(0.0), _yPoints(0), _yDelta(0.0),
+  : _xRange(1.0), _xPoints(0), _xDelta(0.0), _yRange(1.0), _yPoints(0), _yDelta(0.0),
     _type(type)
   {
   }
@@ -28,16 +29,22 @@ public:
 
   void setXAxis(type::Float range, std::size_t points)
   {
-    _xRange = range;
-    _xPoints = points;
-    _xDelta = _xPoints / _xRange;
+    if (std::fpclassify(range) != FP_ZERO )
+    {
+      _xRange = range;
+      _xPoints = points;
+      _xDelta = _xPoints / _xRange;
+    }
   }
 
   void setYAxis(type::Float range, std::size_t points)
   {
-    _yRange = range;
-    _yPoints = points;
-    _yDelta = _yPoints / _yRange;
+    if (std::fpclassify(range) != FP_ZERO )
+    {
+      _yRange = range;
+      _yPoints = points;
+      _yDelta = _yPoints / _yRange;
+    }
   }
 
   virtual bool buildCF(Catalog& catalogData, Catalog& catalogModel) = 0;

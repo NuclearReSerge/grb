@@ -14,28 +14,33 @@ QMAKE_LFLAGS = -g
 QMAKE_LIBS = -lgtest -lgmock -pthread
 
 HEADERS += \
+    test/Mock/AnalyzerMock.h \
     test/Mock/CatalogEntryMock.h \
     test/Mock/CatalogMock.h \
+    test/Mock/CmdMock.h \
     test/Mock/CoordinatesMock.h \
+    test/Mock/CorrelationMock.h \
     test/Mock/DataBaseFormatMock.h \
     test/Mock/FactoryMock.h \
-    test/Mock/NameMapperMock.h \
     test/Mock/MapperMock.h \
-    test/Mock/CmdMock.h
-
+    test/Mock/ModelMock.h \
+    test/Mock/NameMapperMock.h
 
 HEADERS += \
     test/UnitTest/Data/test/CatalogEntryMockSample.h
 
 SOURCES += \
+    test/UnitTest/Analyzer/test/AnalyzerTest.cpp \
     test/UnitTest/CLI/test/CmdTest.cpp \
     test/UnitTest/CLI/test/CommandLineTest.cpp \
     test/UnitTest/Common/test/ExceptionTest.cpp \
     test/UnitTest/Common/test/FactoryTest.cpp \
     test/UnitTest/Common/test/MapperTest.cpp \
     test/UnitTest/Common/test/SingletonTest.cpp \
+    test/UnitTest/Correlation/test/CorrelationTest.cpp \
     test/UnitTest/Correlation/test/GreatCircleDistanceTest.cpp \
-    test/UnitTest/Data/test/CatalogEntryTest.cpp
+    test/UnitTest/Data/test/CatalogEntryTest.cpp \
+    test/UnitTest/Model/test/ModelTest.cpp \
 #    test/UnitTest/Tools/test/NameMapperTest.cpp
 #    test/UnitTest/Tools/test/ParserFileTest.cpp \
 #    test/UnitTest/Tools/test/ParserTest.cpp

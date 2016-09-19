@@ -29,10 +29,10 @@ struct TestData
 
 } // namespace
 
-namespace grb
+namespace testing
 {
 
-class GreatCircleDistanceTest : public ::testing::Test
+class GreatCircleDistanceTest : public Test
 {
 protected:
   void SetUp()
@@ -44,44 +44,44 @@ protected:
 
 TEST_F(GreatCircleDistanceTest, defaultPoints_SphericalLawFormula)
 {
-  GreatCircleDistance distance(grb::type::SPHERICAL_LAW_OF_COSINES);
-  CoordinatesMock P1, P2;
+  grb::GreatCircleDistance distance(grb::type::SPHERICAL_LAW_OF_COSINES);
+  grb::CoordinatesMock P1, P2;
 
   EXPECT_DOUBLE_EQ((grb::type::Float) 0.0, distance(P1, P2));
 }
 
 TEST_F(GreatCircleDistanceTest, defaultPoints_HaversineFormula)
 {
-  GreatCircleDistance distance(grb::type::HAVERSINE_FORMULA);
-  CoordinatesMock P1, P2;
+  grb::GreatCircleDistance distance(grb::type::HAVERSINE_FORMULA);
+  grb::CoordinatesMock P1, P2;
 
   EXPECT_DOUBLE_EQ((grb::type::Float) 0.0, distance(P1, P2));
 }
 
 TEST_F(GreatCircleDistanceTest, defaultPoints_VincentyFormula)
 {
-  GreatCircleDistance distance(grb::type::VINCENTY_FORMULAE);
-  CoordinatesMock P1, P2;
+  grb::GreatCircleDistance distance(grb::type::VINCENTY_FORMULAE);
+  grb::CoordinatesMock P1, P2;
 
   EXPECT_DOUBLE_EQ((grb::type::Float) 0.0, distance(P1, P2));
 }
 
 TEST_F(GreatCircleDistanceTest, defaultPoints_UnknownFormula)
 {
-  GreatCircleDistance distance(grb::type::UNDEFINED_ARC_FORMULA);
-  CoordinatesMock P1, P2;
+  grb::GreatCircleDistance distance(grb::type::UNDEFINED_ARC_FORMULA);
+  grb::CoordinatesMock P1, P2;
 
   EXPECT_DOUBLE_EQ((grb::type::Float) 0.0, distance(P1, P2));
 }
 
 TEST_F(GreatCircleDistanceTest, points_RandomCoordinates)
 {
-  GreatCircleDistance distSpherical(grb::type::SPHERICAL_LAW_OF_COSINES);
-  GreatCircleDistance distHaversine(grb::type::HAVERSINE_FORMULA);
-  GreatCircleDistance distVincenty(grb::type::VINCENTY_FORMULAE);
+  grb::GreatCircleDistance distSpherical(grb::type::SPHERICAL_LAW_OF_COSINES);
+  grb::GreatCircleDistance distHaversine(grb::type::HAVERSINE_FORMULA);
+  grb::GreatCircleDistance distVincenty(grb::type::VINCENTY_FORMULAE);
 
-  CoordinatesMock P1(grb::type::GALACTIC);
-  CoordinatesMock P2(grb::type::GALACTIC);
+  grb::CoordinatesMock P1(grb::type::GALACTIC);
+  grb::CoordinatesMock P2(grb::type::GALACTIC);
 
   std::vector<TestData> testData
   {
@@ -114,4 +114,4 @@ TEST_F(GreatCircleDistanceTest, points_RandomCoordinates)
   }
 }
 
-} // namespace grb
+} // namespace testing

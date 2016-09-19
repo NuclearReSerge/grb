@@ -15,6 +15,7 @@ public:
     : _type(type), _configured(false)
   {
   }
+
   virtual ~Analyzer() = default;
 
   type::AnalyzerType getType() const
@@ -27,14 +28,13 @@ public:
     return _configured;
   }
 
-  virtual bool parse(std::list<std::string>& tokens) = 0;
-  virtual void run() = 0;
-
-protected:
   void setConfigured(const bool configured = true)
   {
     _configured = configured;
   }
+
+  virtual bool parse(std::list<std::string>& tokens) = 0;
+  virtual void run() = 0;
 
 private:
   type::AnalyzerType _type;
