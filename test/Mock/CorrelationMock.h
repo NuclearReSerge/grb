@@ -10,8 +10,8 @@ namespace grb
 class CorrelationMock : public Correlation
 {
 public:
-  CorrelationMock()
-    : Correlation()
+  CorrelationMock(const type::CorrelationType type)
+    : Correlation(type)
   {
   }
 
@@ -23,8 +23,9 @@ public:
   std::size_t getyPoints() const { return _yPoints; }
   type::Float getyDelta() const { return _yDelta; }
 
-  MOCK_METHOD2(buildCF, bool(Catalog& catalogData, Catalog& catalogModel));
-  MOCK_METHOD1(saveCF, bool(const std::string& filename));
+  MOCK_METHOD1(parse, bool(std::list<std::string>& tokens));
+  MOCK_METHOD2(build, bool(Catalog& catalogData, Catalog& catalogModel));
+  MOCK_METHOD1(save, bool(const std::string& filePrefix));
 };
 
 } // namespace grb

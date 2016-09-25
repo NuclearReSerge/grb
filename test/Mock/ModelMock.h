@@ -10,8 +10,8 @@ namespace grb
 class ModelMock : public Model
 {
 public:
-  ModelMock()
-    : Model()
+  ModelMock(const type::ModelType type)
+    : Model(type)
   {
   }
 

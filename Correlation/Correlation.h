@@ -2,6 +2,7 @@
 #include "Correlation/CorrelationType.h"
 
 #include <cmath>
+#include <list>
 #include <string>
 
 #pragma once
@@ -27,28 +28,31 @@ public:
     return _type;
   }
 
-  void setXAxis(type::Float range, std::size_t points)
+  bool setXAxis(type::Float range, std::size_t points)
   {
-    if (std::fpclassify(range) != FP_ZERO )
-    {
-      _xRange = range;
-      _xPoints = points;
-      _xDelta = _xPoints / _xRange;
-    }
+    if (std::fpclassify(range) == FP_ZERO )
+      return false;
+
+    _xRange = range;
+    _xPoints = points;
+    _xDelta = _xPoints / _xRange;
+    return true;
   }
 
-  void setYAxis(type::Float range, std::size_t points)
+  bool setYAxis(type::Float range, std::size_t points)
   {
-    if (std::fpclassify(range) != FP_ZERO )
-    {
-      _yRange = range;
-      _yPoints = points;
-      _yDelta = _yPoints / _yRange;
-    }
+    if (std::fpclassify(range) == FP_ZERO )
+      return false;
+
+    _yRange = range;
+    _yPoints = points;
+    _yDelta = _yPoints / _yRange;
+    return true;
   }
 
-  virtual bool buildCF(Catalog& catalogData, Catalog& catalogModel) = 0;
-  virtual bool saveCF(const std::string& filename) = 0;
+  virtual bool parse(std::list<std::string>& tokens) = 0;
+  virtual bool build(Catalog& catalogData, Catalog& catalogModel) = 0;
+  virtual bool save(const std::string& filePrefix) = 0;
 
 protected:
   type::Float _xRange;

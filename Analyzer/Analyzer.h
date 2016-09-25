@@ -1,5 +1,7 @@
 #include "Analyzer/AnalyzerType.h"
 
+#include "Analyzer/AnalyzerCmdType.h"
+
 #include <list>
 #include <string>
 
@@ -11,8 +13,8 @@ namespace grb
 class Analyzer
 {
 public:
-  Analyzer(type::AnalyzerType type = type::UNDEFINED_ANALYZER)
-    : _type(type), _configured(false)
+  Analyzer(const type::AnalyzerType type = type::UNDEFINED_ANALYZER)
+    : _type(type), _configured(false), _cmdType(type::UNDEFINED_ANALYZER_CMD)
   {
   }
 
@@ -33,12 +35,22 @@ public:
     _configured = configured;
   }
 
-  virtual bool parse(std::list<std::string>& tokens) = 0;
-  virtual void run() = 0;
+  type::AnalyzerCmdType getCmdType() const
+  {
+    return _cmdType;
+  }
+
+  bool parse(std::list<std::string>& tokens);
+  void execute();
+
+protected:
+  virtual bool doParse(std::list<std::string>& tokens) = 0;
+  virtual void doExecute() = 0;
 
 private:
-  type::AnalyzerType _type;
+  const type::AnalyzerType _type;
   bool _configured;
+  type::AnalyzerCmdType _cmdType;
 };
 
 } // namespace grb

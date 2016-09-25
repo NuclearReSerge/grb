@@ -30,135 +30,113 @@ public:
     return false;
   }
 
+protected:
+  void SetUp()
+  {
+    _args = ARGS;
+  }
+
+  bool _result { false };
+  grb::ModelMock _model { grb::type::UNDEFINED_MODEL };
+  std::list<std::string> _args;
 };
 
 TEST_F(ModelTest, initial)
 {
-  grb::ModelMock model;
-
-  ASSERT_EQ(grb::type::UNDEFINED_MODEL, model.getType());
-  ASSERT_FALSE(model.isConfigured());
-  ASSERT_EQ((std::size_t) 0, model.getNumberOfEntries());
+  ASSERT_EQ(grb::type::UNDEFINED_MODEL, _model.getType());
+  ASSERT_FALSE(_model.isConfigured());
+  ASSERT_EQ((std::size_t) 0, _model.getNumberOfEntries());
 
   std::uniform_real_distribution<> dist;
-  double val1 = dist(model.getGenerator());
-  double val2 = dist(model.getGenerator());
+  double val1 = dist(_model.getGenerator());
+  double val2 = dist(_model.getGenerator());
 
   ASSERT_NE(std::fpclassify(std::abs(val1 - val2)), FP_ZERO);
 }
 
 TEST_F(ModelTest, setConfigured)
 {
-  grb::ModelMock model;
+  _model.setConfigured();
 
-  model.setConfigured();
-
-  ASSERT_TRUE(model.isConfigured());
+  ASSERT_TRUE(_model.isConfigured());
 }
 
 TEST_F(ModelTest, setNumberOfEntries)
 {
-  grb::ModelMock model;
   std::size_t entries = 123456789;
 
-  model.setNumberOfEntries(entries);
+  _model.setNumberOfEntries(entries);
 
-  ASSERT_EQ(entries, model.getNumberOfEntries());
+  ASSERT_EQ(entries, _model.getNumberOfEntries());
 }
 
 TEST_F(ModelTest, parseCreate_Positive)
 {
-  grb::ModelMock model;
-
-  EXPECT_CALL(model, doParse(_,_))
+  EXPECT_CALL(_model, doParse(_,_))
       .Times(1)
       .WillOnce(Invoke(this, &ModelTest::doParseTrue));
 
-  bool res = false;
-  std::list<std::string> args = ARGS;
+  ASSERT_NO_THROW(_result = _model.parse(grb::type::MODEL_CREATE, _args));
 
-  ASSERT_NO_THROW(res = model.parse(grb::type::MODEL_CREATE, args));
-  ASSERT_TRUE(res);
-  ASSERT_NE(0, args.size());
+  ASSERT_TRUE(_result);
+  ASSERT_NE(0, _args.size());
 }
 
 TEST_F(ModelTest, parseCreate_Negative)
 {
-  grb::ModelMock model;
-
-  EXPECT_CALL(model, doParse(_, _))
+  EXPECT_CALL(_model, doParse(_, _))
       .Times(1)
       .WillOnce(Invoke(this, &ModelTest::doParseFalse));
 
-  bool res = false;
-  std::list<std::string> args = ARGS;
+  ASSERT_NO_THROW(_result = _model.parse(grb::type::MODEL_CREATE, _args));
 
-  ASSERT_NO_THROW(res = model.parse(grb::type::MODEL_CREATE, args));
-  ASSERT_FALSE(res);
-  ASSERT_NE(0, args.size());
+  ASSERT_FALSE(_result);
+  ASSERT_NE(0, _args.size());
 }
 
 TEST_F(ModelTest, parseHelp_Positive)
 {
-  grb::ModelMock model;
-  std::list<std::string> args = ARGS;
-
-  EXPECT_CALL(model, doParse(_, _))
+  EXPECT_CALL(_model, doParse(_, _))
       .Times(1)
       .WillOnce(Invoke(this, &ModelTest::doParseTrue));
 
-  bool res = false;
+  ASSERT_NO_THROW(_result = _model.parse(grb::type::MODEL_HELP, _args));
 
-  ASSERT_NO_THROW(res = model.parse(grb::type::MODEL_HELP, args));
-  ASSERT_TRUE(res);
-  ASSERT_NE(0, args.size());
+  ASSERT_TRUE(_result);
+  ASSERT_NE(0, _args.size());
 }
 
 TEST_F(ModelTest, parseHelp_Negative)
 {
-  grb::ModelMock model;
-  std::list<std::string> args = ARGS;
-
-  EXPECT_CALL(model, doParse(_, _))
+  EXPECT_CALL(_model, doParse(_, _))
       .Times(1)
       .WillOnce(Invoke(this, &ModelTest::doParseFalse));
 
-  bool res = false;
-
-  ASSERT_NO_THROW(res = model.parse(grb::type::MODEL_HELP, args));
-  ASSERT_FALSE(res);
-  ASSERT_NE(0, args.size());
+  ASSERT_NO_THROW(_result = _model.parse(grb::type::MODEL_HELP, _args));
+  ASSERT_FALSE(_result);
+  ASSERT_NE(0, _args.size());
 }
 
 TEST_F(ModelTest, parseGenerate_Positive)
 {
-  grb::ModelMock model;
-  std::list<std::string> args = ARGS;
-
-  EXPECT_CALL(model, doParse(_, _))
+  EXPECT_CALL(_model, doParse(_, _))
       .Times(0);
 
-  bool res = false;
-
-  ASSERT_NO_THROW(res = model.parse(grb::type::MODEL_GENERATE, args));
-  ASSERT_TRUE(res);
-  ASSERT_EQ(0, args.size());
+  ASSERT_NO_THROW(_result = _model.parse(grb::type::MODEL_GENERATE, _args));
+  ASSERT_TRUE(_result);
+  ASSERT_EQ(0, _args.size());
 }
 
 TEST_F(ModelTest, parseUndefinedModelCmd_Negative)
 {
-  grb::ModelMock model;
-  std::list<std::string> args = ARGS;
-
-  EXPECT_CALL(model, doParse(_, _))
+  EXPECT_CALL(_model, doParse(_, _))
       .Times(1)
       .WillOnce(Invoke(this, &ModelTest::doParseTrue));
 
-  bool res = false;
+  ASSERT_NO_THROW(_result = _model.parse(grb::type::UNDEFINED_MODEL_CMD, _args));
 
-  ASSERT_NO_THROW(res = model.parse(grb::type::UNDEFINED_MODEL_CMD, args));
-  ASSERT_TRUE(res);
-  ASSERT_NE(0, args.size());
+  ASSERT_TRUE(_result);
+  ASSERT_NE(0, _args.size());
 }
 
 } // namespace testing

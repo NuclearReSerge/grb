@@ -54,10 +54,9 @@ public:
     return _coord_flag;
   }
 
-  Coordinates& getCoodinates()
-  {
-    return _coordinates;
-  }
+  Coordinates& getCoodinates() { return _coordinates; }
+  const Coordinates& getCoodinates() const { return _coordinates; }
+
 
   type::Index& getRegion()
   {

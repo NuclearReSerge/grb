@@ -10,12 +10,11 @@ namespace grb
 class CatalogEntryMock : public CatalogEntry
 {
 public:
-  CatalogEntryMock()
-    : CatalogEntry()
+  CatalogEntryMock(const type::CatalogEntryType type)
+    : CatalogEntry(type)
   {
   }
 
-protected:
   MOCK_METHOD1(getFlag, type::Flag*(type::ColumnType column));
   MOCK_METHOD1(getInteger, type::Integer*(type::ColumnType column));
   MOCK_METHOD1(getIndex, type::Index*(type::ColumnType column));

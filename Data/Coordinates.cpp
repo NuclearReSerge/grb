@@ -29,7 +29,7 @@ namespace grb
 /** ***********************************************************************************************/
 
 type::Float
-Coordinates::getT()
+Coordinates::getT() const
 {
   switch (_dateType)
   {
@@ -45,19 +45,18 @@ Coordinates::getT()
 }
 
 type::Float
-Coordinates::getTimeUnix()
+Coordinates::getTimeUnix() const
 {
   return _u.common.x0;
 }
 
 type::Float
-Coordinates::getTimeJD()
+Coordinates::getTimeJD() const
 {
   return _u.common.x0;
 }
 
-type::Float
-Coordinates::getTimeMJD()
+type::Float Coordinates::getTimeMJD() const
 {
   return _u.common.x0;
 }

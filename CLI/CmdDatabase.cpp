@@ -128,7 +128,7 @@ CmdDatabase::doExecute()
   }
   std::cout << "Parsing of database successful. Extraced " << rows << " rows." << std::endl;
 
-  G_CatalogData().reset(catalog);
+  AnalysisData::instance()->setCatalogData(catalog);
 }
 
 std::string

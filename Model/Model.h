@@ -19,7 +19,7 @@ public:
     : _type(type), _entries(0), _configured(false)
   {
     std::random_device hwGen;
-    std::seed_seq seedSeq{hwGen(), hwGen(), hwGen(), hwGen(), hwGen(), hwGen(), hwGen(), hwGen()};
+    std::seed_seq seedSeq { hwGen(), hwGen(), hwGen(), hwGen(), hwGen(), hwGen(), hwGen(), hwGen() };
     _generator.seed(seedSeq);
   }
 

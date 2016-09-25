@@ -10,13 +10,13 @@ namespace grb
 class AnalyzerMock : public Analyzer
 {
 public:
-  AnalyzerMock()
-    : Analyzer()
+  AnalyzerMock(const type::AnalyzerType type)
+    : Analyzer(type)
   {
   }
 
-  MOCK_METHOD1(parse, bool(std::list<std::string>& tokens));
-  MOCK_METHOD0(run, void());
+  MOCK_METHOD1(doParse, bool(std::list<std::string>& tokens));
+  MOCK_METHOD0(doExecute, void());
 };
 
 } // namespace grb

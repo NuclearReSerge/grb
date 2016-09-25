@@ -7,6 +7,11 @@ static const std::string _prefix = "GRB exception: ";
 namespace grb
 {
 
+Exception::Exception(uint8_t level, std::string message, std::string function)
+  : Exception((type::ExceptionLevel) level, message, function)
+{
+}
+
 Exception::Exception(type::ExceptionLevel level, std::string message, std::string function)
   : _level(level), _message("")
 {

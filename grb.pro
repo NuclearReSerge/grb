@@ -16,6 +16,8 @@ QMAKE_LIBS =
 
 HEADERS += \
     Analyzer/Analyzer.h \
+    Analyzer/AnalyzerCmdMapper.h \
+    Analyzer/AnalyzerCmdType.h \
     Analyzer/AnalyzerFactory.h \
     Analyzer/AnalyzerGrbcat.h \
     Analyzer/AnalyzerMapper.h \
@@ -95,6 +97,8 @@ HEADERS += \
     Tools/Parser.h
 
 SOURCES += \
+    Analyzer/Analyzer.cpp \
+    Analyzer/AnalyzerCmdMapper.cpp \
     Analyzer/AnalyzerFactory.cpp \
     Analyzer/AnalyzerGrbcat.cpp \
     Analyzer/AnalyzerMapper.cpp \
@@ -115,6 +119,7 @@ SOURCES += \
     Correlation/CorrelationMapper.cpp \
     Correlation/CorrelationTimeArcGrbcat.cpp \
     Correlation/GreatCircleDistance.cpp \
+    Data/Catalog.cpp \
     Data/CatalogEntryFactory.cpp \
     Data/CatalogEntryGrbcat.cpp \
     Data/CatalogEntryMapper.cpp \
@@ -136,6 +141,7 @@ SOURCES += \
     Filter/FilterFactory.cpp \
     Filter/FilterMapper.cpp \
     Filter/FilterNone.cpp \
+    Main/AnalysisData.cpp \
     Main/Init.cpp \
     Main/Main.cpp \
     Model/IsotropicBallModel.cpp \
@@ -146,4 +152,3 @@ SOURCES += \
     Tools/ConvertSpaceTime.cpp \
     Tools/NameMapper.cpp \
     Tools/Parser.cpp
-

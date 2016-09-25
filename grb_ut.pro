@@ -30,7 +30,15 @@ HEADERS += \
     test/UnitTest/Data/test/CatalogEntryMockSample.h
 
 SOURCES += \
+    test/UnitTest/Analyzer/test/AnalyzerGrbcatTest.cpp \
     test/UnitTest/Analyzer/test/AnalyzerTest.cpp \
+    test/UnitTest/CLI/test/CmdAnalysisTest.cpp \
+    test/UnitTest/CLI/test/CmdCorrelationTest.cpp \
+    test/UnitTest/CLI/test/CmdDatabaseTest.cpp \
+    test/UnitTest/CLI/test/CmdFilterTest.cpp \
+    test/UnitTest/CLI/test/CmdHelpTest.cpp \
+    test/UnitTest/CLI/test/CmdModelTest.cpp \
+    test/UnitTest/CLI/test/CmdQuitTest.cpp \
     test/UnitTest/CLI/test/CmdTest.cpp \
     test/UnitTest/CLI/test/CommandLineTest.cpp \
     test/UnitTest/Common/test/ExceptionTest.cpp \
@@ -38,9 +46,19 @@ SOURCES += \
     test/UnitTest/Common/test/MapperTest.cpp \
     test/UnitTest/Common/test/SingletonTest.cpp \
     test/UnitTest/Correlation/test/CorrelationTest.cpp \
+    test/UnitTest/Correlation/test/CorrelationTimeArcGrbcatTest.cpp \
     test/UnitTest/Correlation/test/GreatCircleDistanceTest.cpp \
+    test/UnitTest/Data/test/CatalogEntryGrbcatTest.cpp \
     test/UnitTest/Data/test/CatalogEntryTest.cpp \
-    test/UnitTest/Model/test/ModelTest.cpp \
+    test/UnitTest/Data/test/CatalogTest.cpp \
+    test/UnitTest/Data/test/CoordinatesTest.cpp \
+    test/UnitTest/Data/test/DataBaseColumnTest.cpp \
+    test/UnitTest/Data/test/DataBaseFormatGrbcatTest.cpp \
+    test/UnitTest/Data/test/DataBaseFormatTest.cpp \
+    test/UnitTest/Data/test/DurationTest.cpp \
+    test/UnitTest/Model/test/IsotropicBallModelTest.cpp \
+    test/UnitTest/Model/test/IsotropicSphereModelTest.cpp \
+    test/UnitTest/Model/test/ModelTest.cpp
 #    test/UnitTest/Tools/test/NameMapperTest.cpp
 #    test/UnitTest/Tools/test/ParserFileTest.cpp \
 #    test/UnitTest/Tools/test/ParserTest.cpp
@@ -50,6 +68,8 @@ SOURCES += \
 
 HEADERS += \
     Analyzer/Analyzer.h \
+    Analyzer/AnalyzerCmdType.h \
+    Analyzer/AnalyzerCmdMapper.h \
     Analyzer/AnalyzerFactory.h \
     Analyzer/AnalyzerGrbcat.h \
     Analyzer/AnalyzerMapper.h \
@@ -128,8 +148,9 @@ HEADERS += \
     Tools/NameMapper.h \
     Tools/Parser.h
 
-
 SOURCES += \
+    Analyzer/Analyzer.cpp \
+    Analyzer/AnalyzerCmdMapper.cpp \
     Analyzer/AnalyzerFactory.cpp \
     Analyzer/AnalyzerGrbcat.cpp \
     Analyzer/AnalyzerMapper.cpp \

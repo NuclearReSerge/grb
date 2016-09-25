@@ -1,18 +1,18 @@
 #include "Common/Global.h"
 #include "Data/CatalogEntryType.h"
-#include "Data/DataBaseColumn.h"
+#include "Data/ColumnType.h"
+#include "Data/UnitType.h"
 
 #pragma once
 
 namespace grb
 {
-
 namespace mapper
 {
 
 class NameMapper;
 
-}
+} // namespace mapper
 
 class CatalogEntry
 {

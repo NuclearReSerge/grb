@@ -47,7 +47,7 @@ public:
 protected:
   virtual bool doParse(std::list<std::string>& tokens) = 0;
   virtual void doExecute() = 0;
-  virtual std::string doHelp(type::CommandHelpType type) = 0;
+  virtual std::string doHelp(const type::CommandHelpType type) = 0;
 
 
 

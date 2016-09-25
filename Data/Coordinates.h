@@ -72,12 +72,12 @@ public:
    * time
    *
    ************************************************************************************************/
-  type::Float getT();
+  type::Float getT() const;
   // system date
-  type::Float getTimeUnix();
+  type::Float getTimeUnix() const;
   // Julian Date
-  type::Float getTimeJD();
-  type::Float getTimeMJD();
+  type::Float getTimeJD() const;
+  type::Float getTimeMJD() const;
   /** **********************************************************************************************
    *
    * space

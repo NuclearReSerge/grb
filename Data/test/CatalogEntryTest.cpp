@@ -10,7 +10,7 @@ class CatalogEntryTest : public Test
 
 };
 
-TEST_F(CatalogEntryTest, just)
+TEST_F(CatalogEntryTest, init)
 {
 
 }

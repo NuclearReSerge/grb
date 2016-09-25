@@ -11,9 +11,9 @@ public:
   CmdCorrelation();
 
 protected:
-  bool doParse(std::list<std::string>& tokens);
-  void doExecute();
-  std::string doHelp(type::CommandHelpType type);
+  bool doParse(std::list<std::string>& tokens) override;
+  void doExecute() override;
+  std::string doHelp(const type::CommandHelpType type) override;
 };
 
 } // namespace grb

@@ -10,8 +10,8 @@ namespace grb
 class CatalogMock : public Catalog
 {
 public:
-  CatalogMock()
-    : Catalog()
+  CatalogMock(const type::CatalogEntryType& type)
+    : Catalog(type)
   {
   }
 

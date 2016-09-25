@@ -1,170 +1,264 @@
 #include "Analyzer/AnalyzerGrbcat.h"
 
+#include "Analyzer/AnalyzerCmdMapper.h"
 #include "Correlation/CorrelationFactory.h"
-#include "Correlation/CorrelationTimeArcGrbcat.h"
-#include "CLI/CommandLine.h"
 #include "Common/Exception.h"
 #include "Data/Catalog.h"
-#include "Data/CatalogEntryGrbcat.h"
 #include "Main/AnalysisData.h"
 
-#include <algorithm>
-#include <cmath>
-#include <string>
 #include <sstream>
-#include <vector>
 
 namespace grb
 {
 
-namespace subcmd
-{
-enum SubCmd
-{
-  CREATE,
-  SET,
-  BUILD,
-  SAVE,
-  // LAST
-  SUB_CMD_UNDEFINED
-};
-}
-
-namespace
-{
-std::vector<std::string> SUB_CMD
-{
-  "create",
-  "set",
-  "build",
-  "save",
-  // LAST
-  "undefined sub command"
-};
-
-type::Float getTime(CatalogEntry* entry)
-{
-  return static_cast<CatalogEntryGrbcat*>(entry)->getCoodinates().getTimeMJD();
-}
-
-class CompareTime
-{
-public:
-  bool operator()(CatalogEntry* a, CatalogEntry* b)
-  {
-    return getTime(a) < getTime(b);
-  }
-};
-
-}
-
 AnalyzerGrbcat::AnalyzerGrbcat()
-  : Analyzer(type::GRBCAT_ANALYZER), _correlation(nullptr)
+  : Analyzer(type::GRBCAT_ANALYZER), _corrType(grb::type::UNDEFINED_CORRELATION),
+    _filePrefix("grbcf")
 {
-}
-
-AnalyzerGrbcat::~AnalyzerGrbcat()
-{
-  delete _correlation;
 }
 
 bool
-AnalyzerGrbcat::parse(std::list<std::string>& tokens)
+AnalyzerGrbcat::doParse(std::list<std::string>& tokens)
 {
-  while (!tokens.empty())
+  switch (getCmdType())
   {
-    bool result = false;
-    std::string token = tokens.front();
-    tokens.pop_front();
-
-    if (token == SUB_CMD[subcmd::CREATE])
+    case type::AC_CREATE:
+    {
+      return parseCreate(tokens);
+    }
+    case type::AC_SET:
+    {
+      return parseSet(tokens);
+    }
+    case type::AC_BUILD:
+    {
+      return parseBuild();
+    }
+    case type::AC_SAVE:
     {
       if (!tokens.empty())
       {
-        result = cmdCreate(tokens.front());
+        _filePrefix = tokens.front();
         tokens.pop_front();
       }
+      return true;
     }
-    else if (token == SUB_CMD[subcmd::SET])
-    {
-      result = cmdSet();
-    }
-    else if (token == SUB_CMD[subcmd::BUILD])
-    {
-      result = cmdBuild();
-    }
-    else if (token == SUB_CMD[subcmd::SAVE])
-    {
-      result = cmdSave();
-    }
-    else
-    {
-      std::stringstream ss;
-      ss << "Unknown subcommand '"<< token <<"' passed to AnalyzerGrbcat." << std::endl;
-      Exception exc(type::EXCEPTION_CRITICAL, ss.str(), PRETTY_FUNCTION);
-      throw exc;
-    }
+    default:
+      break;
+  }
 
-    if (!result)
+  std::stringstream ss;
+  ss << "AnalyzerGrbcat failed at parsing. Command '"
+     << AnalyzerCmdMapper::instance()->getKey(getCmdType())
+     << "' unhandled." << std::endl;
+  Exception exc(type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX,
+                ss.str());
+  throw exc;
+}
+
+void
+AnalyzerGrbcat::doExecute()
+{
+  switch (getCmdType())
+  {
+    case type::AC_CREATE:
     {
-      std::stringstream ss;
-      ss << "AnalyzerGrbcat failed at subcommand '" << token << "'" << std::endl;
-      Exception exc(type::EXCEPTION_CRITICAL, ss.str(), PRETTY_FUNCTION);
-      throw exc;
+      executeCreate();
+      break;
     }
+    case type::AC_SET:
+    {
+      executeSet();
+      break;
+    }
+    case type::AC_BUILD:
+    {
+      executeBuild();
+      break;
+    }
+    case type::AC_SAVE:
+    {
+      executeSave();
+      break;
+    }
+    default:
+      break;
+  }
+}
+
+bool
+AnalyzerGrbcat::parseCreate(std::list<std::string>& tokens)
+{
+  if (tokens.empty())
+  {
+    std::stringstream ss;
+    ss << "AnalyzerGrbcat failed at parsing. Command '"
+       << AnalyzerCmdMapper::instance()->getKey(getCmdType())
+       << "'. No arguments." << std::endl;
+    Exception exc(type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX,
+                  ss.str());
+    throw exc;
+  }
+
+  std::string name = tokens.front();
+  tokens.pop_front();
+
+  try
+  {
+    _corrType = CorrelationMapper::instance()->getValue(name);
+  }
+  catch (Exception&)
+  {
+    std::stringstream ss;
+    ss << "AnalyzerGrbcat failed at parsing. Command '"
+       << AnalyzerCmdMapper::instance()->getKey(getCmdType())
+       << "'. Correlation '"
+       << name
+       << "' unknown." << std::endl;
+    Exception exc(type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX,
+                  ss.str());
+    throw exc;
   }
   return true;
 }
 
 void
-AnalyzerGrbcat::run()
+AnalyzerGrbcat::executeCreate()
 {
-
-}
-
-bool
-AnalyzerGrbcat::cmdCreate(std::string& cfName)
-{
-  _correlation = CorrelationFactory::instance()->createName(cfName);
-  return _correlation != nullptr;
-}
-
-bool
-AnalyzerGrbcat::cmdSet()
-{
-  Catalog* catalog = G_CatalogData().get();
-  auto minEntry = std::min_element(catalog->getEntries().begin(), catalog->getEntries().end(),
-                                   CompareTime());
-  auto maxEntry = std::max_element(catalog->getEntries().begin(), catalog->getEntries().end(),
-                                   CompareTime());
-
-  type::Float range = std::ceil((getTime(*maxEntry) - getTime(*minEntry)) / 365.0) * 365.0;
-
-  _correlation->setXAxis(range, 365);
-  _correlation->setYAxis(M_PIl, 180);
-
-  return true;
-}
-
-bool
-AnalyzerGrbcat::cmdBuild()
-{
-  if (!_correlation->buildCF(*G_CatalogData().get(),
-                             *G_CatalogModel().get()))
+  Correlation* corr = CorrelationFactory::instance()->createType(_corrType);
+  if (!corr)
   {
-    Exception exc(type::EXCEPTION_CRITICAL, "Failed to build CF.", PRETTY_FUNCTION);
+    std::stringstream ss;
+    ss << "AnalyzerGrbcat failed at executing. Command '"
+       << AnalyzerCmdMapper::instance()->getKey(getCmdType())
+       << "'. Correlation '"
+       << CorrelationMapper::instance()->getKey(_corrType)
+       << "' not created." << std::endl;
+    Exception exc(type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX,
+                  ss.str());
+    throw exc;
+  }
+  AnalysisData::instance()->setCorrelation(corr);
+}
+
+bool
+AnalyzerGrbcat::parseSet(std::list<std::string>& tokens)
+{
+  if (tokens.empty())
+  {
+    std::stringstream ss;
+    ss << "AnalyzerGrbcat failed at parsing. Command '"
+       << AnalyzerCmdMapper::instance()->getKey(getCmdType())
+       << "'. No arguments." << std::endl;
+    Exception exc(type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX,
+                  ss.str());
+    throw exc;
+  }
+
+  checkAnalyzerDataIsValid();
+
+  return AnalysisData::instance()->getCorrelation()->parse(tokens);
+}
+
+void
+AnalyzerGrbcat::executeSet()
+{
+  setConfigured();
+}
+
+bool
+AnalyzerGrbcat::parseBuild()
+{
+  checkAnalyzerDataIsValid();
+
+  if (!isConfigured())
+  {
+    std::stringstream ss;
+    ss << "AnalyzerGrbcat failed at parsing. Command '"
+       << AnalyzerCmdMapper::instance()->getKey(getCmdType())
+       << "'. Correlation '"
+       << CorrelationMapper::instance()->getKey(_corrType)
+       << "' not configured." << std::endl;
+    Exception exc(type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX,
+                  ss.str());
     throw exc;
   }
 
   return true;
 }
 
-bool
-AnalyzerGrbcat::cmdSave()
+void
+AnalyzerGrbcat::executeBuild()
 {
-  _correlation->saveCF("grbcf");
-
-  return true;
+  if (!AnalysisData::instance()->getCorrelation()->build(
+        *AnalysisData::instance()->getCatalogData(),
+        *AnalysisData::instance()->getCatalogModel()))
+  {
+    std::stringstream ss;
+    ss << "AnalyzerGrbcat failed at executing. Command '"
+       << AnalyzerCmdMapper::instance()->getKey(getCmdType())
+       << "'. Correlation '"
+       << CorrelationMapper::instance()->getKey(_corrType)
+       << "' build failed." << std::endl;
+    Exception exc(type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX,
+                  ss.str());
+    throw exc;
+  }
 }
 
+void
+AnalyzerGrbcat::executeSave()
+{
+  if (!AnalysisData::instance()->getCorrelation()->save(_filePrefix))
+  {
+    std::stringstream ss;
+    ss << "AnalyzerGrbcat failed at executing. Command '"
+       << AnalyzerCmdMapper::instance()->getKey(getCmdType())
+       << "'. Correlation '"
+       << CorrelationMapper::instance()->getKey(_corrType)
+       << "' save failed." << std::endl;
+    Exception exc(type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX,
+                  ss.str());
+    throw exc;
+  }
 }
+
+void
+AnalyzerGrbcat::checkAnalyzerDataIsValid()
+{
+  const Catalog* catalogData = AnalysisData::instance()->getCatalogData();
+  const Catalog* catalogModel = AnalysisData::instance()->getCatalogModel();
+  const Correlation* correlation = AnalysisData::instance()->getCorrelation();
+
+  if (catalogData->getType() == type::GRBCAT_ENTRY &&
+      catalogModel->getType() == type::GRBCAT_ENTRY &&
+      correlation->getType() == type::CORRELATION_GRBCAT_DTDARC)
+  {
+    return;
+  }
+
+  std::stringstream ss;
+  ss << "AnalyzerGrbcat input verification failure. ";
+
+  if (catalogData->getType() != type::GRBCAT_ENTRY ||
+           catalogModel->getType() != type::GRBCAT_ENTRY ||
+           correlation->getType() != type::CORRELATION_GRBCAT_DTDARC)
+  {
+    ss << "Wrong type of { "
+       << (catalogData->getType() == type::GRBCAT_ENTRY ? "" : "database ")
+       << (catalogModel->getType() == type::GRBCAT_ENTRY ? "" : "model ")
+       << (correlation->getType() == type::CORRELATION_GRBCAT_DTDARC ? "" : "correlation ")
+       << "}";
+  }
+  else
+  {
+    ss << "Unspecified.";
+  }
+  ss << std::endl;
+
+  Exception exc(type::EXCEPTION_CRITICAL + type::EXCEPTION_MOD_NO_PREFIX,
+                ss.str());
+  throw exc;
+}
+
+} // namespace grb

@@ -8,71 +8,74 @@ namespace testing
 
 class CorrelationTest : public Test
 {
+protected:
+  void SetUp()
+  {
+  }
 
+  void TearDown()
+  {
+  }
+
+  grb::type::Float _range;
+  std::size_t _points;
+  grb::type::Float _delta;
+
+  grb::CorrelationMock _correlation { grb::type::UNDEFINED_CORRELATION };
 };
 
 TEST_F(CorrelationTest, initial)
 {
-  grb::CorrelationMock corr;
 
-  ASSERT_EQ(grb::type::UNDEFINED_CORRELATION, corr.getType());
+  ASSERT_EQ(grb::type::UNDEFINED_CORRELATION, _correlation.getType());
 
-  ASSERT_FLOAT_EQ((grb::type::Float) 1.0, corr.getxRange());
-  ASSERT_EQ((std::size_t) 0, corr.getxPoints());
-  ASSERT_FLOAT_EQ((grb::type::Float) 0.0, corr.getxDelta());
+  ASSERT_FLOAT_EQ((grb::type::Float) 1.0, _correlation.getxRange());
+  ASSERT_EQ((std::size_t) 0, _correlation.getxPoints());
+  ASSERT_FLOAT_EQ((grb::type::Float) 0.0, _correlation.getxDelta());
 
-  ASSERT_FLOAT_EQ((grb::type::Float) 1.0, corr.getyRange());
-  ASSERT_EQ((std::size_t) 0, corr.getyPoints());
-  ASSERT_FLOAT_EQ((grb::type::Float) 0.0, corr.getyDelta());
+  ASSERT_FLOAT_EQ((grb::type::Float) 1.0, _correlation.getyRange());
+  ASSERT_EQ((std::size_t) 0, _correlation.getyPoints());
+  ASSERT_FLOAT_EQ((grb::type::Float) 0.0, _correlation.getyDelta());
 }
 
 TEST_F(CorrelationTest, setAxis_Positive)
 {
-  grb::CorrelationMock corr;
-  grb::type::Float range;
-  std::size_t points;
-  grb::type::Float delta;
+  _range = M_PI;
+  _points = 180;
+  _delta = 180.0 / M_PI ;
+  _correlation.setXAxis(_range, _points);
 
-  range = M_PI;
-  points = 180;
-  delta = 180.0 / M_PI ;
-  corr.setXAxis(range, points);
+  ASSERT_FLOAT_EQ(_range, _correlation.getxRange());
+  ASSERT_EQ(_points, _correlation.getxPoints());
+  ASSERT_FLOAT_EQ(_delta, _correlation.getxDelta());
 
-  ASSERT_FLOAT_EQ(range, corr.getxRange());
-  ASSERT_EQ(points, corr.getxPoints());
-  ASSERT_FLOAT_EQ(delta, corr.getxDelta());
+  _range = M_E;
+  _points = 256;
+  _delta = 256.0 / M_E;
+  _correlation.setYAxis(_range, _points);
 
-  range = M_E;
-  points = 256;
-  delta = 256.0 / M_E;
-  corr.setYAxis(range, points);
-
-  ASSERT_FLOAT_EQ(range, corr.getyRange());
-  ASSERT_EQ(points, corr.getyPoints());
-  ASSERT_FLOAT_EQ(delta, corr.getyDelta());
+  ASSERT_FLOAT_EQ(_range, _correlation.getyRange());
+  ASSERT_EQ(_points, _correlation.getyPoints());
+  ASSERT_FLOAT_EQ(_delta, _correlation.getyDelta());
 }
 
 TEST_F(CorrelationTest, setAxis_Negative)
 {
-  grb::CorrelationMock corr;
-  grb::type::Float range;
-  std::size_t points;
+  _range = 0.0;
+  _points = 180;
+  _correlation.setXAxis(_range, _points);
 
-  range = 0.0;
-  points = 180;
-  corr.setXAxis(range, points);
+  ASSERT_FLOAT_EQ((grb::type::Float) 1.0, _correlation.getxRange());
+  ASSERT_EQ((std::size_t) 0, _correlation.getxPoints());
+  ASSERT_FLOAT_EQ((grb::type::Float) 0.0, _correlation.getxDelta());
 
-  ASSERT_FLOAT_EQ((grb::type::Float) 1.0, corr.getxRange());
-  ASSERT_EQ((std::size_t) 0, corr.getxPoints());
-  ASSERT_FLOAT_EQ((grb::type::Float) 0.0, corr.getxDelta());
+  _range = -0.0;
+  _points = 256;
+  _correlation.setYAxis(_range, _points);
 
-  range = -0.0;
-  points = 256;
-  corr.setYAxis(range, points);
-
-  ASSERT_FLOAT_EQ((grb::type::Float) 1.0, corr.getyRange());
-  ASSERT_EQ((std::size_t) 0, corr.getyPoints());
-  ASSERT_FLOAT_EQ((grb::type::Float) 0.0, corr.getyDelta());
+  ASSERT_FLOAT_EQ((grb::type::Float) 1.0, _correlation.getyRange());
+  ASSERT_EQ((std::size_t) 0, _correlation.getyPoints());
+  ASSERT_FLOAT_EQ((grb::type::Float) 0.0, _correlation.getyDelta());
 }
 
 } // namespace testing

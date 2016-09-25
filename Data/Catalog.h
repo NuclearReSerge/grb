@@ -18,11 +18,7 @@ public:
 
   virtual ~Catalog()
   {
-    for(CatalogEntry* entry : _catalog)
-    {
-      delete entry;
-    }
-    _catalog.clear();
+    clear();
   }
 
   type::CatalogEntryType getType() const
@@ -33,6 +29,25 @@ public:
   std::vector<CatalogEntry*>& getEntries()
   {
     return _catalog;
+  }
+
+  const std::vector<CatalogEntry*>& getEntries() const
+  {
+    return _catalog;
+  }
+
+  bool empty() const
+  {
+    return _catalog.empty();
+  }
+
+  void clear()
+  {
+    for(CatalogEntry* entry : _catalog)
+    {
+      delete entry;
+    }
+    _catalog.clear();
   }
 
   virtual CatalogEntry* createEntry();

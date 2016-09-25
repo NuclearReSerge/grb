@@ -6,8 +6,6 @@ namespace
 const std::vector<std::string> CATALOG_ENTRY_NAMES
 {
   "grbcat-entry",
-  // TEST
-  "test-catalog-entry",
   // LAST
   "undefined-catalog-entry"
 };

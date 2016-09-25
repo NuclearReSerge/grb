@@ -4,6 +4,7 @@
 #include "Common/Global.h"
 #include "Data/Catalog.h"
 #include "Data/CatalogEntryGrbcat.h"
+#include "Main/AnalysisData.h"
 #include "Model/IsotropicSphereModel.h"
 
 #include <algorithm>
@@ -17,6 +18,26 @@
 
 namespace grb
 {
+
+namespace
+{
+
+type::Float getTime(const CatalogEntry* entry)
+{
+  return static_cast<const CatalogEntryGrbcat*>(entry)->getCoodinates().getTimeMJD();
+}
+
+class CompareTime
+{
+public:
+  bool operator()(const CatalogEntry* a, const CatalogEntry* b) const
+  {
+    return getTime(a) < getTime(b);
+  }
+};
+
+} // namespace
+
 
 CorrelationTimeArcGrbcat::CorrelationTimeArcGrbcat()
   : Correlation(type::CORRELATION_GRBCAT_DTDARC), _formula(type::VINCENTY_FORMULAE),
@@ -47,7 +68,33 @@ CorrelationTimeArcGrbcat::~CorrelationTimeArcGrbcat()
 }
 
 bool
-CorrelationTimeArcGrbcat::buildCF(Catalog& catalogData, Catalog& catalogModel)
+CorrelationTimeArcGrbcat::parse(std::list<std::string>& tokens)
+{
+  if (!tokens.empty())
+    return false;
+
+  const Catalog* catalog = AnalysisData::instance()->getCatalogData();
+
+  auto minEntry = std::min_element(catalog->getEntries().begin(), catalog->getEntries().end(),
+                                   CompareTime());
+  auto maxEntry = std::max_element(catalog->getEntries().begin(), catalog->getEntries().end(),
+                                   CompareTime());
+
+  type::Float range = std::ceil((getTime(*maxEntry) - getTime(*minEntry)) / 365.0) * 365.0;
+
+  if (setXAxis(range, 365))
+  {
+    Exception exc(type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX,
+                  "CorrelationTimeArcGrbcat failed to set correlation x axis.\n");
+    throw exc;
+  }
+  setYAxis(M_PIl, 180);
+
+  return true;
+}
+
+bool
+CorrelationTimeArcGrbcat::build(Catalog& catalogData, Catalog& catalogModel)
 {
   initiate();
 
@@ -75,7 +122,7 @@ CorrelationTimeArcGrbcat::buildCF(Catalog& catalogData, Catalog& catalogModel)
 }
 
 bool
-CorrelationTimeArcGrbcat::saveCF(const std::string& filename)
+CorrelationTimeArcGrbcat::save(const std::string& filename)
 {
   std::ofstream ofsCat(filename + "-cat.tsv");
   std::ofstream ofsBkg(filename + "-bkg.tsv");

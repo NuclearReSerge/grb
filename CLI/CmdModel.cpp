@@ -1,6 +1,7 @@
 #include "CLI/CmdModel.h"
 
 #include "CLI/CommandMapper.h"
+#include "Data/Catalog.h"
 #include "Main/AnalysisData.h"
 #include "Model/ModelCmdMapper.h"
 #include "Model/ModelFactory.h"
@@ -83,9 +84,9 @@ CmdModel::doParse(std::list<std::string>& tokens)
       break;
   }
 
-  if (G_Model().get())
+  if (AnalysisData::instance()->getModel())
   {
-    return G_Model().get()->parse(_subCmd, tokens);
+    return AnalysisData::instance()->getModel()->parse(_subCmd, tokens);
   }
   return false;
 }
@@ -136,12 +137,12 @@ CmdModel::doHelp(type::CommandHelpType type)
 bool
 CmdModel::parseCreate(std::list<std::string>& tokens)
 {
-  if (G_Model().get())
+  if (AnalysisData::instance()->getModel())
   {
     std::stringstream ss;
     errorHeader(ss, type::MODEL_CREATE);
     ss << "Previous model "
-       << ModelMapper::instance()->getKey(G_Model().get()->getType())
+       << ModelMapper::instance()->getKey(AnalysisData::instance()->getModel()->getType())
        << " already exists.";
     Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
                   ss.str(), PRETTY_FUNCTION);
@@ -187,7 +188,7 @@ CmdModel::parseHelp(std::list<std::string>& tokens)
 {
   if (tokens.empty())
   {
-    if (G_Model().get())
+    if (AnalysisData::instance()->getModel())
       return true;
 
     std::stringstream ss;
@@ -228,13 +229,13 @@ CmdModel::executeCreate()
     throw exc;
   }
 
-  G_Model().reset(model);
+  AnalysisData::instance()->setModel(model);
 }
 
 void
 CmdModel::executeGenerate()
 {
-  if (!G_Model().get())
+  if (!AnalysisData::instance()->getModel())
   {
     std::stringstream ss;
     errorHeader(ss, _subCmd);
@@ -245,7 +246,7 @@ CmdModel::executeGenerate()
   }
 
 
-  if (!G_Model().get()->isConfigured())
+  if (!AnalysisData::instance()->getModel()->isConfigured())
   {
     std::stringstream ss;
     errorHeader(ss, type::MODEL_GENERATE);
@@ -255,7 +256,7 @@ CmdModel::executeGenerate()
     throw exc;
   }
 
-  if (!G_CatalogData().get())
+  if (!AnalysisData::instance()->getCatalogData())
   {
     std::stringstream ss;
     errorHeader(ss, type::MODEL_GENERATE);
@@ -265,9 +266,9 @@ CmdModel::executeGenerate()
     throw exc;
   }
 
-  Catalog* catalog = new Catalog(G_CatalogData().get()->getType());
-  G_Model().get()->generate(*catalog);
-  G_CatalogModel().reset(catalog);
+  Catalog* catalog = new Catalog(AnalysisData::instance()->getCatalogData()->getType());
+  AnalysisData::instance()->getModel()->generate(*catalog);
+  AnalysisData::instance()->setCatalogModel(catalog);
 }
 
 void
@@ -276,9 +277,9 @@ CmdModel::executeHelp()
   std::stringstream ss;
   Model* model = nullptr;
 
-  if (G_Model().get())
+  if (AnalysisData::instance()->getModel())
   {
-    model = G_Model().get();
+    model = AnalysisData::instance()->getModel();
     ss << model->help();
   }
   else

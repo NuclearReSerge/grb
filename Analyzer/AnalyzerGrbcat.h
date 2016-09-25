@@ -1,4 +1,8 @@
 #include "Analyzer/Analyzer.h"
+#include "Correlation/CorrelationType.h"
+#include "Data/CatalogEntryType.h"
+#include "Common/Global.h"
+
 
 #include <string>
 #include <list>
@@ -14,19 +18,27 @@ class AnalyzerGrbcat : public Analyzer
 {
 public:
   AnalyzerGrbcat();
-  ~AnalyzerGrbcat();
-
-  bool parse(std::list<std::string>& tokens);
-  void run();
+  ~AnalyzerGrbcat() = default;
 
 protected:
-  bool cmdCreate(std::string& cfName);
-  bool cmdSet();
-  bool cmdBuild();
-  bool cmdSave();
+  bool doParse(std::list<std::string>& tokens) override;
+  void doExecute() override;
+
+  bool parseCreate(std::list<std::string>& tokens);
+  bool parseSet(std::list<std::string>& tokens);
+  bool parseBuild();
+
+  void executeCreate();
+  void executeSet();
+  void executeBuild();
+  void executeSave();
+
+  void checkAnalyzerDataIsValid();
 
 private:
-  Correlation* _correlation;
+  type::CorrelationType _corrType;
+  std::string _filePrefix;
+
 };
 
-}
+} // namespace grb

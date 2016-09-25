@@ -29,7 +29,7 @@ CmdCorrelation::doExecute()
 }
 
 std::string
-CmdCorrelation::doHelp(type::CommandHelpType type)
+CmdCorrelation::doHelp(const type::CommandHelpType type)
 {
   if (type == type::HELP_SHORT)
     return HELP_SHORT;

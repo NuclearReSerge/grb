@@ -26,14 +26,14 @@ CmdAnalyzer::doParse(std::list<std::string>& tokens)
 {
   if (tokens.empty())
   {
-    Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
+    Exception exc(type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX,
                   help(type::HELP_LONG), PRETTY_FUNCTION);
     throw exc;
   }
 
-  if (!G_Analyzer().get())
+  if (!AnalysisData::instance()->getAnalyzer())
   {
-    if (!G_CatalogData().get())
+    if (!AnalysisData::instance()->getCatalogData())
     {
       std::stringstream ss;
       ss << "Noting to analyse. Provide a databse first.";
@@ -42,7 +42,7 @@ CmdAnalyzer::doParse(std::list<std::string>& tokens)
       throw exc;
     }
 
-    Analyzer* analyzer = AnalyzerFactory::instance()->createType(type::GRBCAT_ANALYZER /*parse this*/);
+    Analyzer* analyzer = createAnalyzer("grbcat-analyzer" /*parse this*/);
     if (!analyzer)
     {
       std::stringstream ss;
@@ -50,18 +50,18 @@ CmdAnalyzer::doParse(std::list<std::string>& tokens)
       Exception exc(type::EXCEPTION_CRITICAL, ss.str(), PRETTY_FUNCTION);
       throw exc;
     }
-    G_Analyzer().reset(analyzer);
+    AnalysisData::instance()->setAnalyzer(analyzer);
   }
-  return G_Analyzer().get()->parse(tokens);
+  return AnalysisData::instance()->getAnalyzer()->parse(tokens);
 }
 
 void
 CmdAnalyzer::doExecute()
 {
-  if (!G_Analyzer().get()->isConfigured())
+  if (!AnalysisData::instance()->getAnalyzer()->isConfigured())
     return;
 
-  if (!G_CatalogModel().get())
+  if (!AnalysisData::instance()->getCatalogModel())
   {
     std::stringstream ss;
     ss << "Noting to analyse. Provide a model first.";
@@ -70,7 +70,7 @@ CmdAnalyzer::doExecute()
     throw exc;
   }
 
-  G_Analyzer().get()->run();
+  AnalysisData::instance()->getAnalyzer()->execute();
 }
 
 std::string
@@ -81,5 +81,56 @@ CmdAnalyzer::doHelp(type::CommandHelpType type)
 
   return HELP_LONG;
 }
+
+Analyzer*
+CmdAnalyzer::createAnalyzer(const std::string& name)
+{
+  return AnalyzerFactory::instance()->createName(name);
+}
+
+/*
+void
+Analyzer::checkAnalyzerDataIsValid()
+{
+  const Catalog* catalogData = AnalysisData::instance()->getCatalogData();
+  const Catalog* catalogModel = AnalysisData::instance()->getCatalogModel();
+  const Correlation* correlation = AnalysisData::instance()->getCorrelation();
+
+  if (catalogData && !catalogData->empty() && catalogModel && !catalogModel->empty() &&
+      correlation)
+  {
+    return;
+  }
+
+  std::stringstream ss;
+  ss << "Analyzer input verification failure. ";
+
+  if (!catalogData || !catalogModel || !correlation)
+  {
+    ss << "Uncreated { "
+       << (catalogData ? "" : "datatabase ")
+       << (catalogModel ? "" : "model ")
+       << (correlation ? "" : "correlation ")
+       << "}";
+  }
+  else if (catalogData->empty() || catalogModel->empty())
+  {
+    ss << "Empty { "
+       << (catalogData->empty() ? "database " : "")
+       << (catalogModel->empty() ? "model " : "")
+       << "}";
+  }
+  else
+  {
+    ss << "Unspecified.";
+  }
+
+  ss << std::endl;
+  Exception exc(type::EXCEPTION_CRITICAL + type::EXCEPTION_MOD_NO_PREFIX,
+                ss.str());
+  throw exc;
+}
+ */
+
 
 } // namespace grb

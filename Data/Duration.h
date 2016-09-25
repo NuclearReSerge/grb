@@ -6,18 +6,29 @@
 namespace grb
 {
 
-class Duration
+class DurationBase
 {
 public:
-  Duration()
-    : _isPresent(false), _mod(-1), _duration(0.0), _error(0.0), _emin(0), _emax(0),
-      _durationUnitType(type::UNDEFINED_UNIT), _energyUnitType(type::UNDEFINED_UNIT)
+  DurationBase(type::UnitType durationUnitType = type::UNDEFINED_UNIT)
+    : _duration(0.0), _durationUnitType(durationUnitType), _isPresent(false)
   {
   }
 
-  ~Duration()
+  virtual ~DurationBase() = default;
+
+  type::UnitType setDurationUnitType() const
   {
-    _range.clear();
+    return _durationUnitType;
+  }
+
+  void setDurationUnitType(const type::UnitType durationUnitType)
+  {
+    _durationUnitType = durationUnitType;
+  }
+
+  type::Float& getDuration()
+  {
+    return _duration;
   }
 
   bool isPresent() const
@@ -30,24 +41,37 @@ public:
     _isPresent = val;
   }
 
-  type::Index& getMod()
+  virtual bool isValid() = 0;
+
+protected:
+
+private:
+  type::Float _duration;
+  type::UnitType _durationUnitType;
+  bool _isPresent;
+};
+
+class Energy
+{
+public:
+  Energy(type::UnitType energyUnitType = type::UNDEFINED_UNIT)
+    : _energyUnitType(energyUnitType), _emin(0), _emax(0)
   {
-    return _mod;
   }
 
-  type::Float& getDuration()
+  virtual ~Energy()
   {
-    return _duration;
+    _range.clear();
   }
 
-  type::Float& getError()
+  type::UnitType getEnergyUnitType() const
   {
-    return _error;
+    return _energyUnitType;
   }
 
-  type::IntegerRange& getRange()
+  void setEnergyUnitType(const type::UnitType energyUnitType)
   {
-    return _range;
+    _energyUnitType = energyUnitType;
   }
 
   type::Integer& getEmin()
@@ -60,77 +84,63 @@ public:
     return _emax;
   }
 
-protected:
-  friend class CatalogEntryGrbcat;
-
-  void setDurationUnitType(type::UnitType unitType)
+  type::IntegerRange& getRange()
   {
-    _durationUnitType = unitType;
+    return _range;
   }
 
-  void setEnergyUnitType(type::UnitType unitType)
+private:
+  type::UnitType _energyUnitType;
+  type::Integer _emin;
+  type::Integer _emax;
+  type::IntegerRange _range;
+};
+
+class Duration : public DurationBase, public Energy
+{
+public:
+  Duration(type::UnitType durationUnitType = type::UNDEFINED_UNIT,
+           type::UnitType energyUnitType = type::UNDEFINED_UNIT)
+    : DurationBase(durationUnitType), Energy(energyUnitType),
+      _mod(-1), _error(0.0)
   {
-    _energyUnitType = unitType;
+  }
+
+  type::Index& getMod()
+  {
+    return _mod;
+  }
+
+  type::Float& getError()
+  {
+    return _error;
   }
 
   bool isValid();
 
 private:
-  bool _isPresent;
   type::Index _mod;
-  type::Float _duration;
   type::Float _error;
-  type::IntegerRange _range;
-  type::Integer _emin;
-  type::Integer _emax;
-  type::UnitType _durationUnitType;
-  type::UnitType _energyUnitType;
-
 };
 
-class DurationOther
+class DurationOther : public DurationBase
 {
 public:
-  DurationOther()
-    : _isPresent(false), _duration(0.0), _durationUnitType(type::UNDEFINED_UNIT)
+  DurationOther(type::UnitType unitType = type::UNDEFINED_UNIT)
+    : DurationBase(unitType)
   {
   }
 
   ~DurationOther() = default;
-
-  bool isPresent() const
-  {
-    return _isPresent;
-  }
-
-  void setPresent(bool val = true)
-  {
-    _isPresent = val;
-  }
-
-  type::Float& getDuration()
-  {
-    return _duration;
-  }
 
   type::String& getNotes()
   {
     return _notes;
   }
 
-protected:
-  friend class CatalogEntryGrbcat;
-  void setDurationUnitType(type::UnitType unitType)
-  {
-    _durationUnitType = unitType;
-  }
-
   bool isValid();
 
 private:
-  bool _isPresent;
-  type::Float _duration;
-  type::UnitType _durationUnitType;
   type::String _notes;
 };
 

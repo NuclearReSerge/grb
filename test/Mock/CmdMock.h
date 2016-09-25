@@ -10,6 +10,11 @@ namespace grb
 class CmdMock : public Cmd
 {
 public:
+  CmdMock(const type::CommandType type)
+    : Cmd(type)
+  {
+  }
+
   MOCK_METHOD1(doParse, bool(std::list<std::string>& tokens));
   MOCK_METHOD0(doExecute, void());
   MOCK_METHOD1(doHelp, std::string(type::CommandHelpType type));

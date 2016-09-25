@@ -36,6 +36,10 @@ enum ExceptionLevel
 class Exception : public std::exception
 {
 public:
+  Exception(uint8_t level,
+            std::string message = "",
+            std::string function = "");
+
   Exception(type::ExceptionLevel level = type::EXCEPTION_LEVEL_UNKNOWN,
             std::string message = "",
             std::string function = "");

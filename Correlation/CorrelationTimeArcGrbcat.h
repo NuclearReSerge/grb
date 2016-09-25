@@ -17,8 +17,9 @@ public:
   CorrelationTimeArcGrbcat();
   ~CorrelationTimeArcGrbcat();
 
-  bool buildCF(Catalog& catalogData, Catalog& catalogModel);
-  bool saveCF(const std::string& filename);
+  bool parse(std::list<std::string>& tokens) override;
+  bool build(Catalog& catalogData, Catalog& catalogModel) override;
+  bool save(const std::string& filePrefix) override;
 
 protected:
   bool checkCatalog(Catalog& catalog);

@@ -45,7 +45,8 @@ protected:
 TEST_F(GreatCircleDistanceTest, defaultPoints_SphericalLawFormula)
 {
   grb::GreatCircleDistance distance(grb::type::SPHERICAL_LAW_OF_COSINES);
-  grb::CoordinatesMock P1, P2;
+  grb::CoordinatesMock P1(grb::type::UNDEFINED_COORDINATE_SYSTEM, grb::type::UNDEFINED_DATE);
+  grb::CoordinatesMock P2(grb::type::UNDEFINED_COORDINATE_SYSTEM, grb::type::UNDEFINED_DATE);
 
   EXPECT_DOUBLE_EQ((grb::type::Float) 0.0, distance(P1, P2));
 }
@@ -53,7 +54,8 @@ TEST_F(GreatCircleDistanceTest, defaultPoints_SphericalLawFormula)
 TEST_F(GreatCircleDistanceTest, defaultPoints_HaversineFormula)
 {
   grb::GreatCircleDistance distance(grb::type::HAVERSINE_FORMULA);
-  grb::CoordinatesMock P1, P2;
+  grb::CoordinatesMock P1(grb::type::UNDEFINED_COORDINATE_SYSTEM, grb::type::UNDEFINED_DATE);
+  grb::CoordinatesMock P2(grb::type::UNDEFINED_COORDINATE_SYSTEM, grb::type::UNDEFINED_DATE);
 
   EXPECT_DOUBLE_EQ((grb::type::Float) 0.0, distance(P1, P2));
 }
@@ -61,7 +63,8 @@ TEST_F(GreatCircleDistanceTest, defaultPoints_HaversineFormula)
 TEST_F(GreatCircleDistanceTest, defaultPoints_VincentyFormula)
 {
   grb::GreatCircleDistance distance(grb::type::VINCENTY_FORMULAE);
-  grb::CoordinatesMock P1, P2;
+  grb::CoordinatesMock P1(grb::type::UNDEFINED_COORDINATE_SYSTEM, grb::type::UNDEFINED_DATE);
+  grb::CoordinatesMock P2(grb::type::UNDEFINED_COORDINATE_SYSTEM, grb::type::UNDEFINED_DATE);
 
   EXPECT_DOUBLE_EQ((grb::type::Float) 0.0, distance(P1, P2));
 }
@@ -69,7 +72,8 @@ TEST_F(GreatCircleDistanceTest, defaultPoints_VincentyFormula)
 TEST_F(GreatCircleDistanceTest, defaultPoints_UnknownFormula)
 {
   grb::GreatCircleDistance distance(grb::type::UNDEFINED_ARC_FORMULA);
-  grb::CoordinatesMock P1, P2;
+  grb::CoordinatesMock P1(grb::type::UNDEFINED_COORDINATE_SYSTEM, grb::type::UNDEFINED_DATE);
+  grb::CoordinatesMock P2(grb::type::UNDEFINED_COORDINATE_SYSTEM, grb::type::UNDEFINED_DATE);
 
   EXPECT_DOUBLE_EQ((grb::type::Float) 0.0, distance(P1, P2));
 }
@@ -80,8 +84,8 @@ TEST_F(GreatCircleDistanceTest, points_RandomCoordinates)
   grb::GreatCircleDistance distHaversine(grb::type::HAVERSINE_FORMULA);
   grb::GreatCircleDistance distVincenty(grb::type::VINCENTY_FORMULAE);
 
-  grb::CoordinatesMock P1(grb::type::GALACTIC);
-  grb::CoordinatesMock P2(grb::type::GALACTIC);
+  grb::CoordinatesMock P1(grb::type::GALACTIC, grb::type::UNDEFINED_DATE);
+  grb::CoordinatesMock P2(grb::type::GALACTIC, grb::type::UNDEFINED_DATE);
 
   std::vector<TestData> testData
   {
