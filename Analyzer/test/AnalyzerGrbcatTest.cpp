@@ -115,6 +115,16 @@ TEST_F(AnalyzerGrbcatTest, create_unknownCorrelation)
   ASSERT_TRUE(_thrown);
 }
 
+TEST_F(AnalyzerGrbcatTest, create_invalidCorrelation)
+{
+  _tokens.push_back("create");
+  _tokens.push_back(grb::CorrelationMapper::instance()->getKey(grb::type::UNDEFINED_CORRELATION));
+
+  callParseAndExecute();
+
+  ASSERT_TRUE(_thrown);
+}
+
 TEST_F(AnalyzerGrbcatTest, create_validCorrelation)
 {
   _tokens.push_back("create");

@@ -139,4 +139,22 @@ TEST_F(ModelTest, parseUndefinedModelCmd_Negative)
   ASSERT_NE(0, _args.size());
 }
 
+TEST_F(ModelTest, generate)
+{
+  grb::CatalogMock catalog(grb::type::UNDEFINED_CATALOG_ENTRY);
+
+  EXPECT_CALL(_model, doGenerate(_))
+      .Times(1);
+
+  _model.generate(catalog);
+}
+
+TEST_F(ModelTest, help)
+{
+  EXPECT_CALL(_model, doHelp())
+      .Times(1);
+
+  _model.help();
+}
+
 } // namespace testing

@@ -25,8 +25,8 @@ namespace grb
 class CommandLineMock : public CommandLine
 {
 public:
-  CommandLineMock()
-    : CommandLine(ARGC, ARGV), _cmd(new grb::CmdMock(grb::type::UNDEFINED_COMMAND))
+  CommandLineMock(int argc, char** argv)
+    : CommandLine(argc, argv), _cmd(new grb::CmdMock(grb::type::UNDEFINED_COMMAND))
   {
   }
 
@@ -113,22 +113,34 @@ protected:
   bool _thrown { false };
   std::list<std::string> _tokens { "command-name" };
   grb::Cmd* _cmd { nullptr };
-  grb::CommandLineMock _cli;
+  grb::CommandLineMock _cli { ARGC, ARGV };
 };
 
-TEST_F(CommandLineTest, initial)
+TEST_F(CommandLineTest, getBinaryName_noArgcNoArgv)
+{
+  grb::CommandLineMock cli(0, nullptr);
+    ASSERT_STREQ("", cli.getBinaryName().c_str());
+}
+
+TEST_F(CommandLineTest, getBinaryName_ArgcArgv)
+{
+  ASSERT_STREQ(ARG0, _cli.getBinaryName().c_str());
+}
+
+TEST_F(CommandLineTest, getPrompt)
 {
   std::string prompt = grb::CMD_PROMPT + "> ";
   std::string prompt0 = grb::CMD_PROMPT + "[0]> ";
   std::string prompt1 = grb::CMD_PROMPT + "[1]> ";
 
-  ASSERT_STREQ(ARG0, _cli.getBinaryName().c_str());
-
   ASSERT_STREQ(prompt.c_str(), _cli.getPrompt(false).c_str());
   ASSERT_STREQ(prompt0.c_str(), _cli.getPrompt().c_str());
   _cli.incCmdIdx();
   ASSERT_STREQ(prompt1.c_str(), _cli.getPrompt().c_str());
+}
 
+TEST_F(CommandLineTest, quit)
+{
   ASSERT_FALSE(_cli.quit());
   _cli.setQuit();
   ASSERT_TRUE(_cli.quit());

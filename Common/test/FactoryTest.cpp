@@ -105,72 +105,90 @@ protected:
   {
     delete _factory;
     delete _mapper;
+    delete _base;
   }
 
   grb::mapper::MapperMock<Type>* _mapper;
   grb::factory::FactoryMock<Base, Type>* _factory;
+  Base* _base { nullptr };
+  std::string _name;
+  Type _type;
 };
+
+TEST_F(FactoryTest, createName_Unknown)
+{
+  _name = "name";
+
+  ASSERT_NO_THROW(_base = _factory->createName(_name));
+
+  ASSERT_EQ((Base*) nullptr, _base);
+}
 
 TEST_F(FactoryTest, createName_Type1_Positive)
 {
-  Type type = TYPE_1;
-  std::string name = LIST[type];
-  Base* base = nullptr;
-  ASSERT_NO_THROW(base = _factory->createName(name));
-  ASSERT_NE((Base*) nullptr, base);
-  ASSERT_EQ(type, base->type());
-  ASSERT_STREQ(name.c_str(), base->name().c_str());
+  _type = TYPE_1;
+  _name = LIST[_type];
+
+  ASSERT_NO_THROW(_base = _factory->createName(_name));
+
+  ASSERT_NE((Base*) nullptr, _base);
+  ASSERT_EQ(_type, _base->type());
+  ASSERT_STREQ(_name.c_str(), _base->name().c_str());
 }
 
 TEST_F(FactoryTest, createName_Type2_Positive)
 {
-  Type type = TYPE_2;
-  std::string name = LIST[type];
-  Base* base = nullptr;
-  ASSERT_NO_THROW(base = _factory->createName(name));
-  ASSERT_NE((Base*) nullptr, base);
-  ASSERT_EQ(type, base->type());
-  ASSERT_STREQ(name.c_str(), base->name().c_str());
+  _type = TYPE_2;
+  _name = LIST[_type];
+
+  ASSERT_NO_THROW(_base = _factory->createName(_name));
+
+  ASSERT_NE((Base*) nullptr, _base);
+  ASSERT_EQ(_type, _base->type());
+  ASSERT_STREQ(_name.c_str(), _base->name().c_str());
 }
 
 TEST_F(FactoryTest, createName_Base_Negative)
 {
-  Type type = BASE;
-  std::string name = LIST[type];
-  Base* base = nullptr;
-  ASSERT_NO_THROW(base = _factory->createName(LIST[type]));
-  ASSERT_EQ((Base*) nullptr, base);
+  _type = BASE;
+  _name = LIST[_type];
+
+  ASSERT_NO_THROW(_base = _factory->createName(_name));
+
+  ASSERT_EQ((Base*) nullptr, _base);
 }
 
 TEST_F(FactoryTest, createType_Type1_Positive)
 {
-  Type type = TYPE_1;
-  std::string name = LIST[type];
-  Base* base = nullptr;
-  ASSERT_NO_THROW(base = _factory->createType(type));
-  ASSERT_NE((Base*) nullptr, base);
-  ASSERT_EQ(type, base->type());
-  ASSERT_STREQ(name.c_str(), base->name().c_str());
+  _type = TYPE_1;
+  _name = LIST[_type];
+
+  ASSERT_NO_THROW(_base = _factory->createType(_type));
+
+  ASSERT_NE((Base*) nullptr, _base);
+  ASSERT_EQ(_type, _base->type());
+  ASSERT_STREQ(_name.c_str(), _base->name().c_str());
 }
 
 TEST_F(FactoryTest, createType_Type2_Positive)
 {
-  Type type = TYPE_2;
-  std::string name = LIST[type];
-  Base* base = nullptr;
-  ASSERT_NO_THROW(base = _factory->createType(type));
-  ASSERT_NE((Base*) nullptr, base);
-  ASSERT_EQ(type, base->type());
-  ASSERT_STREQ(name.c_str(), base->name().c_str());
+  _type = TYPE_2;
+  _name = LIST[_type];
+
+  ASSERT_NO_THROW(_base = _factory->createType(_type));
+
+  ASSERT_NE((Base*) nullptr, _base);
+  ASSERT_EQ(_type, _base->type());
+  ASSERT_STREQ(_name.c_str(), _base->name().c_str());
 }
 
 TEST_F(FactoryTest, createType_Base_Negative)
 {
-  Type type = BASE;
-  std::string name = LIST[type];
-  Base* base = nullptr;
-  ASSERT_NO_THROW(base = _factory->createType(type));
-  ASSERT_EQ((Base*) nullptr, base);
+  _type = BASE;
+
+  ASSERT_NO_THROW(_base = _factory->createType(_type));
+
+  ASSERT_EQ((Base*) nullptr, _base);
 }
 
 } // namespace testing

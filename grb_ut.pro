@@ -7,11 +7,11 @@ TARGET  = grb_ut
 
 DEFINES += GRB_VERSION="0.2"
 
-QMAKE_CXXFLAGS += -std=c++11 -O0 -Wextra -Werror -Wpedantic
+QMAKE_CXXFLAGS = -std=c++11 -O0 -Wextra -Werror -Wpedantic -fPIC -fprofile-arcs -ftest-coverage --coverage
 
 QMAKE_LFLAGS = -g
 
-QMAKE_LIBS = -lgtest -lgmock -pthread
+QMAKE_LIBS = -lgtest -lgmock -pthread -fprofile-arcs --coverage
 
 HEADERS += \
     test/Mock/AnalyzerMock.h \
@@ -30,7 +30,9 @@ HEADERS += \
     test/UnitTest/Data/test/CatalogEntryMockSample.h
 
 SOURCES += \
+    test/UnitTest/Analyzer/test/AnalyzerFactoryTest.cpp \
     test/UnitTest/Analyzer/test/AnalyzerGrbcatTest.cpp \
+    test/UnitTest/Analyzer/test/AnalyzerMapperTest.cpp \
     test/UnitTest/Analyzer/test/AnalyzerTest.cpp \
     test/UnitTest/CLI/test/CmdAnalysisTest.cpp \
     test/UnitTest/CLI/test/CmdCorrelationTest.cpp \

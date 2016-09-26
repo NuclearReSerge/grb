@@ -250,10 +250,7 @@ AnalyzerGrbcat::checkAnalyzerDataIsValid()
        << (correlation->getType() == type::CORRELATION_GRBCAT_DTDARC ? "" : "correlation ")
        << "}";
   }
-  else
-  {
-    ss << "Unspecified.";
-  }
+
   ss << std::endl;
 
   Exception exc(type::EXCEPTION_CRITICAL + type::EXCEPTION_MOD_NO_PREFIX,

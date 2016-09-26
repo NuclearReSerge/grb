@@ -8,64 +8,55 @@ namespace testing
 class CmdTest : public Test
 {
 public:
-  bool parseAllTrue(std::list<std::string>& tokens)
+  bool doParseAllTrue(std::list<std::string>& tokens)
   {
     tokens.clear();
     return true;
   }
-  bool parseAllFalse(std::list<std::string>& tokens)
+  bool doParseAllFalse(std::list<std::string>& tokens)
   {
     tokens.clear();
     return false;
   }
-  bool parseNoneTrue(std::list<std::string>& )
+  bool doParseNoneTrue(std::list<std::string>& )
   {
     return true;
   }
-  bool parseNoneFalse(std::list<std::string>& )
+  bool doParseNoneFalse(std::list<std::string>& )
   {
     return false;
   }
-  bool parseThrow(std::list<std::string>& )
+  bool doParseThrow(std::list<std::string>& )
   {
     grb::Exception exc(grb::type::EXCEPTION_CRITICAL + grb::type::EXCEPTION_MOD_NO_PREFIX,
                        "parseThrow");
     throw exc;
   }
-  void executeNoThrow()
+  void doExecuteNoThrow()
   {
   }
-  void executeThrow()
+  void doExecuteThrow()
   {
     grb::Exception exc(grb::type::EXCEPTION_CRITICAL + grb::type::EXCEPTION_MOD_NO_PREFIX,
                        "executeThrow");
     throw exc;
   }
-  std::string help(grb::type::CommandHelpType type)
+  std::string doHelp(grb::type::CommandHelpType type)
   {
-    switch (type)
-    {
-      case grb::type::HELP_SHORT:
-      {
-        ++_helpShort;
-        return "short help";
-      }
-      case grb::type::HELP_LONG:
-      {
-        ++_helpLong;
-        return "long help";
-      }
-      case grb::type::HELP_FULL:
-      {
-        ++_helpFull;
-        return "full help";
-      }
-      default:
-        break;
-    }
-    return "unknown help";
-  }
+    std::string text;
 
+    if (type == grb::type::HELP_SHORT)
+    {
+      ++_helpShort;
+      text +=  "short help";
+    }
+    if (type == grb::type::HELP_LONG)
+    {
+      ++_helpLong;
+      text += "long help";
+    }
+    return text;
+  }
 
 protected:
   void printWhat(grb::Exception& /*exc*/)
@@ -103,7 +94,6 @@ protected:
   bool _thrown { false };
   int _helpShort { 0 };
   int _helpLong { 0 };
-  int _helpFull { 0 };
   std::list<std::string> _tokens { "arg1", "arg2" };
   grb::CmdMock _cmd { grb::type::UNDEFINED_COMMAND };
 };
@@ -118,7 +108,7 @@ TEST_F(CmdTest, parseAllTrue)
 {
   EXPECT_CALL(_cmd, doParse(_))
       .Times(1)
-      .WillOnce(Invoke(this, &CmdTest::parseAllTrue));
+      .WillOnce(Invoke(this, &CmdTest::doParseAllTrue));
 
   callParse();
 
@@ -129,7 +119,7 @@ TEST_F(CmdTest, parseAllFalse)
 {
   EXPECT_CALL(_cmd, doParse(_))
       .Times(1)
-      .WillOnce(Invoke(this, &CmdTest::parseAllFalse));
+      .WillOnce(Invoke(this, &CmdTest::doParseAllFalse));
 
   callParse();
 
@@ -140,7 +130,7 @@ TEST_F(CmdTest, parseNoneFalse)
 {
   EXPECT_CALL(_cmd, doParse(_))
       .Times(1)
-      .WillOnce(Invoke(this, &CmdTest::parseNoneFalse));
+      .WillOnce(Invoke(this, &CmdTest::doParseNoneFalse));
 
   callParse();
 
@@ -151,7 +141,7 @@ TEST_F(CmdTest, parseNoneTrue)
 {
   EXPECT_CALL(_cmd, doParse(_))
       .Times(1)
-      .WillOnce(Invoke(this, &CmdTest::parseNoneTrue));
+      .WillOnce(Invoke(this, &CmdTest::doParseNoneTrue));
 
   callParse();
 
@@ -162,7 +152,7 @@ TEST_F(CmdTest, parseThrow)
 {
   EXPECT_CALL(_cmd, doParse(_))
       .Times(1)
-      .WillOnce(Invoke(this, &CmdTest::parseThrow));
+      .WillOnce(Invoke(this, &CmdTest::doParseThrow));
 
   callParse();
 
@@ -173,7 +163,7 @@ TEST_F(CmdTest, executeNoThrow)
 {
   EXPECT_CALL(_cmd, doExecute())
       .Times(1)
-      .WillOnce(Invoke(this, &CmdTest::executeNoThrow));
+      .WillOnce(Invoke(this, &CmdTest::doExecuteNoThrow));
 
   callExecute();
 
@@ -185,7 +175,7 @@ TEST_F(CmdTest, executeThrow)
 {
   EXPECT_CALL(_cmd, doExecute())
       .Times(1)
-      .WillOnce(Invoke(this, &CmdTest::executeThrow));
+      .WillOnce(Invoke(this, &CmdTest::doExecuteThrow));
 
   callExecute();
 
@@ -197,39 +187,36 @@ TEST_F(CmdTest, helpShort)
 {
   EXPECT_CALL(_cmd, doHelp(_))
       .Times(1)
-      .WillOnce(Invoke(this, &CmdTest::help));
+      .WillOnce(Invoke(this, &CmdTest::doHelp));
 
   ASSERT_NO_THROW(_cmd.help());
 
   ASSERT_EQ(1, _helpShort);
   ASSERT_EQ(0, _helpLong);
-  ASSERT_EQ(0, _helpFull);
 }
 
 TEST_F(CmdTest, helpLong)
 {
   EXPECT_CALL(_cmd, doHelp(_))
       .Times(1)
-      .WillOnce(Invoke(this, &CmdTest::help));
+      .WillOnce(Invoke(this, &CmdTest::doHelp));
 
   ASSERT_NO_THROW(_cmd.help(grb::type::HELP_LONG));
 
   ASSERT_EQ(0, _helpShort);
   ASSERT_EQ(1, _helpLong);
-  ASSERT_EQ(0, _helpFull);
 }
 
 TEST_F(CmdTest, helpFull)
 {
   EXPECT_CALL(_cmd, doHelp(_))
       .Times(2)
-      .WillRepeatedly(Invoke(this, &CmdTest::help));
+      .WillRepeatedly(Invoke(this, &CmdTest::doHelp));
 
   ASSERT_NO_THROW(_cmd.help(grb::type::HELP_FULL));
 
   ASSERT_EQ(1, _helpShort);
   ASSERT_EQ(1, _helpLong);
-  ASSERT_EQ(0, _helpFull);
 }
 
 } // namespace testing
