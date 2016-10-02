@@ -3,4 +3,4 @@
 
 #pragma once
 
-MAPPER_CLASS_H(DataBaseFormatMapper, type::DatabaseFormatType)
+MAPPER_CLASS_H(DataBaseFormatMapper, type::DataBaseFormatType)

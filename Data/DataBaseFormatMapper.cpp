@@ -17,10 +17,8 @@ static std::vector<std::string> DATABASE_FORMAT_NAMES
   "heasarc_grbcatinta",
   "heasarc_grbcatirr",
 
-  // TEST
-  "test-database-table",
   // LAST
-  "undefined-database-table"
+  "undefined-database-format"
 };
 
 } // namespace

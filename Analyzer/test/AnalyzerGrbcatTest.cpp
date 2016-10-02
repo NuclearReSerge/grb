@@ -7,6 +7,7 @@
 
 #include "test/Mock/CatalogMock.h"
 #include "test/Mock/CorrelationMock.h"
+#include "test/Mock/MockHelper.h"
 
 #include <gmock/gmock.h>
 
@@ -51,11 +52,6 @@ protected:
       _thrown = true;
       printWhat(exc);
     }
-  }
-
-  void printWhat(grb::Exception& /*exc*/)
-  {
-    //std::cout << exc.what() << std::endl;
   }
 
   std::list<std::string> _tokens;

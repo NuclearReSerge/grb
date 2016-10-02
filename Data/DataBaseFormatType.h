@@ -7,7 +7,7 @@ namespace type
 
 // High Energy Astrophysics Science Archive Research Center
 // http://heasarc.gsfc.nasa.gov/
-enum DatabaseFormatType
+enum DataBaseFormatType
 {
   // HEASARC
   HEASARC_GRBCAT,

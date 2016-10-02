@@ -10,7 +10,7 @@ namespace grb
 class DataBaseFormatMock : public DataBaseFormat
 {
 public:
-  DataBaseFormatMock(const type::DatabaseFormatType dbType)
+  DataBaseFormatMock(const type::DataBaseFormatType dbType)
     : DataBaseFormat(dbType)
   {
   }

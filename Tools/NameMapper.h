@@ -28,7 +28,7 @@ public:
 
   virtual const std::string& getDescription() const = 0;
 
-protected:
+protected:  
   const type::ColumnType _columnType;
 };
 
@@ -48,9 +48,9 @@ public:\
   {\
     initiate();\
   }\
-  const std::string& getDescription() const;\
+  const std::string& getDescription() const override;\
 protected:\
-  const std::vector<std::string>& getList() const;\
+  const std::vector<std::string>& getList() const override;\
 };\
 }\
 typedef Singleton<mapper::_nameMapperClass_> _nameMapperClass_;\

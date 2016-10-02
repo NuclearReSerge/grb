@@ -1,43 +1,41 @@
 #include "Analyzer/AnalyzerFactory.h"
 
-#include <gtest/gtest.h>
+#include "test/Mock/FactoryTestFixtures.h"
 
 namespace testing
 {
 
-class AnalyzerFactoryTest : public Test
+class AnalyzerFactoryTest :
+    public FactoryTestFixturesBase<grb::type::AnalyzerType, grb::Analyzer, grb::factory::AnalyzerFactory>
 {
 protected:
-  void TearDown()
+  void SetUp()
   {
-    delete _analyzer;
+    _invalidType = grb::type::UNDEFINED_ANALYZER;
+    _invalidName = "undefined-analyzer";
   }
-
-  grb::Analyzer* _analyzer { nullptr };
 };
 
-TEST_F(AnalyzerFactoryTest, createType_Positive)
+} // namespace testing
+
+FACTORY_TEST_FIXTURES(AnalyzerFactoryTest)
+
+
+namespace testing
 {
-  _analyzer = grb::AnalyzerFactory::instance()->createType(grb::type::GRBCAT_ANALYZER);
-  ASSERT_NE((grb::Analyzer*) nullptr, _analyzer);
+
+TEST_F(AnalyzerFactoryTest, createName_AnalyzerGrbcat)
+{
+  _validType = grb::type::GRBCAT_ANALYZER;
+  _validName = "grbcat-analyzer";
+  callCreateName();
 }
 
-TEST_F(AnalyzerFactoryTest, createType_Negative)
+TEST_F(AnalyzerFactoryTest, createType_AnalyzerGrbcat)
 {
-  _analyzer = grb::AnalyzerFactory::instance()->createType(grb::type::UNDEFINED_ANALYZER);
-  ASSERT_EQ((grb::Analyzer*) nullptr, _analyzer);
-}
-
-TEST_F(AnalyzerFactoryTest, createName_Positive)
-{
-  _analyzer = grb::AnalyzerFactory::instance()->createName("grbcat-analyzer");
-  ASSERT_NE((grb::Analyzer*) nullptr, _analyzer);
-}
-
-TEST_F(AnalyzerFactoryTest, createName_Negative)
-{
-  _analyzer = grb::AnalyzerFactory::instance()->createName("undefined-analyzer");
-  ASSERT_EQ((grb::Analyzer*) nullptr, _analyzer);
+  _validType = grb::type::GRBCAT_ANALYZER;
+  callCreateType();
 }
 
 } // namespace testing
+

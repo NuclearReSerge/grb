@@ -1,63 +1,24 @@
 #include "Analyzer/AnalyzerMapper.h"
 
-#include <gtest/gtest.h>
+#include "test/Mock/MapperTestFixtures.h"
 
 namespace testing
 {
 
-class AnalyzerMapperTest : public Test
+class AnalyzerMapperTest
+    : public MapperTestFixturesBase<grb::type::AnalyzerType, grb::mapper::AnalyzerMapper>
 {
 protected:
-  void printWhat(grb::Exception& /*exc*/)
+  void SetUp()
   {
-    //std::cout << exc.what() << std::endl;
+    _validType = grb::type::UNDEFINED_ANALYZER;
+    _invalidType = (grb::type::AnalyzerType) -1;
+
+    _validName = "undefined-analyzer";
+    _invalidName = "analyzer-name";
   }
 };
 
-TEST_F(AnalyzerMapperTest, isPresent_Positive)
-{
-  ASSERT_TRUE(grb::AnalyzerMapper::instance()->isPresent("undefined-analyzer"));
-}
-
-TEST_F(AnalyzerMapperTest, isPresent_Negative)
-{
-  ASSERT_FALSE(grb::AnalyzerMapper::instance()->isPresent("analyzer-name"));
-}
-
-TEST_F(AnalyzerMapperTest, getValue_Positive)
-{
-  ASSERT_EQ((grb::type::AnalyzerType) grb::type::UNDEFINED_ANALYZER,
-            grb::AnalyzerMapper::instance()->getValue("undefined-analyzer"));
-}
-
-TEST_F(AnalyzerMapperTest, getValue_Negative)
-{
-  try
-  {
-    grb::AnalyzerMapper::instance()->getValue("analyzer-name");
-  }
-  catch (grb::Exception exc)
-  {
-    printWhat(exc);
-  }
-}
-
-TEST_F(AnalyzerMapperTest, getKey_Positive)
-{
-  ASSERT_STREQ("undefined-analyzer",
-               grb::AnalyzerMapper::instance()->getKey(grb::type::UNDEFINED_ANALYZER).c_str());
-}
-
-TEST_F(AnalyzerMapperTest, getKey_Negative)
-{
-  try
-  {
-    grb::AnalyzerMapper::instance()->getKey((grb::type::AnalyzerType) -1);
-  }
-  catch (grb::Exception exc)
-  {
-    printWhat(exc);
-  }
-}
-
 } // namespace testing
+
+MAPPER_TEST_FIXTURES(AnalyzerMapperTest)

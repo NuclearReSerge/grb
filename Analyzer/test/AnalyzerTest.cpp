@@ -2,6 +2,7 @@
 #include "Common/Exception.h"
 
 #include "test/Mock/AnalyzerMock.h"
+#include "test/Mock/MockHelper.h"
 
 #include <gtest/gtest.h>
 
@@ -29,11 +30,6 @@ protected:
       _thrown = true;
       printWhat(exc);
     }
-  }
-
-  void printWhat(grb::Exception& /*exc*/)
-  {
-    //std::cout << exc.what() << std::endl;
   }
 
   bool _result { false };

@@ -27,7 +27,7 @@ namespace grb
 {
 
 type::CatalogEntryType
-convertDataBaseFormat(type::DatabaseFormatType dbType)
+convertDataBaseFormat(type::DataBaseFormatType dbType)
 {
   switch (dbType)
   {
@@ -93,7 +93,7 @@ CmdDatabase::doExecute()
     throw exc;
   }
 
-  type::DatabaseFormatType dbType = dbFormat->getType();
+  type::DataBaseFormatType dbType = dbFormat->getType();
   std::printf("Database table: %s\n",
               DataBaseFormatMapper::instance()->getKey(dbType).c_str());
 
@@ -142,7 +142,7 @@ CmdDatabase::doHelp(type::CommandHelpType type)
   for(int i = 0; i < type::UNDEFINED_DATABASE_FORMAT; ++i)
   {
     ss << "  "
-       << DataBaseFormatMapper::instance()->getKey((type::DatabaseFormatType) i)
+       << DataBaseFormatMapper::instance()->getKey((type::DataBaseFormatType) i)
        << "."<< TDAT_FILE_EXT << std::endl;
   }
 

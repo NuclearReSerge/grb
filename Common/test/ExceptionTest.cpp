@@ -1,5 +1,7 @@
 #include "Common/Exception.h"
 
+#include "test/Mock/MockHelper.h"
+
 #include <gtest/gtest.h>
 
 namespace
@@ -19,14 +21,6 @@ protected:
   {
     _level = grb::type::EXCEPTION_CRITICAL;
     _what = grb::Exception::getPrefix();
-  }
-  void TearDown()
-  {
-  }
-
-  void printWhat(grb::Exception& /*exc*/)
-  {
-    //std::cout << exc.what() << std::endl;
   }
 
   grb::type::ExceptionLevel _level;

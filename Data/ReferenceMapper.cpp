@@ -6,6 +6,9 @@ namespace
 
 const std::vector<std::string> NAME_LIST
 {
+  "undefined-reference",
+
+  //
   "1974ApJ...188L...1S",
   "1982ApJ...259L..51K",
   "1982grap.symp..211D",

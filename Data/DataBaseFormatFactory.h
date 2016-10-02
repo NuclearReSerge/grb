@@ -4,4 +4,4 @@
 
 #pragma once
 
-FACTORY_CLASS_H(DataBaseFormatFactory, type::DatabaseFormatType, DataBaseFormat, DataBaseFormatMapper)
+FACTORY_CLASS_H(DataBaseFormatFactory, type::DataBaseFormatType, DataBaseFormat, DataBaseFormatMapper)

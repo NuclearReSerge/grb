@@ -1,4 +1,5 @@
 #include "test/Mock/CmdMock.h"
+#include "test/Mock/MockHelper.h"
 
 #include <gtest/gtest.h>
 
@@ -59,11 +60,6 @@ public:
   }
 
 protected:
-  void printWhat(grb::Exception& /*exc*/)
-  {
-    // std::cout << exc.what() << std::endl;
-  }
-
   void callParse()
   {
     try

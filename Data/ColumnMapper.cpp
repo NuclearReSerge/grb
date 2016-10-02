@@ -43,16 +43,6 @@ const std::vector<std::string> COLUMN_NAMES
   "horizontal_coordinate",	//
   "vertical_coordinate",	//
 
-  // TEST
-  "test_column_flag",		// Test column for flag
-  "test_column_integer",	// Test column for integer
-  "test_column_index",		// Test column for index
-  "test_column_integer_range",	// Test column for integer range
-  "test_column_index_list",	// Test column for index list
-  "test_column_float",		// Test column for float
-  "test_column_string",		// Test column for string
-  "test_column_string_list",	// Test column for string list
-
   // LAST
   "undefined-column"		// Unknown column type
 };

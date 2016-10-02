@@ -11,7 +11,7 @@ namespace grb
 class DataBaseFormat
 {
 public:
-  DataBaseFormat(type::DatabaseFormatType dbType = type::UNDEFINED_DATABASE_FORMAT)
+  DataBaseFormat(type::DataBaseFormatType dbType = type::UNDEFINED_DATABASE_FORMAT)
     : _type(dbType)
   {
   }
@@ -25,7 +25,7 @@ public:
     _format.clear();
   }
 
-  type::DatabaseFormatType getType() const
+  type::DataBaseFormatType getType() const
   {
     return _type;
   }
@@ -62,7 +62,7 @@ protected:
   }
 
 private:
-  const type::DatabaseFormatType _type;
+  const type::DataBaseFormatType _type;
   type::ColumnFlags _requiredFlags;
   std::vector<DataBaseColumn*> _format;
 };

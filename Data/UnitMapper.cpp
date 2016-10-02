@@ -8,14 +8,15 @@ const std::vector<std::string> UNIT_NAMES
   "",
   "deg",
   "s",
-  "MJD"
+  "Unix",
+  "JD",
+  "MJD",
   "keV",
   // LAST
   "undefined-unit"
 };
 
 } // namespace
-
 
 namespace grb
 {

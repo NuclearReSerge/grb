@@ -2,6 +2,7 @@
 #include "CLI/CommandMapper.h"
 
 #include "test/Mock/CmdMock.h"
+#include "test/Mock/MockHelper.h"
 
 #include <gtest/gtest.h>
 #include <memory>
@@ -44,6 +45,12 @@ public:
     return _cmd;
   }
 
+  Cmd* createCommandOriginal(const std::string& name)
+  {
+    return CommandLine::createCommand(name);
+  }
+
+
 protected:
   Cmd* createCommand(const std::string& /*name*/) override
   {
@@ -85,18 +92,6 @@ public:
   }
 
 protected:
-  void SetUp()
-  {
-  }
-  void TearDown()
-  {
-  }
-
-  void printWhat(grb::Exception& /*exc*/)
-  {
-    // std::cout << exc.what() << std::endl;
-  }
-
   void callParse()
   {
     try
@@ -216,6 +211,270 @@ TEST_F(CommandLineTest, parse_CmdParseThrow)
 
   ASSERT_TRUE(_thrown);
   ASSERT_EQ((grb::Cmd*) nullptr, _cmd);
+}
+
+TEST_F(CommandLineTest, createCommand)
+{
+  grb::Cmd* cmd = _cli.createCommandOriginal("undefined-command");
+  ASSERT_EQ(nullptr, cmd);
+}
+
+TEST_F(CommandLineTest, tokenize_empty)
+{
+  const std::string& input = "";
+  std::list<std::string> tokens;
+
+  _cli.tokenize(input, tokens);
+
+  ASSERT_TRUE(tokens.empty());
+}
+
+TEST_F(CommandLineTest, tokenize_whitespace_space)
+{
+  const std::string& input = " ";
+  std::list<std::string> tokens;
+
+  _cli.tokenize(input, tokens);
+
+  ASSERT_TRUE(tokens.empty());
+}
+
+TEST_F(CommandLineTest, tokenize_whitespace_horizontalTab)
+{
+  const std::string& input = "\t";
+  std::list<std::string> tokens;
+
+  _cli.tokenize(input, tokens);
+
+  ASSERT_TRUE(tokens.empty());
+}
+
+TEST_F(CommandLineTest, tokenize_whitespace_newline)
+{
+  const std::string& input = "\n";
+  std::list<std::string> tokens;
+
+  _cli.tokenize(input, tokens);
+
+  ASSERT_TRUE(tokens.empty());
+}
+
+TEST_F(CommandLineTest, tokenize_whitespace_carriageReturn)
+{
+  const std::string& input = "\r";
+  std::list<std::string> tokens;
+
+  _cli.tokenize(input, tokens);
+
+  ASSERT_TRUE(tokens.empty());
+}
+
+TEST_F(CommandLineTest, tokenize_whitespace_formFeed)
+{
+  const std::string& input = "\f";
+  std::list<std::string> tokens;
+
+  _cli.tokenize(input, tokens);
+
+  ASSERT_TRUE(tokens.empty());
+}
+
+TEST_F(CommandLineTest, tokenize_whitespace_verticalTab)
+{
+  const std::string& input = "\v";
+  std::list<std::string> tokens;
+
+  _cli.tokenize(input, tokens);
+
+  ASSERT_TRUE(tokens.empty());
+}
+
+TEST_F(CommandLineTest, tokenize_whitespace_all)
+{
+  const std::string& input = " \t\n\r\f\v  \t\n\r\f\v  \t\t\n\n\r\f\f\v\v";
+  std::list<std::string> tokens;
+
+  _cli.tokenize(input, tokens);
+
+  ASSERT_TRUE(tokens.empty());
+}
+
+TEST_F(CommandLineTest, tokenize_oneWord)
+{
+  const std::string& input = "word";
+  std::list<std::string> tokens;
+
+  _cli.tokenize(input, tokens);
+
+  ASSERT_STREQ("word", tokens.front().c_str());
+}
+
+TEST_F(CommandLineTest, tokenize_twoWords_whitespace)
+{
+  const std::string& input = "word1 \t word2";
+  std::list<std::string> tokens;
+
+  _cli.tokenize(input, tokens);
+
+  ASSERT_STREQ("word1", tokens.front().c_str());
+  ASSERT_STREQ("word2", tokens.back().c_str());
+}
+
+TEST_F(CommandLineTest, tokenize_twoWord_delimiter_pipe)
+{
+  const std::string& input = "word1|word2";
+  std::list<std::string> tokens;
+  char delim = '|';
+
+  _cli.tokenize(input, tokens, delim);
+
+  ASSERT_STREQ("word1", tokens.front().c_str());
+  ASSERT_STREQ("word2", tokens.back().c_str());
+  ASSERT_EQ(2, tokens.size());
+}
+
+TEST_F(CommandLineTest, tokenize_twoWord_whitespace_delimiter_pipe)
+{
+  const std::string& input = "\rword1\f|\vword2\t";
+  std::list<std::string> tokens;
+  char delim = '|';
+
+  _cli.tokenize(input, tokens, delim);
+
+  ASSERT_STREQ("word1", tokens.front().c_str());
+  ASSERT_STREQ("word2", tokens.back().c_str());
+  ASSERT_EQ(2, tokens.size());
+}
+
+TEST_F(CommandLineTest, tokenize_twoWords_comma)
+{
+  const std::string& input = "word1,word2";
+  std::list<std::string> tokens;
+
+  _cli.tokenize(input, tokens);
+
+  ASSERT_STREQ("word1", tokens.front().c_str());
+  ASSERT_STREQ("word2", tokens.back().c_str());
+}
+
+TEST_F(CommandLineTest, tokenize_twoWords_commaAndWhitespace)
+{
+  const std::string& input = "word1 , word2";
+  std::list<std::string> tokens;
+
+  _cli.tokenize(input, tokens);
+
+  ASSERT_STREQ("word1", tokens.front().c_str());
+  ASSERT_STREQ("word2", tokens.back().c_str());
+}
+
+TEST_F(CommandLineTest, tokenize_oneWord_brace)
+{
+  const std::string& input = "(word1)";
+  std::list<std::string> tokens;
+
+  _cli.tokenize(input, tokens);
+
+  ASSERT_STREQ("(", tokens.front().c_str());
+  ASSERT_STREQ(")", tokens.back().c_str());
+  ASSERT_EQ(3, tokens.size());
+}
+
+
+TEST_F(CommandLineTest, tokenize_oneWord_squareBrace)
+{
+  const std::string& input = "[word1]";
+  std::list<std::string> tokens;
+
+  _cli.tokenize(input, tokens);
+
+  ASSERT_STREQ("[", tokens.front().c_str());
+  ASSERT_STREQ("]", tokens.back().c_str());
+  ASSERT_EQ(3, tokens.size());
+}
+
+TEST_F(CommandLineTest, tokenize_oneWord_currlyBrace)
+{
+  const std::string& input = "{word1}";
+  std::list<std::string> tokens;
+
+  _cli.tokenize(input, tokens);
+
+  ASSERT_STREQ("{", tokens.front().c_str());
+  ASSERT_STREQ("}", tokens.back().c_str());
+  ASSERT_EQ(3, tokens.size());
+}
+
+TEST_F(CommandLineTest, tokenize_twoWord_brace)
+{
+  const std::string& input = "(word1,word2)";
+  std::list<std::string> tokens;
+
+  _cli.tokenize(input, tokens);
+
+  ASSERT_STREQ("(", tokens.front().c_str());
+  ASSERT_STREQ(")", tokens.back().c_str());
+  ASSERT_EQ(5, tokens.size());
+}
+
+TEST_F(CommandLineTest, tokenize_twoWord_squareBrace)
+{
+  const std::string& input = "[word1,word2]";
+  std::list<std::string> tokens;
+
+  _cli.tokenize(input, tokens);
+
+  ASSERT_STREQ("[", tokens.front().c_str());
+  ASSERT_STREQ("]", tokens.back().c_str());
+  ASSERT_EQ(5, tokens.size());
+}
+
+TEST_F(CommandLineTest, tokenize_twoWord_currlyBrace)
+{
+  const std::string& input = "{word1,word2}";
+  std::list<std::string> tokens;
+
+  _cli.tokenize(input, tokens);
+
+  ASSERT_STREQ("{", tokens.front().c_str());
+  ASSERT_STREQ("}", tokens.back().c_str());
+  ASSERT_EQ(5, tokens.size());
+}
+
+TEST_F(CommandLineTest, tokenize_twoWord_brace_whitespace)
+{
+  const std::string& input = " (\tword1\n,\rword2\f)\v";
+  std::list<std::string> tokens;
+
+  _cli.tokenize(input, tokens);
+
+  ASSERT_STREQ("(", tokens.front().c_str());
+  ASSERT_STREQ(")", tokens.back().c_str());
+  ASSERT_EQ(5, tokens.size());
+}
+
+TEST_F(CommandLineTest, tokenize_twoWord_squareBrace_whitespace)
+{
+  const std::string& input = " [\tword1\n,\rword2\f]\v";
+  std::list<std::string> tokens;
+
+  _cli.tokenize(input, tokens);
+
+  ASSERT_STREQ("[", tokens.front().c_str());
+  ASSERT_STREQ("]", tokens.back().c_str());
+  ASSERT_EQ(5, tokens.size());
+}
+
+TEST_F(CommandLineTest, tokenize_twoWord_currlyBrace_whitespace)
+{
+  const std::string& input = " {\tword1\n,\rword2\f}\v";
+  std::list<std::string> tokens;
+
+  _cli.tokenize(input, tokens);
+
+  ASSERT_STREQ("{", tokens.front().c_str());
+  ASSERT_STREQ("}", tokens.back().c_str());
+  ASSERT_EQ(5, tokens.size());
 }
 
 } // namespace testing

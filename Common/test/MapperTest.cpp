@@ -1,4 +1,5 @@
 #include "test/Mock/MapperMock.h"
+#include "test/Mock/MockHelper.h"
 
 #include <gtest/gtest.h>
 
@@ -88,15 +89,6 @@ protected:
 
     _mapInt.initiateMock();
     _mapClass.initiateMock();
-  }
-
-  void TearDown()
-  {
-  }
-
-  void printWhat(grb::Exception& /*exc*/)
-  {
-    //std::cout << exc.what() << std::endl;
   }
 
   grb::mapper::MapperMock<int> _mapInt;

@@ -8,7 +8,7 @@ namespace factory
 {
 
 DataBaseFormat*
-DataBaseFormatFactory::createType(const type::DatabaseFormatType& type)
+DataBaseFormatFactory::createType(const type::DataBaseFormatType& type)
 {
   DataBaseFormat* format = nullptr;
   switch (type)

@@ -6,6 +6,9 @@ namespace
 // cat grbcatalog.dat | egrep -v "^#" | awk -F "|" '{printf "#%s#%s", $15, $21}' | sed -re "s/\s*(#|$)/\n/g" | sort | uniq | sed "s/^/\ \ \"/g" | sed "s/$/\",/g"
 const std::vector<std::string> NAME_LIST
 {
+  "undefined-time-mod",
+
+  //
   "<",
   ">",
   "~"

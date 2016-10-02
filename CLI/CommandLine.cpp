@@ -15,7 +15,7 @@ namespace
 
 const std::string WHITESPACE   = " \t\n\r\f\v";
 const std::string DELIM = " ";
-const std::string SPECIAL = "=,[]()";
+const std::string SPECIAL = "=,()[]{}";
 
 } // namespace
 

@@ -5,13 +5,15 @@ CONFIG -= qt
 
 TARGET  = grb_ut
 
-DEFINES += GRB_VERSION="0.2"
+DEFINES += GRB_VERSION="0.2" TEST_PRINT_EXC
 
 QMAKE_CXXFLAGS = -std=c++11 -O0 -Wextra -Werror -Wpedantic -fPIC -fprofile-arcs -ftest-coverage --coverage
 
 QMAKE_LFLAGS = -g
 
 QMAKE_LIBS = -lgtest -lgmock -pthread -fprofile-arcs --coverage
+
+#make -j4 && ./grb_ut && lcov --no-external --capture -d . -d ../../grb -o coverage.info && genhtml coverage.info --output-directory out
 
 HEADERS += \
     test/Mock/AnalyzerMock.h \
@@ -22,14 +24,20 @@ HEADERS += \
     test/Mock/CorrelationMock.h \
     test/Mock/DataBaseFormatMock.h \
     test/Mock/FactoryMock.h \
+    test/Mock/FactoryTestFixtures.h \
     test/Mock/MapperMock.h \
+    test/Mock/MapperTestFixtures.h \
     test/Mock/ModelMock.h \
-    test/Mock/NameMapperMock.h
+    test/Mock/MockHelper.h \
+    test/Mock/NameMapperMock.h \
+    test/Mock/NameMapperTestFixtures.h
 
 HEADERS += \
     test/UnitTest/Data/test/CatalogEntryMockSample.h
 
 SOURCES += \
+    test/Mock/MockHelper.cpp \
+    test/UnitTest/Analyzer/test/AnalyzerCmdMapperTest.cpp \
     test/UnitTest/Analyzer/test/AnalyzerFactoryTest.cpp \
     test/UnitTest/Analyzer/test/AnalyzerGrbcatTest.cpp \
     test/UnitTest/Analyzer/test/AnalyzerMapperTest.cpp \
@@ -42,7 +50,9 @@ SOURCES += \
     test/UnitTest/CLI/test/CmdModelTest.cpp \
     test/UnitTest/CLI/test/CmdQuitTest.cpp \
     test/UnitTest/CLI/test/CmdTest.cpp \
+    test/UnitTest/CLI/test/CommandFactoryTest.cpp \
     test/UnitTest/CLI/test/CommandLineTest.cpp \
+    test/UnitTest/CLI/test/CommandMapperTest.cpp \
     test/UnitTest/Common/test/ExceptionTest.cpp \
     test/UnitTest/Common/test/FactoryTest.cpp \
     test/UnitTest/Common/test/MapperTest.cpp \
@@ -50,18 +60,31 @@ SOURCES += \
     test/UnitTest/Correlation/test/CorrelationTest.cpp \
     test/UnitTest/Correlation/test/CorrelationTimeArcGrbcatTest.cpp \
     test/UnitTest/Correlation/test/GreatCircleDistanceTest.cpp \
+    test/UnitTest/Data/test/CatalogEntryFactoryTest.cpp \
     test/UnitTest/Data/test/CatalogEntryGrbcatTest.cpp \
+    test/UnitTest/Data/test/CatalogEntryMapperTest.cpp \
     test/UnitTest/Data/test/CatalogEntryTest.cpp \
     test/UnitTest/Data/test/CatalogTest.cpp \
+    test/UnitTest/Data/test/CoordinateSystemMapperTest.cpp \
     test/UnitTest/Data/test/CoordinatesTest.cpp \
     test/UnitTest/Data/test/DataBaseColumnTest.cpp \
+    test/UnitTest/Data/test/DataBaseFormatFactoryTest.cpp \
     test/UnitTest/Data/test/DataBaseFormatGrbcatTest.cpp \
+    test/UnitTest/Data/test/DataBaseFormatMapperTest.cpp \
     test/UnitTest/Data/test/DataBaseFormatTest.cpp \
     test/UnitTest/Data/test/DurationTest.cpp \
+    test/UnitTest/Data/test/DateMapperTest.cpp \
+    test/UnitTest/Data/test/ObservatoryMapperTest.cpp \
+    test/UnitTest/Data/test/ReferenceMapperTest.cpp \
+    test/UnitTest/Data/test/RegionMapperTest.cpp \
+    test/UnitTest/Data/test/TimeDefMapperTest.cpp \
+    test/UnitTest/Data/test/TimeModMapperTest.cpp \
+    test/UnitTest/Data/test/UnitMapperTest.cpp \
+    test/UnitTest/Data/test/ValueMapperTest.cpp \
     test/UnitTest/Model/test/IsotropicBallModelTest.cpp \
     test/UnitTest/Model/test/IsotropicSphereModelTest.cpp \
-    test/UnitTest/Model/test/ModelTest.cpp
-#    test/UnitTest/Tools/test/NameMapperTest.cpp
+    test/UnitTest/Model/test/ModelTest.cpp \
+    test/UnitTest/Tools/test/NameMapperTest.cpp
 #    test/UnitTest/Tools/test/ParserFileTest.cpp \
 #    test/UnitTest/Tools/test/ParserTest.cpp
 

@@ -7,6 +7,9 @@ namespace
 
 const std::vector<std::string> NAME_LIST
 {
+  "undefined-observatory",
+
+  //
   "APEX",
   "BATSE-CGRO",
   "BeppoSAX",

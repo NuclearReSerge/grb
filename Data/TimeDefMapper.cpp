@@ -7,6 +7,9 @@ namespace
 
 const std::vector<std::string> NAME_LIST
 {
+  "undefined-time-def",
+
+  //
   "BAT trigger",
   "Earth Crossing Time",
   "Not Specified",
