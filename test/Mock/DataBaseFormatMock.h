@@ -15,6 +15,13 @@ public:
   {
   }
 
+  void addColumn(DataBaseColumn* dataType) { DataBaseFormat::addColumn(dataType); }
+  void setColumnFlag(std::size_t column, bool required = true)
+  {
+    DataBaseFormat::setColumnFlag(column, required);
+  }
+  void setColumnFlags() { DataBaseFormat::setColumnFlags(); }
+
   MOCK_METHOD0(initialize, void());
 };
 

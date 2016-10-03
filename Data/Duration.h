@@ -16,7 +16,7 @@ public:
 
   virtual ~DurationBase() = default;
 
-  type::UnitType setDurationUnitType() const
+  type::UnitType getDurationUnitType() const
   {
     return _durationUnitType;
   }
