@@ -11,7 +11,7 @@ class CatalogEntryGrbcat : public CatalogEntry
 {
 public:
   CatalogEntryGrbcat()
-    : CatalogEntry(type::GRBCAT_ENTRY),
+    : CatalogEntry(type::GRBCAT),
       _record_number(0), _id(0),
       _time_def(-1),
       _observatory(-1),
@@ -59,6 +59,8 @@ public:
   const type::String& getLocalNotes() const { return _local_notes; }
   const type::Integer& getClassId() const { return _class_id; }
 
+  bool isValid();
+
 protected:
   type::Flag* getFlag(type::ColumnType column);
   type::Integer* getInteger(type::ColumnType column);
@@ -72,8 +74,6 @@ protected:
   mapper::NameMapper* getMapper(type::ColumnType column);
 
   void setUnitType(type::ColumnType column, type::UnitType unitType);
-
-  bool isValid();
 
 private:
   type::Integer _record_number;

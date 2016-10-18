@@ -6,12 +6,12 @@ namespace testing
 {
 
 class CatalogEntryFactoryTest :
-    public FactoryTestFixturesBase<grb::type::CatalogEntryType, grb::CatalogEntry, grb::factory::CatalogEntryFactory>
+    public FactoryTestFixturesBase<grb::type::CatalogType, grb::CatalogEntry, grb::factory::CatalogEntryFactory>
 {
 protected:
   void SetUp()
   {
-    _invalidType = grb::type::UNDEFINED_CATALOG_ENTRY;
+    _invalidType = grb::type::UNDEFINED_CATALOG;
     _invalidName = "undefined-command";
   }
 };
@@ -25,14 +25,14 @@ namespace testing
 
 TEST_F(CatalogEntryFactoryTest, createName_CatalogEntryGrbcat)
 {
-  _validType = grb::type::GRBCAT_ENTRY;
-  _validName = "grbcat-entry";
+  _validType = grb::type::GRBCAT;
+  _validName = "grbcat";
   callCreateName();
 }
 
 TEST_F(CatalogEntryFactoryTest, createType_CatalogEntryGrbcat)
 {
-  _validType = grb::type::GRBCAT_ENTRY;
+  _validType = grb::type::GRBCAT;
   callCreateType();
 }
 

@@ -5,7 +5,7 @@ namespace
 
 static std::vector<std::string> CORRELATION_NAMES
 {
-  "correlation-grbcat-dtdarc",
+  "dtdarc",
 
   // LAST
   "undefined-correlation"

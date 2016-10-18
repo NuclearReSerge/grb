@@ -1,6 +1,6 @@
 #include "Common/Mapper.h"
-#include "Data/CatalogEntryType.h"
+#include "Data/CatalogType.h"
 
 #pragma once
 
-MAPPER_CLASS_H(CatalogEntryMapper, type::CatalogEntryType)
+MAPPER_CLASS_H(CatalogEntryMapper, type::CatalogType)

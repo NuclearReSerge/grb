@@ -1,5 +1,5 @@
 #include "Data/CatalogEntry.h"
-#include "Data/CatalogEntryType.h"
+#include "Data/CatalogType.h"
 
 #include <vector>
 
@@ -11,7 +11,7 @@ namespace grb
 class Catalog
 {
 public:
-  Catalog(const type::CatalogEntryType& type = type::UNDEFINED_CATALOG_ENTRY)
+  Catalog(const type::CatalogType& type = type::UNDEFINED_CATALOG)
     : _type(type)
   {
   }
@@ -21,7 +21,7 @@ public:
     clear();
   }
 
-  type::CatalogEntryType getType() const
+  type::CatalogType getType() const
   {
     return _type;
   }
@@ -54,7 +54,7 @@ public:
 
 private:
   std::vector<CatalogEntry*> _catalog;
-  type::CatalogEntryType _type;
+  type::CatalogType _type;
 
 };
 

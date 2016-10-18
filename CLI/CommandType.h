@@ -7,6 +7,7 @@ namespace type
 
 enum CommandType
 {
+  CMD_UNAVAILABLE,
   CMD_EXIT,
   CMD_QUIT,
   CMD_HELP,

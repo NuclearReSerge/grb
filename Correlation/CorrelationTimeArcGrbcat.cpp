@@ -178,7 +178,7 @@ CorrelationTimeArcGrbcat::save(const std::string& filename)
 bool
 CorrelationTimeArcGrbcat::checkCatalog(Catalog& catalog)
 {
-  if (catalog.getType() != type::GRBCAT_ENTRY)
+  if (catalog.getType() != type::GRBCAT)
   {
     return false;
   }

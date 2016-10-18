@@ -38,9 +38,7 @@ TEST_F(ParserFileTest, file_Grbcat)
 {
   std::string filename = "heasarc_grbcat_test.tdat";
   grb::type::DatabaseFormatType formatType = grb::type::HEASARC_GRBCAT;
-  grb::type::CatalogEntryType entryType = grb::type::GRBCAT_ENTRY;
-
-  grb::DataBaseFormat* format = grb::DataBaseFormatFactory::instance()->createType(formatType);
+  grb::type::CatalogTypeyType = grb::type::GRBCATrb::DataBaseFormat* format = grb::DataBaseFormatFactory::instance()->createType(formatType);
   grb::Catalog catalog(entryType);
   std::size_t rows = 0;
 

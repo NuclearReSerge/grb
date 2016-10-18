@@ -5,9 +5,9 @@ namespace
 
 const std::vector<std::string> CATALOG_ENTRY_NAMES
 {
-  "grbcat-entry",
+  "grbcat",
   // LAST
-  "undefined-catalog-entry"
+  "undefined-catalog"
 };
 
 } // namespace

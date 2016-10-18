@@ -47,7 +47,7 @@ CmdModel::doParse(std::list<std::string>& tokens)
 {
   if (tokens.empty())
   {
-    Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
+    Exception exc(type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX,
                   help(type::HELP_LONG), PRETTY_FUNCTION);
     throw exc;
   }
@@ -62,8 +62,9 @@ CmdModel::doParse(std::list<std::string>& tokens)
     std::stringstream ss;
     errorHeader(ss);
     ss << "Received unknown subcommand " << tokens.front();
-    Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
+    Exception exc(type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX,
                   ss.str(), PRETTY_FUNCTION);
+    throw exc;
   }
 
   switch (_subCmd)
@@ -99,20 +100,25 @@ CmdModel::doExecute()
     case type::MODEL_CREATE:
     {
       executeCreate();
-      break;
+      return;
     }
     case type::MODEL_GENERATE:
     {
       executeGenerate();
-      break;
+      return;
     }
     case type::MODEL_HELP:
     {
       executeHelp();
-      break;
+      return;
     }
     default:
       break;
+  }
+
+  if (AnalysisData::instance()->getModel())
+  {
+    return AnalysisData::instance()->getModel()->execute(_subCmd);
   }
 }
 
@@ -144,7 +150,7 @@ CmdModel::parseCreate(std::list<std::string>& tokens)
     ss << "Previous model "
        << ModelMapper::instance()->getKey(AnalysisData::instance()->getModel()->getType())
        << " already exists.";
-    Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
+    Exception exc(type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX,
                   ss.str(), PRETTY_FUNCTION);
     throw exc;
   }
@@ -154,7 +160,7 @@ CmdModel::parseCreate(std::list<std::string>& tokens)
     std::stringstream ss;
     errorHeader(ss, type::MODEL_CREATE);
     ss << "Arguments required.";
-    Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
+    Exception exc(type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX,
                   ss.str(), PRETTY_FUNCTION);
     throw exc;
   }
@@ -169,7 +175,7 @@ CmdModel::parseCreate(std::list<std::string>& tokens)
     std::stringstream ss;
     errorHeader(ss, type::MODEL_CREATE);
     ss << "Unknown model " << tokens.front();
-    Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
+    Exception exc(type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX,
                   ss.str(), PRETTY_FUNCTION);
   }
 
@@ -194,7 +200,7 @@ CmdModel::parseHelp(std::list<std::string>& tokens)
     std::stringstream ss;
     errorHeader(ss, type::MODEL_HELP);
     ss << "Arguments required.";
-    Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
+    Exception exc(type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX,
                   ss.str(), PRETTY_FUNCTION);
     throw exc;
   }
@@ -209,7 +215,7 @@ CmdModel::parseHelp(std::list<std::string>& tokens)
     std::stringstream ss;
     errorHeader(ss, type::MODEL_HELP);
     ss << "Unknown model " << tokens.front();
-    Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
+    Exception exc(type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX,
                   ss.str(), PRETTY_FUNCTION);
   }
   return true;
@@ -224,7 +230,7 @@ CmdModel::executeCreate()
     std::stringstream ss;
     errorHeader(ss, type::MODEL_CREATE);
     ss << "Model " << ModelMapper::instance()->getKey(_modelType) << " not created.";
-    Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
+    Exception exc(type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX,
                   ss.str(), PRETTY_FUNCTION);
     throw exc;
   }
@@ -240,7 +246,7 @@ CmdModel::executeGenerate()
     std::stringstream ss;
     errorHeader(ss, _subCmd);
     ss << "Create a model first.";
-    Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
+    Exception exc(type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX,
                   ss.str(), PRETTY_FUNCTION);
     throw exc;
   }
@@ -251,7 +257,7 @@ CmdModel::executeGenerate()
     std::stringstream ss;
     errorHeader(ss, type::MODEL_GENERATE);
     ss << "Model is not configured.";
-    Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
+    Exception exc(type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX,
                   ss.str(), PRETTY_FUNCTION);
     throw exc;
   }
@@ -261,7 +267,7 @@ CmdModel::executeGenerate()
     std::stringstream ss;
     errorHeader(ss, type::MODEL_GENERATE);
     ss << "Noting to model. Provide a databse first.";
-    Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
+    Exception exc(type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX,
                   ss.str(), PRETTY_FUNCTION);
     throw exc;
   }
@@ -275,23 +281,25 @@ void
 CmdModel::executeHelp()
 {
   std::stringstream ss;
-  Model* model = nullptr;
 
   if (AnalysisData::instance()->getModel())
   {
-    model = AnalysisData::instance()->getModel();
-    ss << model->help();
+    ss << AnalysisData::instance()->getModel()->help();
   }
   else
   {
-    model = ModelFactory::instance()->createType(_modelType);
+    Model* model = ModelFactory::instance()->createType(_modelType);
     if (model)
     {
       ss << model->help();
       delete model;
     }
+    else
+    {
+      return;
+    }
   }
-  Exception exc((type::ExceptionLevel) (type::EXCEPTION_LOW + type::EXCEPTION_MOD_NO_PREFIX),
+  Exception exc(type::EXCEPTION_LOW + type::EXCEPTION_MOD_NO_PREFIX,
                 ss.str(), PRETTY_FUNCTION);
   throw exc;
 }

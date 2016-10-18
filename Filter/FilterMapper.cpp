@@ -5,7 +5,7 @@ namespace
 
 const std::vector<std::string> FILTER_NAMES
 {
-  "filter-none",
+  "none",
 
   // LAST
   "undefined-filter"

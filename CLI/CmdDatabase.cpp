@@ -2,10 +2,10 @@
 
 #include "CLI/CommandMapper.h"
 #include "Data/Catalog.h"
-#include "Data/CatalogEntryType.h"
+#include "Data/CatalogType.h"
 #include "Data/DataBaseFormatFactory.h"
 #include "Main/AnalysisData.h"
-#include "Tools/Parser.h"
+#include "Tools/ParserDatabase.h"
 
 #include <iostream>
 #include <sstream>
@@ -26,32 +26,14 @@ const char* HELP_LONG = "[<DB_FILE>]\n"
 namespace grb
 {
 
-type::CatalogEntryType
-convertDataBaseFormat(type::DataBaseFormatType dbType)
-{
-  switch (dbType)
-  {
-    case type::HEASARC_GRBCAT:
-      return type::GRBCAT_ENTRY;
-
-    case type::HEASARC_GRBCATAG:
-    case type::HEASARC_GRBCATANN:
-    case type::HEASARC_GRBCATBOX:
-    case type::HEASARC_GRBCATCIRC:
-    case type::HEASARC_GRBCATDUAL:
-    case type::HEASARC_GRBCATFLUX:
-    case type::HEASARC_GRBCATINT:
-    case type::HEASARC_GRBCATINTA:
-    case type::HEASARC_GRBCATIRR:
-    default:
-      break;
-  }
-  return type::UNDEFINED_CATALOG_ENTRY;
-}
-
 CmdDatabase::CmdDatabase()
   : Cmd(type::CMD_DATABASE)
 {
+}
+
+CmdDatabase::~CmdDatabase()
+{
+  delete _format;
 }
 
 bool
@@ -75,58 +57,85 @@ CmdDatabase::doParse(std::list<std::string>& tokens)
   }
   tokens.pop_front();
 
+  _format = getDbFormat(_dbType);
+
+  if (!_format)
+  {
+    std::stringstream ss;
+    ss << "Error while executing command " << CommandMapper::instance()->getKey(getType())
+       << ". Database format for file " << _dbFilename << " unavailable.";
+    Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
+                  ss.str(), PRETTY_FUNCTION);
+    throw exc;
+  }
+
+  std::cout << "Database table: "
+            << DataBaseFormatMapper::instance()->getKey(_dbType).c_str() << std::endl;
+
   return true;
 }
 
 void
 CmdDatabase::doExecute()
 {
-  DataBaseFormat* dbFormat = DataBaseFormatFactory::instance()->createName(_dbFile);
+  Catalog* catalog = getCatalog(_dbType);
 
-  if (!dbFormat)
+  if (!catalog)
   {
     std::stringstream ss;
     ss << "Error while executing command " << CommandMapper::instance()->getKey(getType())
-       << ". Database format for file " << _dbFile << " unavailable.";
-    Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
+       << ". Catalog not created.";
+    Exception exc(type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX,
                   ss.str(), PRETTY_FUNCTION);
     throw exc;
   }
 
-  type::DataBaseFormatType dbType = dbFormat->getType();
-  std::printf("Database table: %s\n",
-              DataBaseFormatMapper::instance()->getKey(dbType).c_str());
+  Parser* parser = getParser(*_format, *catalog);
 
-  type::CatalogEntryType catType = convertDataBaseFormat(dbType);
-
-  if (catType == type::UNDEFINED_CATALOG_ENTRY)
+  if (!parser)
   {
+    delete catalog;
+
     std::stringstream ss;
     ss << "Error while executing command " << CommandMapper::instance()->getKey(getType())
-       << ". Catalog for database format " << DataBaseFormatMapper::instance()->getKey(dbType)
-       << " unavailable.";
-    Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
+       << ". Parser not created.";
+    Exception exc(type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX,
                   ss.str(), PRETTY_FUNCTION);
     throw exc;
   }
 
-  Catalog* catalog = new Catalog(catType);
+  bool result = false;
+  std::size_t rows = 0;
 
-  std::size_t rows;
   try
   {
-    Parser parser(_dbFilename, *dbFormat, *catalog);
-    rows = parser.parse();
+    result = parser->parse();
+    rows = parser->getNumberOfRows();
+    delete parser;
   }
   catch (grb::Exception& parseExc)
   {
+    delete catalog;
+    delete parser;
+
     std::stringstream ss;
     ss << "Error while executing command " << CommandMapper::instance()->getKey(getType())
-       << ". Parser exception." << std::endl << parseExc.what();
-    Exception exc(parseExc.getLevel(), ss.str(), PRETTY_FUNCTION);
+       << ". Parser exception." << std::endl
+       << parseExc.what();
+    Exception exc(parseExc.getLevel() | type::EXCEPTION_MOD_NO_PREFIX,
+                  ss.str(), PRETTY_FUNCTION);
     throw exc;
   }
-  std::cout << "Parsing of database successful. Extraced " << rows << " rows." << std::endl;
+
+  if (!result)
+  {
+    std::cout << "Parsing of database failed. Extraced "
+              << rows << " rows." << std::endl;
+    return;
+  }
+
+  std::cout << "Parsing of database successful. Extraced "
+            << rows << " rows." << std::endl;
 
   AnalysisData::instance()->setCatalogData(catalog);
 }
@@ -149,6 +158,37 @@ CmdDatabase::doHelp(type::CommandHelpType type)
   return ss.str();
 }
 
+DataBaseFormat*
+CmdDatabase::getDbFormat(const type::DataBaseFormatType& dbType)
+{
+  return DataBaseFormatFactory::instance()->createType(dbType);
+}
+
+Catalog*
+CmdDatabase::getCatalog(type::DataBaseFormatType dbType)
+{
+  type::CatalogType catType = convertDataBaseFormat(dbType);
+
+  if (catType == type::UNDEFINED_CATALOG)
+  {
+    std::stringstream ss;
+    ss << "Error while executing command " << CommandMapper::instance()->getKey(getType())
+       << ". Catalog for database format " << DataBaseFormatMapper::instance()->getKey(_dbType)
+       << " unavailable.";
+    Exception exc(type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX,
+                  ss.str(), PRETTY_FUNCTION);
+    throw exc;
+  }
+
+  return new Catalog(catType);
+}
+
+Parser*
+CmdDatabase::getParser(DataBaseFormat& dbFormat, Catalog& catalog)
+{
+  return new ParserDatabase(_dbFilename, dbFormat, catalog);
+}
+
 bool
 CmdDatabase::filenameMapping(const std::string& filename)
 {
@@ -160,14 +200,42 @@ CmdDatabase::filenameMapping(const std::string& filename)
   if (fileext.compare(TDAT_FILE_EXT) != 0)
     return false;
 
-  _dbFile = filename.substr(0, pos);
+  try
+  {
+    _dbType =  DataBaseFormatMapper::instance()->getValue(filename.substr(0, pos));
+  }
+  catch (Exception& )
+  {
+    return false;
+  }
+
   _dbFilename = filename;
-
-  std::printf("File:           %s\n",
-              _dbFilename.c_str());
-
+  std::cout << "File:           " << _dbFilename.c_str() << std::endl;
 
   return true;
+}
+
+type::CatalogType
+CmdDatabase::convertDataBaseFormat(type::DataBaseFormatType dbType)
+{
+  switch (dbType)
+  {
+    case type::HEASARC_GRBCAT:
+      return type::GRBCAT;
+
+    case type::HEASARC_GRBCATAG:
+    case type::HEASARC_GRBCATANN:
+    case type::HEASARC_GRBCATBOX:
+    case type::HEASARC_GRBCATCIRC:
+    case type::HEASARC_GRBCATDUAL:
+    case type::HEASARC_GRBCATFLUX:
+    case type::HEASARC_GRBCATINT:
+    case type::HEASARC_GRBCATINTA:
+    case type::HEASARC_GRBCATIRR:
+    default:
+      break;
+  }
+  return type::UNDEFINED_CATALOG;
 }
 
 } // namespace grb

@@ -70,61 +70,28 @@ TEST_F(ModelTest, setNumberOfEntries)
   ASSERT_EQ(entries, _model.getNumberOfEntries());
 }
 
-TEST_F(ModelTest, parseCreate_Positive)
+TEST_F(ModelTest, parseCreate)
 {
-  EXPECT_CALL(_model, doParse(_,_))
-      .Times(1)
-      .WillOnce(Invoke(this, &ModelTest::doParseTrue));
-
-  ASSERT_NO_THROW(_result = _model.parse(grb::type::MODEL_CREATE, _args));
-
-  ASSERT_TRUE(_result);
-  ASSERT_NE(0, _args.size());
-}
-
-TEST_F(ModelTest, parseCreate_Negative)
-{
-  EXPECT_CALL(_model, doParse(_, _))
-      .Times(1)
-      .WillOnce(Invoke(this, &ModelTest::doParseFalse));
-
   ASSERT_NO_THROW(_result = _model.parse(grb::type::MODEL_CREATE, _args));
 
   ASSERT_FALSE(_result);
-  ASSERT_NE(0, _args.size());
+  ASSERT_FALSE(_args.empty());
 }
 
-TEST_F(ModelTest, parseHelp_Positive)
+TEST_F(ModelTest, parseHelp)
 {
-  EXPECT_CALL(_model, doParse(_, _))
-      .Times(1)
-      .WillOnce(Invoke(this, &ModelTest::doParseTrue));
-
   ASSERT_NO_THROW(_result = _model.parse(grb::type::MODEL_HELP, _args));
 
-  ASSERT_TRUE(_result);
-  ASSERT_NE(0, _args.size());
-}
-
-TEST_F(ModelTest, parseHelp_Negative)
-{
-  EXPECT_CALL(_model, doParse(_, _))
-      .Times(1)
-      .WillOnce(Invoke(this, &ModelTest::doParseFalse));
-
-  ASSERT_NO_THROW(_result = _model.parse(grb::type::MODEL_HELP, _args));
   ASSERT_FALSE(_result);
-  ASSERT_NE(0, _args.size());
+  ASSERT_FALSE(_args.empty());
 }
 
-TEST_F(ModelTest, parseGenerate_Positive)
+TEST_F(ModelTest, parseGenerate)
 {
-  EXPECT_CALL(_model, doParse(_, _))
-      .Times(0);
-
   ASSERT_NO_THROW(_result = _model.parse(grb::type::MODEL_GENERATE, _args));
-  ASSERT_TRUE(_result);
-  ASSERT_EQ(0, _args.size());
+
+  ASSERT_FALSE(_result);
+  ASSERT_FALSE(_args.empty());
 }
 
 TEST_F(ModelTest, parseUndefinedModelCmd_Negative)
@@ -141,13 +108,21 @@ TEST_F(ModelTest, parseUndefinedModelCmd_Negative)
 
 TEST_F(ModelTest, generate)
 {
-  grb::CatalogMock catalog(grb::type::UNDEFINED_CATALOG_ENTRY);
-
+  grb::CatalogMock catalog(grb::type::UNDEFINED_CATALOG);
   EXPECT_CALL(_model, doGenerate(_))
       .Times(1);
 
   _model.generate(catalog);
 }
+
+TEST_F(ModelTest, execute)
+{
+  EXPECT_CALL(_model, doExecute(_))
+      .Times(1);
+
+  _model.execute(grb::type::UNDEFINED_MODEL_CMD);
+}
+
 
 TEST_F(ModelTest, help)
 {

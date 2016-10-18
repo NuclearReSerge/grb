@@ -24,6 +24,7 @@ protected:
   }
 
   grb::type::ExceptionLevel _level;
+  uint8_t _levelNumeric;
   std::string _what;
 };
 
@@ -33,6 +34,16 @@ TEST_F(ExceptionTest, noLevel_no_Message_no_Function)
 
   grb::Exception exc;
   ASSERT_EQ(grb::type::EXCEPTION_MASK, exc.getLevel());
+  ASSERT_STREQ("", exc.what());
+  printWhat(exc);
+}
+
+TEST_F(ExceptionTest, NumericLevel_no_Message_no_Function)
+{
+  _levelNumeric = grb::type::EXCEPTION_MOD_NO_PREFIX + grb::type::EXCEPTION_LOW;
+
+  grb::Exception exc(_levelNumeric);
+  ASSERT_EQ(grb::type::EXCEPTION_LOW, exc.getLevel());
   ASSERT_STREQ("", exc.what());
   printWhat(exc);
 }

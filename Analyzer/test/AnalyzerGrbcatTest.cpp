@@ -25,12 +25,8 @@ public:
 protected:
   void SetUp()
   {
-    grb::AnalysisData::instance()->setCatalogData(
-          new grb::CatalogMock(grb::type::GRBCAT_ENTRY));
-
-    grb::AnalysisData::instance()->setCatalogModel(
-          new grb::CatalogMock(grb::type::GRBCAT_ENTRY));
-
+    grb::AnalysisData::instance()->setCatalogData(new grb::CatalogMock(grb::type::GRBCAT));
+    grb::AnalysisData::instance()->setCatalogModel(new grb::CatalogMock(grb::type::GRBCAT));
     grb::AnalysisData::instance()->setCorrelation(
           new grb::CorrelationMock(grb::type::CORRELATION_GRBCAT_DTDARC));
   }
@@ -140,9 +136,9 @@ TEST_F(AnalyzerGrbcatTest, wrongAnalysisData)
   _tokens.push_back("set");
   _tokens.push_back("dummy");
   grb::AnalysisData::instance()->setCatalogData(
-        new grb::CatalogMock(grb::type::UNDEFINED_CATALOG_ENTRY));
+        new grb::CatalogMock(grb::type::UNDEFINED_CATALOG));
   grb::AnalysisData::instance()->setCatalogModel(
-        new grb::CatalogMock(grb::type::UNDEFINED_CATALOG_ENTRY));
+        new grb::CatalogMock(grb::type::UNDEFINED_CATALOG));
   grb::AnalysisData::instance()->setCorrelation(
         new grb::CorrelationMock(grb::type::UNDEFINED_CORRELATION));
 
@@ -156,8 +152,7 @@ TEST_F(AnalyzerGrbcatTest, wrongCatalogData)
   _tokens.push_back("set");
   _tokens.push_back("dummy");
   grb::AnalysisData::instance()->setCatalogData(
-        new grb::CatalogMock(grb::type::UNDEFINED_CATALOG_ENTRY));
-
+        new grb::CatalogMock(grb::type::UNDEFINED_CATALOG));
   callParseAndExecute();
 
   ASSERT_TRUE(_thrown);
@@ -168,8 +163,7 @@ TEST_F(AnalyzerGrbcatTest, wrongCatalogModel)
   _tokens.push_back("set");
   _tokens.push_back("dummy");
   grb::AnalysisData::instance()->setCatalogModel(
-        new grb::CatalogMock(grb::type::UNDEFINED_CATALOG_ENTRY));
-
+        new grb::CatalogMock(grb::type::UNDEFINED_CATALOG));
   callParseAndExecute();
 
   ASSERT_TRUE(_thrown);

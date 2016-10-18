@@ -5,7 +5,9 @@ CONFIG -= qt
 
 TARGET  = grb_ut
 
-DEFINES += GRB_VERSION="0.2" TEST_PRINT_EXC
+DEFINES += \
+    GRB_VERSION="0.2" \
+    TEST_PRINT_EXC
 
 QMAKE_CXXFLAGS = -std=c++11 -O0 -Wextra -Werror -Wpedantic -fPIC -fprofile-arcs -ftest-coverage --coverage
 
@@ -15,7 +17,7 @@ QMAKE_LIBS = -lgtest -lgmock -pthread -fprofile-arcs --coverage
 
 #make -j4 && ./grb_ut && lcov --no-external --capture -d . -d ../../grb -o coverage.info && genhtml coverage.info --output-directory out
 
-HEADERS += \
+HEADERS_UT_MOCK += \
     test/Mock/AnalyzerMock.h \
     test/Mock/CatalogEntryMock.h \
     test/Mock/CatalogMock.h \
@@ -25,24 +27,30 @@ HEADERS += \
     test/Mock/DataBaseFormatMock.h \
     test/Mock/FactoryMock.h \
     test/Mock/FactoryTestFixtures.h \
+    test/Mock/FilterMock.h \
     test/Mock/MapperMock.h \
     test/Mock/MapperTestFixtures.h \
     test/Mock/ModelMock.h \
     test/Mock/MockHelper.h \
     test/Mock/NameMapperMock.h \
-    test/Mock/NameMapperTestFixtures.h
+    test/Mock/NameMapperTestFixtures.h \
+    test/Mock/ParserMock.h
 
-HEADERS += \
-    test/UnitTest/Data/test/CatalogEntryMockSample.h
+#HEADERS += \
+#    test/UnitTest/Data/test/CatalogEntryMockSample.h
 
-SOURCES += \
+SOURCES_UT_MOCK += \
     test/Mock/MockHelper.cpp \
+
+SOURCES_UT_ANALYSER += \
     test/UnitTest/Analyzer/test/AnalyzerCmdMapperTest.cpp \
     test/UnitTest/Analyzer/test/AnalyzerFactoryTest.cpp \
     test/UnitTest/Analyzer/test/AnalyzerGrbcatTest.cpp \
     test/UnitTest/Analyzer/test/AnalyzerMapperTest.cpp \
-    test/UnitTest/Analyzer/test/AnalyzerTest.cpp \
-    test/UnitTest/CLI/test/CmdAnalysisTest.cpp \
+    test/UnitTest/Analyzer/test/AnalyzerTest.cpp
+
+SOURCES_UT_CLI += \
+    test/UnitTest/CLI/test/CmdAnalyzerTest.cpp \
     test/UnitTest/CLI/test/CmdCorrelationTest.cpp \
     test/UnitTest/CLI/test/CmdDatabaseTest.cpp \
     test/UnitTest/CLI/test/CmdFilterTest.cpp \
@@ -52,14 +60,23 @@ SOURCES += \
     test/UnitTest/CLI/test/CmdTest.cpp \
     test/UnitTest/CLI/test/CommandFactoryTest.cpp \
     test/UnitTest/CLI/test/CommandLineTest.cpp \
-    test/UnitTest/CLI/test/CommandMapperTest.cpp \
+    test/UnitTest/CLI/test/CommandMapperTest.cpp
+
+SOURCES_UT_COMMON += \
     test/UnitTest/Common/test/ExceptionTest.cpp \
     test/UnitTest/Common/test/FactoryTest.cpp \
     test/UnitTest/Common/test/MapperTest.cpp \
-    test/UnitTest/Common/test/SingletonTest.cpp \
+    test/UnitTest/Common/test/SingletonTest.cpp
+
+SOURCES_UT_CORRELATION += \
+    test/UnitTest/Correlation/test/ArcFormulaMapperTest.cpp \
+    test/UnitTest/Correlation/test/CorrelationFactoryTest.cpp \
+    test/UnitTest/Correlation/test/CorrelationMapperTest.cpp \
     test/UnitTest/Correlation/test/CorrelationTest.cpp \
     test/UnitTest/Correlation/test/CorrelationTimeArcGrbcatTest.cpp \
-    test/UnitTest/Correlation/test/GreatCircleDistanceTest.cpp \
+    test/UnitTest/Correlation/test/GreatCircleDistanceTest.cpp
+
+SOURCES_UT_DATA += \
     test/UnitTest/Data/test/CatalogEntryFactoryTest.cpp \
     test/UnitTest/Data/test/CatalogEntryGrbcatTest.cpp \
     test/UnitTest/Data/test/CatalogEntryMapperTest.cpp \
@@ -80,16 +97,52 @@ SOURCES += \
     test/UnitTest/Data/test/TimeDefMapperTest.cpp \
     test/UnitTest/Data/test/TimeModMapperTest.cpp \
     test/UnitTest/Data/test/UnitMapperTest.cpp \
-    test/UnitTest/Data/test/ValueMapperTest.cpp \
+    test/UnitTest/Data/test/ValueMapperTest.cpp
+
+SOURCES_UT_FILTER += \
+    test/UnitTest/Filter/test/FilterFactoryTest.cpp \
+    test/UnitTest/Filter/test/FilterMapperTest.cpp \
+    test/UnitTest/Filter/test/FilterNoneTest.cpp
+
+SOURCES_UT_MAIN += \
+    test/UnitTest/Main/test/AnalysisDataTest.cpp \
+    test/UnitTest/Main/test/InitTest.cpp
+
+SOURCES_UT_MODEL += \
     test/UnitTest/Model/test/IsotropicBallModelTest.cpp \
     test/UnitTest/Model/test/IsotropicSphereModelTest.cpp \
-    test/UnitTest/Model/test/ModelTest.cpp \
-    test/UnitTest/Tools/test/NameMapperTest.cpp
+    test/UnitTest/Model/test/ModelCmdMapperTest.cpp \
+    test/UnitTest/Model/test/ModelFactoryTest.cpp \
+    test/UnitTest/Model/test/ModelMapperTest.cpp \
+    test/UnitTest/Model/test/ModelTest.cpp
+
+SOURCES_UT_TOOLS += \
+    test/UnitTest/Tools/test/ConvertSpaceTimeTest.cpp \
+    test/UnitTest/Tools/test/NameMapperTest.cpp \
+#    test/UnitTest/Tools/test/ParserDatabaseTest.cpp \
 #    test/UnitTest/Tools/test/ParserFileTest.cpp \
-#    test/UnitTest/Tools/test/ParserTest.cpp
+    test/UnitTest/Tools/test/ParserTest.cpp \
+    test/UnitTest/Tools/test/SyntaxVerifierTest.cpp\
 
 SOURCES += \
-    test/UnitTests.cpp
+    test/UnitTests.cpp \
+    $${SOURCES_UT_MOCK} \
+                                    #   +---------------------------+---------------------------+
+                                    #   |   Line Coverage           |   Functions               |
+                                    #   +---------------------------+---------------------------+
+    $${SOURCES_UT_ANALYSER} \       #   | 100.0 %        194 /  194 |  95.5 %         42 /   44 |
+    $${SOURCES_UT_CLI} \            #   | 100.0 %        516 /  516 |  98.1 %        104 /  106 |
+    $${SOURCES_UT_COMMON} \         #   |  94.0 %         63 /   67 |  19.9 %         33 /  166 |
+    $${SOURCES_UT_CORRELATION} \    #   |  40.5 %         87 /  215 |  71.1 %         32 /   45 |
+    $${SOURCES_UT_DATA} \           #   |  91.3 %        432 /  473 |  86.8 %        203 /  234 |
+    $${SOURCES_UT_FILTER} \         #   | 100.0 %         24 /   24 |  89.5 %         17 /   19 |
+    $${SOURCES_UT_MAIN} \           #   | 100.0 %         52 /   52 | 100.0 %         17 /   17 |
+    $${SOURCES_UT_MODEL} \          #   |  97.4 %        191 /  196 |  96.5 %         55 /   57 |
+    $${SOURCES_UT_TOOLS} \          #   |   9.2 %         28 /  306 |  28.2 %         11 /   39 |
+                                    #   +---------------------------+---------------------------+
+
+HEADERS += \
+    $${HEADERS_UT_MOCK}
 
 HEADERS += \
     Analyzer/Analyzer.h \
@@ -130,7 +183,7 @@ HEADERS += \
     Data/CatalogEntryFactory.h \
     Data/CatalogEntryGrbcat.h \
     Data/CatalogEntryMapper.h \
-    Data/CatalogEntryType.h \
+    Data/CatalogType.h \
     Data/ColumnMapper.h \
     Data/ColumnType.h \
     Data/Coordinates.h \
@@ -161,6 +214,7 @@ HEADERS += \
     Filter/FilterNone.h \
     Filter/FilterType.h \
     Main/AnalysisData.h \
+    Main/Init.h \
     Model/IsotropicBallModel.h \
     Model/IsotropicSphereModel.h \
     Model/Model.h \
@@ -171,7 +225,10 @@ HEADERS += \
     Model/ModelType.h \
     Tools/ConvertSpaceTime.h \
     Tools/NameMapper.h \
-    Tools/Parser.h
+    Tools/Parser.h \
+    Tools/ParserDatabase.h \
+    Tools/SyntaxVerifier.h
+
 
 SOURCES += \
     Analyzer/Analyzer.cpp \
@@ -228,7 +285,8 @@ SOURCES += \
     Model/ModelMapper.cpp \
     Tools/ConvertSpaceTime.cpp \
     Tools/NameMapper.cpp \
-    Tools/Parser.cpp
+    Tools/ParserDatabase.cpp \
+    Tools/SyntaxVerifier.cpp \
 
 DISTFILES += \
     test/UnitTest/Tools/test/heasarc_grbcat_test.tdat

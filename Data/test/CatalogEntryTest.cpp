@@ -10,7 +10,7 @@ class CatalogEntryTest : public Test
 protected:
   void SetUp()
   {
-    _entry = new grb::CatalogEntryMock(grb::type::UNDEFINED_CATALOG_ENTRY);
+    _entry = new grb::CatalogEntryMock(grb::type::UNDEFINED_CATALOG);
   }
   void TearDown()
   {
@@ -22,7 +22,7 @@ protected:
 
 TEST_F(CatalogEntryTest, init)
 {
-  ASSERT_EQ(grb::type::UNDEFINED_CATALOG_ENTRY, _entry->getType());
+  ASSERT_EQ(grb::type::UNDEFINED_CATALOG, _entry->getType());
 }
 
 } // namespace testing

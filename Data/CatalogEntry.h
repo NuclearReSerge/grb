@@ -1,5 +1,5 @@
 #include "Common/Global.h"
-#include "Data/CatalogEntryType.h"
+#include "Data/CatalogType.h"
 #include "Data/ColumnType.h"
 #include "Data/UnitType.h"
 
@@ -17,20 +17,22 @@ class NameMapper;
 class CatalogEntry
 {
 public:
-  CatalogEntry(type::CatalogEntryType type = type::UNDEFINED_CATALOG_ENTRY)
+  CatalogEntry(type::CatalogType type = type::UNDEFINED_CATALOG)
     : _type(type)
   {
   }
 
   virtual ~CatalogEntry() = default;
 
-  type::CatalogEntryType getType() const
+  type::CatalogType getType() const
   {
     return _type;
   }
 
+  virtual bool isValid() = 0;
+
 protected:
-  friend class Parser;
+  friend class ParserDatabase;
 
   virtual type::Flag* getFlag(type::ColumnType column) = 0;
   virtual type::Integer* getInteger(type::ColumnType column) = 0;
@@ -45,10 +47,8 @@ protected:
 
   virtual void setUnitType(type::ColumnType column, type::UnitType unitType) = 0;
 
-  virtual bool isValid() = 0;
-
 private:
-  type::CatalogEntryType _type;
+  type::CatalogType _type;
 };
 
 } // namespace grb

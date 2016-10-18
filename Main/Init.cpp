@@ -1,5 +1,6 @@
+#include "Main/Init.h"
+
 #include <cstdio>
-#include <string>
 
 namespace grb
 {
@@ -12,7 +13,7 @@ const char* PROGRAM_NAME = "Gamma-Ray Burst Correlation Analyzer";
 } // namespace
 
 void
-intro()
+Init::intro()
 {
   std::printf("*%s*\n*%78s*\n* %s ver. %2.2f%s%30s*\n*%78s*\n*%s*\n\n",
               LINE_78_ASTER,
@@ -23,7 +24,7 @@ intro()
 }
 
 void
-usage(const std::string& binaryName)
+Init::usage(const std::string& binaryName)
 {
   std::printf("Usage: %s <DB_FILE_NAME>.tdat\n\n\t<DB_FILE_NAME> : name corresponding to database "
               "table name form dbms1.gsfc.nasa.gov\n\n",

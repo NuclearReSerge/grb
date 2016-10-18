@@ -230,8 +230,8 @@ AnalyzerGrbcat::checkAnalyzerDataIsValid()
   const Catalog* catalogModel = AnalysisData::instance()->getCatalogModel();
   const Correlation* correlation = AnalysisData::instance()->getCorrelation();
 
-  if (catalogData->getType() == type::GRBCAT_ENTRY &&
-      catalogModel->getType() == type::GRBCAT_ENTRY &&
+  if (catalogData->getType() == type::GRBCAT &&
+      catalogModel->getType() == type::GRBCAT &&
       correlation->getType() == type::CORRELATION_GRBCAT_DTDARC)
   {
     return;
@@ -240,13 +240,13 @@ AnalyzerGrbcat::checkAnalyzerDataIsValid()
   std::stringstream ss;
   ss << "AnalyzerGrbcat input verification failure. ";
 
-  if (catalogData->getType() != type::GRBCAT_ENTRY ||
-           catalogModel->getType() != type::GRBCAT_ENTRY ||
+  if (catalogData->getType() != type::GRBCAT ||
+           catalogModel->getType() != type::GRBCAT ||
            correlation->getType() != type::CORRELATION_GRBCAT_DTDARC)
   {
     ss << "Wrong type of { "
-       << (catalogData->getType() == type::GRBCAT_ENTRY ? "" : "database ")
-       << (catalogModel->getType() == type::GRBCAT_ENTRY ? "" : "model ")
+       << (catalogData->getType() == type::GRBCAT ? "" : "database ")
+       << (catalogModel->getType() == type::GRBCAT ? "" : "model ")
        << (correlation->getType() == type::CORRELATION_GRBCAT_DTDARC ? "" : "correlation ")
        << "}";
   }

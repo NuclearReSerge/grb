@@ -10,6 +10,15 @@ class CmdHelp : public Cmd
 public:
   CmdHelp();
 
+  bool showAll() const
+  {
+    return _showAll;
+  }
+  std::string getSpecific() const
+  {
+    return _specific;
+  }
+
 protected:
   bool doParse(std::list<std::string>& tokens);
   void doExecute();

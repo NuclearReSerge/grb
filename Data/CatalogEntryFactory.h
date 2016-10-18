@@ -4,4 +4,4 @@
 
 #pragma once
 
-FACTORY_CLASS_H(CatalogEntryFactory, type::CatalogEntryType, CatalogEntry, CatalogEntryMapper)
+FACTORY_CLASS_H(CatalogEntryFactory, type::CatalogType, CatalogEntry, CatalogEntryMapper)

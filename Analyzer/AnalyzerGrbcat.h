@@ -1,6 +1,6 @@
 #include "Analyzer/Analyzer.h"
 #include "Correlation/CorrelationType.h"
-#include "Data/CatalogEntryType.h"
+#include "Data/CatalogType.h"
 #include "Common/Global.h"
 
 

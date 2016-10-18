@@ -5,12 +5,12 @@ namespace grb
 namespace type
 {
 
-enum CatalogEntryType
+enum CatalogType
 {
-  GRBCAT_ENTRY,
+  GRBCAT,
 
   // LAST
-  UNDEFINED_CATALOG_ENTRY
+  UNDEFINED_CATALOG
 };
 
 } // namespace type

@@ -7,6 +7,7 @@ namespace
 
 const std::vector<std::string> COMMAND_NAMES
 {
+  "",
   "exit",
   "quit",
   "help",

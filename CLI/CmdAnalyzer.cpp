@@ -36,7 +36,7 @@ CmdAnalyzer::doParse(std::list<std::string>& tokens)
     if (!AnalysisData::instance()->getCatalogData())
     {
       std::stringstream ss;
-      ss << "Noting to analyse. Provide a databse first.";
+      ss << "Nothing to analyse. Provide a databse first." << std::endl;
       Exception exc((type::ExceptionLevel) (type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX),
                     ss.str(), PRETTY_FUNCTION);
       throw exc;

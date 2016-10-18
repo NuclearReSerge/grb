@@ -60,18 +60,20 @@ public:
     switch (cmd)
     {
       case type::MODEL_CREATE:
-        break;
       case type::MODEL_HELP:
-        break;
       case type::MODEL_GENERATE:
       {
-        tokens.clear();
-        return true;
+        return false;
       }
       default:
         break;
     }
     return doParse(cmd, tokens);
+  }
+
+  void execute(type::ModelCmdType cmd)
+  {
+    doExecute(cmd);
   }
 
   void generate(Catalog& catalog)
@@ -86,6 +88,7 @@ public:
 
 protected:
   virtual bool doParse(type::ModelCmdType cmd, std::list<std::string>& tokens) = 0;
+  virtual void doExecute(type::ModelCmdType cmd) = 0;
   virtual void doGenerate(Catalog& catalog) = 0;
   virtual std::string doHelp() = 0;
 

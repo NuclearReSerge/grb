@@ -13,6 +13,7 @@ enum ModelCmdType
   MODEL_GENERATE,
   MODEL_HELP,
 
+  MODEL_SET_CATALOG_TYPE,
   // Isotropic
   MODEL_SET_TIME,
   MODEL_SET_RADIUS,

@@ -33,8 +33,8 @@ CmdHelp::doParse(std::list<std::string>& tokens)
   {
     _specific = tokens.front();
     _showAll = false;
+    tokens.pop_front();
   }
-  tokens.clear();
   return true;
 }
 
@@ -49,9 +49,10 @@ CmdHelp::doExecute()
       Cmd* cmd = CommandFactory::instance()->createType((type::CommandType) i);
       if (!cmd)
       {
-        std::cout << "No help for command "
-                  << CommandMapper::instance()->getKey((type::CommandType) i) << std::endl;
-        return;
+        std::cout << "# '"
+                  << CommandMapper::instance()->getKey((type::CommandType) i)
+                  << "' - command unavailable." << std::endl;
+        continue;
       }
       std::cout << cmd->help(type::HELP_SHORT);
       delete cmd;
@@ -62,7 +63,7 @@ CmdHelp::doExecute()
     Cmd* cmd = CommandFactory::instance()->createName(_specific);
     if (!cmd)
     {
-      std::cout << "No help for command " << _specific << " or wrong command name." << std::endl;
+      std::cout << "No help for command '" << _specific << "', wrong command name." << std::endl;
       return;
     }
     std::cout << cmd->help(type::HELP_FULL);

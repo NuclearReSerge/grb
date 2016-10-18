@@ -9,6 +9,13 @@ const std::vector<std::string> MODEL_CMD_NAMES
   "generate",
   "help",
 
+  "set-catalog-type",
+  // Isotropic
+  "set-time",
+  "set-radius",
+  "set-phi",
+  "set-theta",
+
   // LAST
   "undefined-model-command"
 };
