@@ -352,9 +352,9 @@ TEST_F(CmdDatabaseStubTest, getParser_ParserNotCreated)
 
 TEST_F(CmdDatabaseStubTest, getParser_Positive)
 {
-
   std::string filename("heasarc_grbcat.tdat");
   grb::DataBaseFormatMock dbFormat(grb::type::UNDEFINED_DATABASE_FORMAT);
+  dbFormat.getDataTypes().push_back(new grb::DataBaseColumn(grb::type::RECORD_NUMBER));
   grb::CatalogMock catalog(grb::type::UNDEFINED_CATALOG);
   grb::Parser* parser = nullptr;
 

@@ -119,7 +119,7 @@ SOURCES_UT_MODEL += \
 SOURCES_UT_TOOLS += \
     test/UnitTest/Tools/test/ConvertSpaceTimeTest.cpp \
     test/UnitTest/Tools/test/NameMapperTest.cpp \
-#    test/UnitTest/Tools/test/ParserDatabaseTest.cpp \
+    test/UnitTest/Tools/test/ParserDatabaseTest.cpp \
 #    test/UnitTest/Tools/test/ParserFileTest.cpp \
     test/UnitTest/Tools/test/ParserTest.cpp \
     test/UnitTest/Tools/test/SyntaxVerifierTest.cpp\
@@ -138,7 +138,7 @@ SOURCES += \
     $${SOURCES_UT_FILTER} \         #   | 100.0 %         24 /   24 |  89.5 %         17 /   19 |
     $${SOURCES_UT_MAIN} \           #   | 100.0 %         52 /   52 | 100.0 %         17 /   17 |
     $${SOURCES_UT_MODEL} \          #   |  97.4 %        191 /  196 |  96.5 %         55 /   57 |
-    $${SOURCES_UT_TOOLS} \          #   |   9.2 %         28 /  306 |  28.2 %         11 /   39 |
+    $${SOURCES_UT_TOOLS} \          #   |  99.4 %        350 /  352 |  92.7 %         38 /   41 |
                                     #   +---------------------------+---------------------------+
 
 HEADERS += \

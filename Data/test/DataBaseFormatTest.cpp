@@ -38,9 +38,9 @@ TEST_F(DataBaseFormatTest, setColumnFlags)
 {
   grb::DataBaseColumn* column;
 
-  column = new grb::DataBaseColumn(grb::type::RECORD_NUMBER, true, grb::type::NO_UNIT, grb::type::INTEGER);
+  column = new grb::DataBaseColumn(grb::type::RECORD_NUMBER, grb::type::NO_UNIT, grb::type::INTEGER, true);
   _format.addColumn(column);
-  column = new grb::DataBaseColumn(grb::type::NAME, false, grb::type::NO_UNIT, grb::type::STRING);
+  column = new grb::DataBaseColumn(grb::type::NAME, grb::type::NO_UNIT, grb::type::STRING, false);
   _format.addColumn(column);
   _format.setColumnFlags();
 

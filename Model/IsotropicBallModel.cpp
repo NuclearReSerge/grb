@@ -1,9 +1,28 @@
 #include "Model/IsotropicBallModel.h"
 
+#include "Data/CatalogEntryMapper.h"
 #include "Model/ModelCmdMapper.h"
 #include "Model/ModelMapper.h"
 #include "Tools/SyntaxVerifier.h"
 
+namespace
+{
+
+const char* HELP = "\n"
+"<SUB_COMMAND> = set-catalog-type <CATALOG_TYPE> | set-time <RANGE> | set-radius <RANGE> | set-phi <RANGE> | set-theta <RANGE>\n"
+"\n"
+"    set-catalog-type    : set the type of catalog entries that will be generated,\n"
+"    set-time            : set time range,\n"
+"    set-radius          : set radius range,\n"
+"    set-phi             : set phi range (right ascension),\n"
+"    set-theta           : set theta range (declination).\n"
+"\n"
+"    RANGE format : ( min , max ) - whitespace are ignored\n"
+"         Example : (-2.0,10.135)\n"
+"\n"
+"Available CATALOG_TYPE :\n";
+
+} // namespace
 
 namespace grb
 {
@@ -83,7 +102,15 @@ IsotropicBallModel::doExecute(type::ModelCmdType cmd)
 std::string
 IsotropicBallModel::doHelp()
 {
-  return "IsotropicBallModel help";
+  std::stringstream ss;
+  ss << HELP;
+  for(int i = 0; i < type::UNDEFINED_CATALOG; ++i)
+  {
+    ss << "  "
+       << CatalogEntryMapper::instance()->getKey((type::CatalogType) i)
+       << std::endl;
+  }
+  return ss.str();
 }
 
 void

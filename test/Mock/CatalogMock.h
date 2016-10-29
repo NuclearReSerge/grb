@@ -16,7 +16,6 @@ public:
   }
 
   MOCK_METHOD0(createEntry, CatalogEntry*());
-
 };
 
 } // namespace grb

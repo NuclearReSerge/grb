@@ -35,6 +35,11 @@ public:
     return _requiredFlags;
   }
 
+  const std::vector<DataBaseColumn*>& getDataTypes() const
+  {
+    return _format;
+  }
+
   std::vector<DataBaseColumn*>& getDataTypes()
   {
     return _format;

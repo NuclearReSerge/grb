@@ -12,6 +12,8 @@
 #include <sstream>
 #include <fstream>
 
+#include "Common/trace.h"
+
 namespace grb
 {
 
@@ -26,23 +28,27 @@ const char  DELIM_RANGE  = '-';
 
 ParserDatabase::ParserDatabase(const std::string& filename, DataBaseFormat& format,
                                Catalog& catalog)
-  : Parser(), _isSourceFile(false), _stream(nullptr), _column(0),
-    _columnType(type::UNDEFINED_COLUMN), _format(format),
-    _columnsRequired(_format.getRequiredColumns()), _catalog(catalog)
+  : Parser(), _stream(nullptr), _format(format), _catalog(catalog),
+    _columnsRequired(_format.getRequiredColumns()), _isSourceFile(false),  _columnIdx(0),
+    _columnType(type::UNDEFINED_COLUMN), _valueType(type::UNDEFINED_VALUE)
+
 {
   openFileStream(filename);
+  checkFormat();
 }
 
 ParserDatabase::ParserDatabase(std::istream* stream, DataBaseFormat& format, Catalog& catalog)
-  : Parser(), _isSourceFile(false), _stream(stream), _column(0),
-    _columnType(type::UNDEFINED_COLUMN), _format(format),
-    _columnsRequired(_format.getRequiredColumns()), _catalog(catalog)
+  : Parser(), _stream(stream), _format(format), _catalog(catalog),
+    _columnsRequired(_format.getRequiredColumns()), _isSourceFile(false),  _columnIdx(0),
+    _columnType(type::UNDEFINED_COLUMN), _valueType(type::UNDEFINED_VALUE)
 {
   if (!_stream)
   {
-    Exception exc(type::EXCEPTION_CRITICAL, "Parsing failed. Stream is nullptr.", PRETTY_FUNCTION);
+    Exception exc(type::EXCEPTION_CRITICAL,
+                  "Parsing failed. Stream is nullptr.", PRETTY_FUNCTION);
     throw exc;
   }
+  checkFormat();
 }
 
 ParserDatabase::~ParserDatabase()
@@ -64,11 +70,40 @@ ParserDatabase::openFileStream(const std::string& filename)
     delete _stream;
 
     std::stringstream ss;
-    ss << "Parsing failed. Unable to open file=" << filename << ".";
+    ss << "Parsing failed. Unable to open file '" << filename << "'.";
     Exception exc(type::EXCEPTION_CRITICAL, ss.str(), PRETTY_FUNCTION);
     throw exc;
   }
   _isSourceFile = true;
+}
+
+void
+ParserDatabase::checkFormat()
+{
+  if (_format.getDataTypes().empty())
+  {
+    std::stringstream ss;
+    ss << "Parsing failed. Database format '"
+       << DataBaseFormatMapper::instance()->getKey(_format.getType())
+       << "' is undefined.";
+
+    Exception exc(type::EXCEPTION_WARNING, ss.str(), PRETTY_FUNCTION);
+    throw exc;
+  }
+
+  for (const DataBaseColumn* dbCol : _format.getDataTypes())
+  {
+    if (dbCol->getColumnType() == type::UNDEFINED_COLUMN)
+    {
+      std::stringstream ss;
+      ss << "Parsing failed. Database format '"
+         << DataBaseFormatMapper::instance()->getKey(_format.getType())
+         << "' has undefined column type.";
+
+      Exception exc(type::EXCEPTION_WARNING, ss.str(), PRETTY_FUNCTION);
+      throw exc;
+    }
+  }
 }
 
 bool
@@ -87,9 +122,9 @@ ParserDatabase::parse()
     if (!entry)
     {
       std::stringstream ss;
-      ss << "Parsing failed. Catalog of type "
+      ss << "Parsing failed. Catalog of type '"
          << CatalogEntryMapper::instance()->getKey(_catalog.getType())
-         << " creates invalid entries.";
+         << "' creates invalid entries.";
 
       Exception exc(type::EXCEPTION_WARNING, ss.str(), PRETTY_FUNCTION);
       throw exc;
@@ -124,17 +159,26 @@ ParserDatabase::parseLine(const std::string& line, CatalogEntry* entry)
 {
   type::ColumnFlags columnFlags;
   std::stringstream ss(line);
-  _column = 0;
+  _columnIdx = 0;
 
   for (std::string element; std::getline(ss, element, DELIM_COLUMN);)
   {
+    if (_columnIdx >= _format.getDataTypes().size())
+    {
+      std::stringstream ss;
+      ss << "Parsing failed. Row=" << _rows + 1 << ". Line has more columns than expected.";
+      Exception exc(type::EXCEPTION_WARNING, ss.str(), PRETTY_FUNCTION);
+      throw exc;
+    }
+
     element.erase(0, element.find_first_not_of(WHITESPACE));
     element.erase(element.find_last_not_of(WHITESPACE) + 1);
 
     bool result = false;
+    _columnType = type::UNDEFINED_COLUMN;
     try
     {
-      _columnType = _format.getDataTypes()[_column]->getColumnType();
+      _columnType = _format.getDataTypes()[_columnIdx]->getColumnType();
       result = parseMapper(element, entry);
     }
     catch (Exception& grbExc)
@@ -154,7 +198,7 @@ ParserDatabase::parseLine(const std::string& line, CatalogEntry* entry)
       }
     }
     columnFlags.set(_columnType, result);
-    ++_column;
+    ++_columnIdx;
   }
 
   checkColumns(columnFlags);
@@ -172,7 +216,7 @@ void
 ParserDatabase::checkColumns(const type::ColumnFlags& columnFlags)
 {
   const bool allRequired = ((columnFlags & _columnsRequired) ^ _columnsRequired).none();
-  const bool allProcessed = _column == _format.getDataTypes().size();
+  const bool allProcessed = _columnIdx == _format.getDataTypes().size();
 
   if (allProcessed && allRequired)
     return;
@@ -185,7 +229,7 @@ ParserDatabase::checkColumns(const type::ColumnFlags& columnFlags)
     std::size_t i = 0;
     for (const DataBaseColumn* dataType : _format.getDataTypes())
     {
-      if (i++ < _column)
+      if (i++ < _columnIdx)
         continue;
 
       ss << i << " [" << ColumnMapper::instance()->getKey(dataType->getColumnType()) << "] ";
@@ -211,7 +255,7 @@ bool
 ParserDatabase::parseMapper(const std::string& raw, CatalogEntry* entry)
 {
   bool result = false;
-  _valueType = _format.getDataTypes()[_column]->getValueType();
+  _valueType = _format.getDataTypes()[_columnIdx]->getValueType();
 
   switch (_valueType)
   {
@@ -286,6 +330,9 @@ ParserDatabase::parseValue(const std::string& raw, type::Flag* value)
 bool
 ParserDatabase::parseValue(const std::string& raw, type::Integer* value)
 {
+  if (raw.empty())
+    return false;
+
   if (!value)
   {
     Exception exc(type::EXCEPTION_WARNING,
@@ -317,6 +364,9 @@ ParserDatabase::parseValue(const std::string& raw, type::Integer* value)
 bool
 ParserDatabase::parseValue(const std::string& raw, const mapper::NameMapper* mapper, type::Index* value)
 {
+  if (raw.empty())
+    return false;
+
   if (!mapper || !value)
   {
     Exception exc(type::EXCEPTION_WARNING,
@@ -344,6 +394,9 @@ ParserDatabase::parseValue(const std::string& raw, const mapper::NameMapper* map
 bool
 ParserDatabase::parseValue(const std::string& raw, type::IntegerRange* value)
 {
+  if (raw.empty())
+    return false;
+
   if (!value)
   {
     Exception exc(type::EXCEPTION_WARNING,
@@ -352,9 +405,11 @@ ParserDatabase::parseValue(const std::string& raw, type::IntegerRange* value)
     throw exc;
   }
 
-  std::stringstream ss(raw);
-  for (std::string item; std::getline(ss, item, DELIM_RANGE);)
+  int i = 0;
+  std::stringstream ssRaw(raw);
+  for (std::string item; std::getline(ssRaw, item, DELIM_RANGE);)
   {
+    ++i;
     type::Integer val;
     if (parseValue(item, &val))
     {
@@ -362,20 +417,22 @@ ParserDatabase::parseValue(const std::string& raw, type::IntegerRange* value)
     }
   }
 
-  if (value->size() != 2)
-  {
-    std::stringstream ss;
-    ss << "Raw string=" << raw << ".";
-    Exception exc(type::EXCEPTION_WARNING, getExceptionString(ss.str()), PRETTY_FUNCTION);
-    throw exc;
-  }
-  return true;
+  if (value->size() == 2 && i == 2)
+    return true;
+
+  std::stringstream ss;
+  ss << "Raw string=" << raw << ".";
+  Exception exc(type::EXCEPTION_WARNING, getExceptionString(ss.str()), PRETTY_FUNCTION);
+  throw exc;
 }
 
 bool
 ParserDatabase::parseValue(const std::string& raw, const mapper::NameMapper* mapper,
-                   type::IndexList* valueList)
+                           type::IndexList* valueList)
 {
+  if (raw.empty())
+    return false;
+
   if (!valueList)
   {
     Exception exc(type::EXCEPTION_WARNING,
@@ -385,35 +442,37 @@ ParserDatabase::parseValue(const std::string& raw, const mapper::NameMapper* map
     throw exc;
   }
 
-  std::stringstream ss(raw);
-  for (std::string item; std::getline(ss, item, DELIM_LIST);)
+  std::size_t i = 0;
+  std::stringstream ssRaw(raw);
+  for (std::string item; std::getline(ssRaw, item, DELIM_LIST);)
   {
+    ++i;
     item.erase(0, item.find_first_not_of(WHITESPACE));
     item.erase(item.find_last_not_of(WHITESPACE) + 1);
+
     if(item.empty())
-      return false;
+      continue;
 
     int index;
-    if (!parseValue(item, mapper, &index))
-    {
-      return false;
-    }
+    parseValue(item, mapper, &index);
     valueList->push_back(index);
   }
 
-  if (valueList->empty())
-  {
-    std::stringstream ss;
-    ss << "Raw string=" << raw << ".";
-    Exception exc(type::EXCEPTION_WARNING, getExceptionString(ss.str()), PRETTY_FUNCTION);
-    throw exc;
-  }
-  return true;
+  if (!valueList->empty() && valueList->size() == i)
+    return true;
+
+  std::stringstream ss;
+  ss << "Raw string=" << raw << ".";
+  Exception exc(type::EXCEPTION_WARNING, getExceptionString(ss.str()), PRETTY_FUNCTION);
+  throw exc;
 }
 
 bool
 ParserDatabase::parseValue(const std::string& raw, type::Float* value)
 {
+  if (raw.empty())
+    return false;
+
   if (!value)
   {
     Exception exc(type::EXCEPTION_WARNING,
@@ -440,6 +499,9 @@ ParserDatabase::parseValue(const std::string& raw, type::Float* value)
 bool
 ParserDatabase::parseValue(const std::string& raw, type::String* value)
 {
+  if (raw.empty())
+    return false;
+
   if (!value)
   {
     Exception exc(type::EXCEPTION_WARNING,
@@ -455,6 +517,9 @@ ParserDatabase::parseValue(const std::string& raw, type::String* value)
 bool
 ParserDatabase::parseValue(const std::string& raw, type::StringList* valueList)
 {
+  if (raw.empty())
+    return false;
+
   if (!valueList)
   {
     Exception exc(type::EXCEPTION_WARNING,
@@ -481,7 +546,7 @@ std::string
 ParserDatabase::getExceptionString(std::string cause)
 {
   std::stringstream ss;
-  ss << "Parsing failed row=" << _rows + 1 << ", column=" << _column+1
+  ss << "Parsing failed row=" << _rows + 1 << ", column=" << _columnIdx+1
      << ", column type=" << _columnType << " [" << ColumnMapper::instance()->getKey(_columnType)
      << "], value type=" << _valueType << " [" << ValueMapper::instance()->getKey(_valueType)
      << "]. " << cause;

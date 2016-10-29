@@ -1,775 +1,1792 @@
-#include "Tools/Parser.h"
+#include "Tools/ParserDatabase.h"
 
 #include "test/Mock/CatalogMock.h"
 #include "test/Mock/CatalogEntryMock.h"
 #include "test/Mock/DataBaseFormatMock.h"
+#include "test/Mock/MockHelper.h"
+#include "test/Mock/NameMapperMock.h"
 
 #include <gtest/gtest.h>
-#include <sstream>
 
 namespace
 {
 
-struct TypeAndValue
+struct ColumnDef
 {
-  grb::type::ColumnTypeMock column;
-  bool required;
-  grb::type::ValueType value;
-  std::string raw;
+  ColumnDef(grb::type::ValueType valueType = grb::type::UNDEFINED_VALUE,
+            bool isRequired = false,
+            grb::type::UnitType unitType = grb::type::UNDEFINED_UNIT)
+    : _unitType(unitType), _valueType(valueType), _isRequired(isRequired)
+  {}
+
+  grb::type::UnitType _unitType;
+  grb::type::ValueType _valueType;
+  bool _isRequired = false;
 };
 
-typedef std::vector<TypeAndValue> TypeValueVector;
-
-
-const TypeValueVector DEFAULT_ROW
+const std::vector<std::string> INDEX_LIST
 {
-  { grb::type::TEST_COLUMN_FLAG,          true, grb::type::FLAG,          "N" },
-  { grb::type::TEST_COLUMN_INTEGER,       true, grb::type::INTEGER,       "9999" },
-  { grb::type::TEST_COLUMN_INDEX,         true, grb::type::INDEX,         "NAME_LIST_FIRST" },
-  { grb::type::TEST_COLUMN_INTEGER_RANGE, true, grb::type::INTEGER_RANGE, "9999-9999" },
-  { grb::type::TEST_COLUMN_INDEX_LIST,    true, grb::type::INDEX_LIST,    "NAME_LIST_FIRST,NAME_LIST_LAST" },
-  { grb::type::TEST_COLUMN_FLOAT,         true, grb::type::FLOAT,         "9999.9999" },
-  { grb::type::TEST_COLUMN_STRING,        true, grb::type::STRING,        "STRING" },
-  { grb::type::TEST_COLUMN_STRING_LIST,   true, grb::type::STRING_LIST,   "STRING1,STRING2" }
+  "index0",
+  "index1",
+  "index2",
+  "index3"
 };
 
-} // namespace
+}
+
+namespace grb
+{
+
+class CatalogEntryDummy
+{
+public:
+  grb::type::Flag* getFlag(grb::type::ColumnType) { return &_flag; }
+  grb::type::Integer* getInteger(grb::type::ColumnType) { return &_integer; }
+  grb::type::Index* getIndex(grb::type::ColumnType) { return &_index; }
+  grb::type::IntegerRange* getIntegerRange(grb::type::ColumnType)
+  {
+    _integerRange.clear();
+    return &_integerRange;
+  }
+  grb::type::IndexList* getIndexList(grb::type::ColumnType)
+  {
+    _indexList.clear();
+    return &_indexList;
+  }
+  grb::type::Float* getFloat(grb::type::ColumnType) { return &_float; }
+  grb::type::String* getString(grb::type::ColumnType) { return &_string; }
+  grb::type::StringList* getStringList(grb::type::ColumnType)
+  {
+    _stringList.clear();
+    return &_stringList;
+  }
+
+  grb::type::String* getStringException(grb::type::ColumnType)
+  {
+    grb::Exception exc(type::EXCEPTION_CRITICAL, "Throw Critical Exception", PRETTY_FUNCTION);
+    throw exc;
+  }
+
+  grb::type::Flag _flag;
+  grb::type::Integer _integer;
+  grb::type::Index _index;
+  grb::type::IntegerRange _integerRange;
+  grb::type::IndexList _indexList;
+  grb::type::Float _float;
+  grb::type::String _string;
+  grb::type::StringList _stringList;
+};
+
+} //namespace
+
 
 namespace testing
 {
 
-class ParserTest : public Test
+class ParserDatabaseTest : public Test
 {
 protected:
   void SetUp()
   {
-    _parser = nullptr;
     _stream = new std::stringstream;
-
-    _format.initialize();
-
+    _catalog = new grb::CatalogMock(grb::type::UNDEFINED_CATALOG);
   }
 
   void TearDown()
   {
     delete _stream;
+    delete _catalog;
+    delete _format;
     delete _parser;
+    delete _mapper;
   }
 
-  void stringsToStream(TypeValueVector& tvv)
+  void tryToConstructFile(const std::string& filename)
   {
-    for(const TypeAndValue& tv : tvv)
-    {
-      _format.setColumnFlag(tv.column, tv.required);
-      *_stream << tv.raw << "|";
-    }
-  }
-
-  void tryToParseFile(std::string& filename,
-                      bool isThrowExpected = false)
-  {
-    bool isThrown = false;
     try
     {
-      _parser = new grb::Parser(filename, _format, _catalog);
+      _parser = new grb::ParserDatabase(filename, *_format, *_catalog);
     }
     catch (const grb::Exception& exc)
     {
-      isThrown = true;
-      std::cout << exc.what()<< std::endl;
+      _thrown = true;
+      printWhat(exc);
     }
-    ASSERT_EQ(isThrowExpected, isThrown);
   }
 
-  void tryToParseStream(std::size_t linesExpected = 1,
-                        bool isThrowExpected = false)
+  void tryToConstructStream()
   {
-    std::size_t linesParsed = linesExpected;
-    bool isThrown = false;
     try
     {
-      _parser = new grb::Parser(_stream, _format, _catalog);
-      linesParsed = _parser->parse();
+      _parser = new grb::ParserDatabase(_stream, *_format, *_catalog);
     }
     catch (const grb::Exception& exc)
     {
-      isThrown = true;
-      std::cout << exc.what()<< std::endl;
+      _thrown = true;
+      printWhat(exc);
     }
-    ASSERT_EQ(isThrowExpected, isThrown);
-    ASSERT_EQ((std::size_t) linesExpected, (std::size_t) linesParsed);
-    ASSERT_EQ((std::size_t) linesExpected, _catalog.getEntries().size());
   }
 
-  grb::CatalogEntryMock& getCatalogEntry(std::size_t index = 0)
+  void tryToParse()
   {
-    return * static_cast<grb::CatalogEntryMock*>(_catalog.getEntries()[index]);
+    try
+    {
+      _parser = new grb::ParserDatabase(_stream, *_format, *_catalog);
+      _result = _parser->parse();
+      _rows = _parser->getNumberOfRows();
+    }
+    catch (const grb::Exception& exc)
+    {
+      _thrown = true;
+      printWhat(exc);
+    }
   }
 
-  std::stringstream* _stream;
-  grb::Parser* _parser;
-  grb::CatalogMock _catalog;
-  grb::DataBaseFormatMock _format;
+  void setupFormat()
+  {
+    int i = 0;
+    _format = new grb::DataBaseFormatMock(grb::type::UNDEFINED_DATABASE_FORMAT);
+
+    for (const ColumnDef& def : _columnDefs)
+    {
+      _format->getDataTypes().push_back(new grb::DataBaseColumn(
+            (grb::type::ColumnType) i++, def._unitType, def._valueType, def._isRequired));
+    }
+    _format->setColumnFlags();
+  }
+
+  void setupCatalogEntry(bool valid = true)
+  {
+    _entry = new grb::CatalogEntryMock(grb::type::UNDEFINED_CATALOG);
+
+    EXPECT_CALL(*_catalog, createEntry())
+        .WillRepeatedly(Return(_entry));
+    EXPECT_CALL(*_entry, isValid())
+        .WillRepeatedly(Return(valid));
+  }
+
+  void cleanCatalogEntry()
+  {
+    _catalog->getEntries().clear();
+    if (!_thrown)
+      delete _entry;
+  }
+
+  void setupFlag(int noOfCalls)
+  {
+    EXPECT_CALL(*_entry, getFlag(_))
+        .Times(noOfCalls)
+        .WillRepeatedly(Invoke(&_dummy, &grb::CatalogEntryDummy::getFlag));
+  }
+  void setupInteger(int noOfCalls)
+  {
+    EXPECT_CALL(*_entry, getInteger(_))
+        .Times(noOfCalls)
+        .WillRepeatedly(Invoke(&_dummy, &grb::CatalogEntryDummy::getInteger));
+  }
+  void setupIndex(int noOfCalls)
+  {
+    _mapper = new grb::mapper::NameMapperMock(grb::type::UNDEFINED_COLUMN);
+    EXPECT_CALL(*_mapper, getList())
+        .WillOnce(ReturnRef(INDEX_LIST));
+    _mapper->initiateMock();
+
+    EXPECT_CALL(*_entry, getIndex(_))
+        .Times(noOfCalls)
+        .WillRepeatedly(Invoke(&_dummy, &grb::CatalogEntryDummy::getIndex));
+    EXPECT_CALL(*_entry, getMapper(_))
+        .Times(noOfCalls)
+        .WillRepeatedly(Return(_mapper));
+  }
+  void setupIntegerRange(int noOfCalls)
+  {
+    EXPECT_CALL(*_entry, getIntegerRange(_))
+        .Times(noOfCalls)
+        .WillRepeatedly(Invoke(&_dummy, &grb::CatalogEntryDummy::getIntegerRange));
+  }
+  void setupIndexList(int noOfCalls)
+  {
+    _mapper = new grb::mapper::NameMapperMock(grb::type::UNDEFINED_COLUMN);
+    EXPECT_CALL(*_mapper, getList())
+        .WillOnce(ReturnRef(INDEX_LIST));
+    _mapper->initiateMock();
+
+    EXPECT_CALL(*_entry, getIndexList(_))
+        .Times(noOfCalls)
+        .WillRepeatedly(Invoke(&_dummy, &grb::CatalogEntryDummy::getIndexList));
+    EXPECT_CALL(*_entry, getMapper(_))
+        .Times(noOfCalls)
+        .WillRepeatedly(Return(_mapper));
+  }
+  void setupFloat(int noOfCalls)
+  {
+    EXPECT_CALL(*_entry, getFloat(_))
+        .Times(noOfCalls)
+        .WillRepeatedly(Invoke(&_dummy, &grb::CatalogEntryDummy::getFloat));
+  }
+  void setupString(int noOfCalls)
+  {
+    EXPECT_CALL(*_entry, getString(_))
+        .Times(noOfCalls)
+        .WillRepeatedly(Invoke(&_dummy, &grb::CatalogEntryDummy::getString));
+  }
+  void setupStringList(int noOfCalls)
+  {
+    EXPECT_CALL(*_entry, getStringList(_))
+        .Times(noOfCalls)
+        .WillRepeatedly(Invoke(&_dummy, &grb::CatalogEntryDummy::getStringList));
+  }
+  bool _result = false;
+  bool _thrown = false;
+  std::size_t _rows = 0;
+  std::stringstream* _stream = nullptr;
+  grb::Parser* _parser = nullptr;
+  grb::DataBaseFormatMock* _format = nullptr;
+  grb::CatalogMock* _catalog = nullptr;
+  grb::CatalogEntryMock* _entry = nullptr;
+  grb::mapper::NameMapperMock* _mapper = nullptr;
+  grb::CatalogEntryDummy _dummy;
+  std::vector<ColumnDef> _columnDefs;
 };
 
-namespace constructor
-{
-
-TEST_F(ParserTest, Constructor_NoSuchFile)
+/***************************************************************************************************
+ *
+ * CONSTRUCTOR
+ *
+ **************************************************************************************************/
+TEST_F(ParserDatabaseTest, ConstructorFile_FileDoesNotExist)
 {
   std::string filename = "unknown.file";
-  tryToParseFile(filename, true);
+
+  tryToConstructFile(filename);
+
+  ASSERT_TRUE(_thrown);
 }
 
-TEST_F(ParserTest, Constructor_FileExists)
+TEST_F(ParserDatabaseTest, ConstructorFile_DatabaseFormatIsEmpty)
 {
+  _format = new grb::DataBaseFormatMock(grb::type::UNDEFINED_DATABASE_FORMAT);
+
   std::string filename = __FILE__;
-  tryToParseFile(filename, false);
+
+  tryToConstructFile(filename);
+
+  ASSERT_TRUE(_thrown);
 }
 
-TEST_F(ParserTest, Constructor_StreamIsNull)
+TEST_F(ParserDatabaseTest, ConstructorFile_DatabaseFormatHasUndefinedColumn)
+{
+  _format = new grb::DataBaseFormatMock(grb::type::UNDEFINED_DATABASE_FORMAT);
+  _format->getDataTypes().push_back(new grb::DataBaseColumn(grb::type::UNDEFINED_COLUMN));
+
+  std::string filename = __FILE__;
+
+  tryToConstructFile(filename);
+
+  ASSERT_TRUE(_thrown);
+}
+
+TEST_F(ParserDatabaseTest, ConstructorFile_Positive)
+{
+  _columnDefs =
+  {
+    { grb::type::UNDEFINED_VALUE, false, grb::type::UNDEFINED_UNIT }
+  };
+  setupFormat();
+
+  std::string filename = __FILE__;
+
+  tryToConstructFile(filename);
+
+  ASSERT_NE(nullptr, _parser);
+}
+
+TEST_F(ParserDatabaseTest, ConstructorStream_StreamIsNull)
 {
   delete _stream;
   _stream = nullptr;
-  tryToParseStream(0, true);
+
+  tryToConstructStream();
+
+  ASSERT_TRUE(_thrown);
 }
 
-TEST_F(ParserTest, Constructor_StreamIsEmpty)
+TEST_F(ParserDatabaseTest, ConstructorStream_Positive)
 {
-  tryToParseStream(0, true);
-}
-
-}
-
-namespace whitespace
-{
-
-TEST_F(ParserTest, parse_EmptyLine)
-{
-  *_stream << "#" << std::endl;
-  tryToParseStream(0, true);
-}
-
-TEST_F(ParserTest, parse_DelimitersOnly)
-{
-  TypeValueVector line = DEFAULT_ROW;
-  for (auto& tv : line)
+  _columnDefs =
   {
-    tv.required = false;
-    tv.raw.clear();
-  }
-  stringsToStream(line);
+    { grb::type::UNDEFINED_VALUE, false, grb::type::UNDEFINED_UNIT }
+  };
+  setupFormat();
 
-  tryToParseStream();
+  tryToConstructStream();
+
+  ASSERT_NE(nullptr, _parser);
 }
 
-TEST_F(ParserTest, parse_DelimitersWhitespaceOnly)
+/***************************************************************************************************
+ *
+ * PARSE
+ *
+ **************************************************************************************************/
+TEST_F(ParserDatabaseTest, Parse_EmptyStream)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  for (auto& tv : line)
+  _columnDefs =
   {
-    tv.required = false;
-    tv.raw = "  ";
-  }
-  stringsToStream(line);
+    { grb::type::UNDEFINED_VALUE, false, grb::type::UNDEFINED_UNIT }
+  };
+  setupFormat();
 
-  tryToParseStream();
+  tryToParse();
+
+  ASSERT_TRUE(_thrown);
 }
 
-}
-
-namespace defaultrow
+TEST_F(ParserDatabaseTest, Parse_EmptyLinesOnly)
 {
+  _columnDefs =
+  {
+    { grb::type::UNDEFINED_VALUE, false, grb::type::UNDEFINED_UNIT }
+  };
+  setupFormat();
 
-TEST_F(ParserTest, parse_DefaultRow)
+  *_stream << "\n";
+
+  tryToParse();
+
+  ASSERT_TRUE(_thrown);
+}
+
+TEST_F(ParserDatabaseTest, Parse_CommentsOnly)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::UNDEFINED_VALUE, false, grb::type::UNDEFINED_UNIT }
+  };
+  setupFormat();
 
-  tryToParseStream();
+  *_stream << "# COMMENT";
+
+  tryToParse();
+
+  ASSERT_TRUE(_thrown);
 }
 
-}
-
-namespace formats
+TEST_F(ParserDatabaseTest, Parse_EmptyLinesAndCommentsOnly)
 {
+  _columnDefs =
+  {
+    { grb::type::UNDEFINED_VALUE, false, grb::type::UNDEFINED_UNIT }
+  };
+  setupFormat();
 
-TEST_F(ParserTest, parse_Format_OneColumn)
+  *_stream << "\n"
+              "\n"
+              "# COMMENT 1\n"
+              "\n"
+              "# COMMENT 2\n";
+
+  tryToParse();
+
+  ASSERT_TRUE(_thrown);
+}
+
+TEST_F(ParserDatabaseTest, Parse_CatalogEntryIsNull)
 {
-  TypeValueVector line;
-  TypeAndValue column { grb::type::TEST_COLUMN_FLAG, true, grb::type::FLAG, "N" };
-  line.push_back(column);
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::UNDEFINED_VALUE, false, grb::type::UNDEFINED_UNIT }
+  };
+  setupFormat();
 
-  tryToParseStream(0, true);
+  *_stream << "something";
+
+  EXPECT_CALL(*_catalog, createEntry())
+      .WillOnce(Return(nullptr));
+
+  tryToParse();
+
+  ASSERT_TRUE(_thrown);
 }
 
-TEST_F(ParserTest, parse_Format_OneLessColumn)
+/***************************************************************************************************
+ *
+ * PARSE FLAG
+ *
+ **************************************************************************************************/
+TEST_F(ParserDatabaseTest, ParseFlag_CatalogEntryGetIsNull)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  line.pop_back();
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::FLAG, true }
+  };
+  setupFormat();
 
-  tryToParseStream(0, true);
+  _entry = new grb::CatalogEntryMock(grb::type::UNDEFINED_CATALOG);
+  EXPECT_CALL(*_catalog, createEntry())
+      .WillRepeatedly(Return(_entry));
+  EXPECT_CALL(*_entry, getFlag(_))
+      .WillOnce(Return(nullptr));
+
+  *_stream << "A|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_thrown);
 }
 
-TEST_F(ParserTest, parse_Format_OneMoreColumn)
+TEST_F(ParserDatabaseTest, ParseFlag_UnknownValue)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  TypeAndValue column { grb::type::TEST_COLUMN_FLAG, true, grb::type::FLAG, "N" };
-  line.push_back(column);
+  _columnDefs =
+  {
+    { grb::type::FLAG, true }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupFlag(1);
 
-  stringsToStream(line);
-// SIGSEGV
-  tryToParseStream(0, true);
+  *_stream << "A|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_thrown);
+  cleanCatalogEntry();
 }
 
-}
-
-namespace typeflag
+TEST_F(ParserDatabaseTest, ParseFlag_OneColumn_Positive)
 {
+  _columnDefs =
+  {
+    { grb::type::FLAG, true }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupFlag(2);
 
-TEST_F(ParserTest, parse_Flag_Yes)
+  *_stream << "N|\n"
+              "Y|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_result);
+  ASSERT_EQ(2, _parser->getNumberOfRows());
+  cleanCatalogEntry();
+}
+
+
+TEST_F(ParserDatabaseTest, ParseFlag_TwoColumns_FirstRequred_Positive)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  std::size_t col = grb::type::FLAG;
-  line[col].raw = "Y";
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::FLAG, true },
+    { grb::type::FLAG, false }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupFlag(4);
 
-  tryToParseStream();
-  ASSERT_EQ(true, getCatalogEntry().getFlag());
+  *_stream << "N|Y|\n"
+              "N||";
+
+  tryToParse();
+
+  ASSERT_TRUE(_result);
+  ASSERT_EQ(2, _parser->getNumberOfRows());
+  cleanCatalogEntry();
 }
 
-TEST_F(ParserTest, parse_Flag_No)
+TEST_F(ParserDatabaseTest, ParseFlag_TwoColumns_SecondRequred_Positive)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  std::size_t col = grb::type::FLAG;
-  line[col].raw = "N";
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::FLAG, false },
+    { grb::type::FLAG, true }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupFlag(4);
 
-  tryToParseStream();
-  ASSERT_EQ(false, getCatalogEntry().getFlag());
+  *_stream << "N|Y|\n"
+              "|Y|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_result);
+  ASSERT_EQ(2, _parser->getNumberOfRows());
+  cleanCatalogEntry();
 }
 
-TEST_F(ParserTest, parse_Flag_Invalid)
+TEST_F(ParserDatabaseTest, ParseFlag_TwoColumns_BothRequred_Positive)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  std::size_t col = grb::type::FLAG;
-  line[col].raw = "INVALID";
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::FLAG, true },
+    { grb::type::FLAG, true }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupFlag(4);
 
-  tryToParseStream(0, true);
+  *_stream << "N|Y|\n"
+              "N|Y|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_result);
+  ASSERT_EQ(2, _parser->getNumberOfRows());
+  cleanCatalogEntry();
 }
 
-TEST_F(ParserTest, parse_Flag_Invalid_Optional)
+/***************************************************************************************************
+ *
+ * PARSE INTEGER
+ *
+ **************************************************************************************************/
+TEST_F(ParserDatabaseTest, ParseInteger_CatalogEntryGetIsNull)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  std::size_t col = grb::type::FLAG;
-  line[col].raw = "INVALID";
-  line[col].required = false;
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::INTEGER, true }
+  };
+  setupFormat();
 
-  tryToParseStream();
-  ASSERT_EQ(false, getCatalogEntry().getFlag());
+  _entry = new grb::CatalogEntryMock(grb::type::UNDEFINED_CATALOG);
+  EXPECT_CALL(*_catalog, createEntry())
+      .WillRepeatedly(Return(_entry));
+  EXPECT_CALL(*_entry, getInteger(_))
+      .WillOnce(Return(nullptr));
+
+  *_stream << "01234567890|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_thrown);
 }
 
-TEST_F(ParserTest, parse_Flag_Empty)
+TEST_F(ParserDatabaseTest, ParseInteger_UnknownValue)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  std::size_t col = grb::type::FLAG;
-  line[col].raw.clear();
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::INTEGER, true }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupInteger(1);
 
-  tryToParseStream(0, true);
+  *_stream << "-|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_thrown);
+  cleanCatalogEntry();
 }
 
-}
-
-namespace typeinteger
+TEST_F(ParserDatabaseTest, ParseInteger_NegativeValue)
 {
+  _columnDefs =
+  {
+    { grb::type::INTEGER, true }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupInteger(1);
 
-TEST_F(ParserTest, parse_Integer_Min)
+  *_stream << "-123456789|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_thrown);
+  cleanCatalogEntry();
+}
+
+TEST_F(ParserDatabaseTest, ParseInteger_OneColumn_Positive)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  std::size_t col = grb::type::INTEGER;
-  line[col].raw = "0";
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::INTEGER, true }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupInteger(2);
 
-  tryToParseStream();
-  ASSERT_EQ(0, getCatalogEntry().getInteger());
+  *_stream << "0123456789|\n"
+              "9876543210|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_result);
+  ASSERT_EQ(2, _parser->getNumberOfRows());
+  cleanCatalogEntry();
 }
 
-TEST_F(ParserTest, parse_Integer_Max)
+
+TEST_F(ParserDatabaseTest, ParseInteger_TwoColumns_FirstRequred_Positive)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  std::size_t col = grb::type::INTEGER;
-  line[col].raw = "4294967295";
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::INTEGER, true },
+    { grb::type::INTEGER, false }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupInteger(4);
 
-  tryToParseStream();
-  ASSERT_EQ(4294967295, getCatalogEntry().getInteger());
+  *_stream << "0123456789|9876543210|\n"
+              "0123456789||";
+
+  tryToParse();
+
+  ASSERT_TRUE(_result);
+  ASSERT_EQ(2, _parser->getNumberOfRows());
+  cleanCatalogEntry();
 }
 
-TEST_F(ParserTest, parse_Integer_Invalid)
+TEST_F(ParserDatabaseTest, ParseInteger_TwoColumns_SecondRequred_Positive)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  std::size_t col = grb::type::INTEGER;
-  line[col].raw = "INVALID";
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::INTEGER, false },
+    { grb::type::INTEGER, true }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupInteger(4);
 
-  tryToParseStream(0, true);
+  *_stream << "0123456789|9876543210|\n"
+              "          |9876543210|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_result);
+  ASSERT_EQ(2, _parser->getNumberOfRows());
+  cleanCatalogEntry();
 }
 
-TEST_F(ParserTest, parse_Integer_Invalid_Optional)
+TEST_F(ParserDatabaseTest, ParseInteger_TwoColumns_BothRequred_Positive)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  std::size_t col = grb::type::INTEGER;
-  line[col].raw = "INVALID";
-  line[col].required = false;
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::INTEGER, true },
+    { grb::type::INTEGER, true }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupInteger(4);
 
-  tryToParseStream();
-  ASSERT_EQ(0, getCatalogEntry().getInteger());
+  *_stream << "0123456789|9876543210|\n"
+              "0123456789|9876543210|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_result);
+  ASSERT_EQ(2, _parser->getNumberOfRows());
+  cleanCatalogEntry();
 }
 
-TEST_F(ParserTest, parse_Integer_Invalid_Negative)
+/***************************************************************************************************
+ *
+ * PARSE INDEX
+ *
+ **************************************************************************************************/
+TEST_F(ParserDatabaseTest, ParseIndex_CatalogEntryGetMapperIsNull)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  std::size_t col = grb::type::INTEGER;
-  line[col].raw = "-1";
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::INDEX, true }
+  };
+  setupFormat();
 
-  tryToParseStream(0, true);
+  _entry = new grb::CatalogEntryMock(grb::type::UNDEFINED_CATALOG);
+  EXPECT_CALL(*_catalog, createEntry())
+      .WillRepeatedly(Return(_entry));
+  EXPECT_CALL(*_entry, getIndex(_))
+      .WillOnce(Invoke(&_dummy, &grb::CatalogEntryDummy::getIndex));
+  EXPECT_CALL(*_entry, getMapper(_))
+      .WillOnce(Return(nullptr));
+
+  *_stream << "undefined-index|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_thrown);
 }
 
-TEST_F(ParserTest, parse_Integer_Invalid_Negative_Optional)
+TEST_F(ParserDatabaseTest, ParseIndex_CatalogEntryGetIsNull)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  std::size_t col = grb::type::INTEGER;
-  line[col].raw = "-1";
-  line[col].required = false;
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::INDEX, true }
+  };
+  setupFormat();
 
-  tryToParseStream();
-  ASSERT_EQ(0, getCatalogEntry().getInteger());
+  _entry = new grb::CatalogEntryMock(grb::type::UNDEFINED_CATALOG);
+  _mapper = new grb::mapper::NameMapperMock(grb::type::UNDEFINED_COLUMN);
+  EXPECT_CALL(*_catalog, createEntry())
+      .WillRepeatedly(Return(_entry));
+  EXPECT_CALL(*_entry, getIndex(_))
+      .WillOnce(Return(nullptr));
+  EXPECT_CALL(*_entry, getMapper(_))
+      .WillOnce(Return(_mapper));
+
+  *_stream << "undefined-index|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_thrown);
 }
 
-TEST_F(ParserTest, parse_Integer_Empty)
+
+TEST_F(ParserDatabaseTest, ParseIndex_UnknownValue)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  std::size_t col = grb::type::INTEGER;
-  line[col].raw = "";
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::INDEX, true }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupIndex(1);
 
-  tryToParseStream(0, true);
+  *_stream << "undefined-index|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_thrown);
+  cleanCatalogEntry();
 }
 
-}
-
-namespace typeindex
+TEST_F(ParserDatabaseTest, ParseIndex_OneColumn_Positive)
 {
+  _columnDefs =
+  {
+    { grb::type::INDEX, true }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupIndex(2);
 
-TEST_F(ParserTest, parse_Index)
+  *_stream << "index0|\n"
+              "index0|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_result);
+  ASSERT_EQ(2, _parser->getNumberOfRows());
+  cleanCatalogEntry();
+}
+
+
+TEST_F(ParserDatabaseTest, ParseIndex_TwoColumns_FirstRequred_Positive)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  std::size_t col = grb::type::INDEX;
-  line[col].raw = "NAME_LIST_LAST";
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::INDEX, true },
+    { grb::type::INDEX, false }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupIndex(4);
 
-  tryToParseStream();
-  ASSERT_EQ(1, getCatalogEntry().getIndex());
+  *_stream << "index0|index1|\n"
+              "index0||";
+
+  tryToParse();
+
+  ASSERT_TRUE(_result);
+  ASSERT_EQ(2, _parser->getNumberOfRows());
+  cleanCatalogEntry();
 }
 
-TEST_F(ParserTest, parse_Index_Invalid)
+TEST_F(ParserDatabaseTest, ParseIndex_TwoColumns_SecondRequred_Positive)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  std::size_t col = grb::type::INDEX;
-  line[col].raw = "INVALID";
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::INDEX, false },
+    { grb::type::INDEX, true }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupIndex(4);
 
-  tryToParseStream(0, true);
+  *_stream << "index0|index1|\n"
+              "      |index1|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_result);
+  ASSERT_EQ(2, _parser->getNumberOfRows());
+  cleanCatalogEntry();
 }
 
-TEST_F(ParserTest, parse_Index_Invalid_Optional)
+TEST_F(ParserDatabaseTest, ParseIndex_TwoColumns_BothRequred_Positive)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  std::size_t col = grb::type::INDEX;
-  line[col].raw = "INVALID";
-  line[col].required = false;
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::INDEX, true },
+    { grb::type::INDEX, true }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupIndex(4);
 
-  tryToParseStream();
-  ASSERT_EQ(-1, getCatalogEntry().getIndex());
+  *_stream << "index0|index1|\n"
+              "index0|index1|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_result);
+  ASSERT_EQ(2, _parser->getNumberOfRows());
+  cleanCatalogEntry();
 }
 
-TEST_F(ParserTest, parse_Index_Empty)
+/***************************************************************************************************
+ *
+ * PARSE INTEGER RANGE
+ *
+ **************************************************************************************************/
+TEST_F(ParserDatabaseTest, ParseIntegerRange_CatalogEntryGetIsNull)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  std::size_t col = grb::type::INDEX;
-  line[col].raw = "";
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::INTEGER_RANGE, true }
+  };
+  setupFormat();
 
-  tryToParseStream(0, true);
+  _entry = new grb::CatalogEntryMock(grb::type::UNDEFINED_CATALOG);
+  EXPECT_CALL(*_catalog, createEntry())
+      .WillRepeatedly(Return(_entry));
+  EXPECT_CALL(*_entry, getIntegerRange(_))
+      .WillOnce(Return(nullptr));
+
+  *_stream << "12345-67890|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_thrown);
 }
 
-}
-
-namespace typeintegerrange
+TEST_F(ParserDatabaseTest, ParseIntegerRange_SingleValue)
 {
+  _columnDefs =
+  {
+    { grb::type::INTEGER_RANGE, true }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupIntegerRange(1);
 
-TEST_F(ParserTest, parse_IntegerRange_Min)
+  *_stream << "1234567890|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_thrown);
+  cleanCatalogEntry();
+}
+
+
+TEST_F(ParserDatabaseTest, ParseIntegerRange_NoValues)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  std::size_t col = grb::type::INTEGER_RANGE;
-  line[col].raw = "0-1";
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::INTEGER_RANGE, true }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupIntegerRange(1);
 
-  tryToParseStream();
-  const grb::type::IntegerRange& range = getCatalogEntry().getIntegerRange();
-  ASSERT_EQ(2, range.size());
-  ASSERT_EQ(0, range[0]);
-  ASSERT_EQ(1, range[1]);
+  *_stream << "-|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_thrown);
+  cleanCatalogEntry();
 }
 
-TEST_F(ParserTest, parse_IntegerRange_Max)
+TEST_F(ParserDatabaseTest, ParseIntegerRange_NoFirstValue)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  std::size_t col = grb::type::INTEGER_RANGE;
-  line[col].raw = "4294967294-4294967295";
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::INTEGER_RANGE, true }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupIntegerRange(1);
 
-  tryToParseStream();
-  const grb::type::IntegerRange& range = getCatalogEntry().getIntegerRange();
-  ASSERT_EQ(2, range.size());
-  ASSERT_EQ(4294967294, range[0]);
-  ASSERT_EQ(4294967295, range[1]);
+  *_stream << "-67890|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_thrown);
+  cleanCatalogEntry();
 }
 
-TEST_F(ParserTest, parse_IntegerRange_Invalid)
+TEST_F(ParserDatabaseTest, ParseIntegerRange_NoSecondValue)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  std::size_t col = grb::type::INTEGER_RANGE;
-  line[col].raw = "INVALID";
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::INTEGER_RANGE, true }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupIntegerRange(1);
 
-  tryToParseStream(0, true);
+  *_stream << "12345-|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_thrown);
+  cleanCatalogEntry();
 }
 
-TEST_F(ParserTest, parse_IntegerRange_Invalid_Optional)
+TEST_F(ParserDatabaseTest, ParseIntegerRange_FirstNegativeValue)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  std::size_t col = grb::type::INTEGER_RANGE;
-  line[col].raw = "INVALID";
-  line[col].required = false;
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::INTEGER_RANGE, true }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupIntegerRange(1);
 
-  tryToParseStream();
-  const grb::type::IntegerRange& range = getCatalogEntry().getIntegerRange();
-  ASSERT_EQ(0, range.size());
+  *_stream << "-12345-67890|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_thrown);
+  cleanCatalogEntry();
 }
 
-TEST_F(ParserTest, parse_IntegerRange_OneNumber)
+TEST_F(ParserDatabaseTest, ParseIntegerRange_SecondNegativeValue)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  std::size_t col = grb::type::INTEGER_RANGE;
-  line[col].raw = "0";
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::INTEGER_RANGE, true }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupIntegerRange(1);
 
-  tryToParseStream(0, true);
+  *_stream << "12345--67890|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_thrown);
+  cleanCatalogEntry();
 }
 
-TEST_F(ParserTest, parse_IntegerRange_OneNumber_Negative)
+TEST_F(ParserDatabaseTest, ParseIntegerRange_MoreThanTwo)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  std::size_t col = grb::type::INTEGER_RANGE;
-  line[col].raw = "-1";
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::INTEGER_RANGE, true }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupIntegerRange(1);
 
-  tryToParseStream(0, true);
+  *_stream << "123-456-7890|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_thrown);
+  cleanCatalogEntry();
 }
 
-TEST_F(ParserTest, parse_IntegerRange_TwoNumber_Negative)
+
+TEST_F(ParserDatabaseTest, ParseIntegerRange_OneColumn_Positive)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  std::size_t col = grb::type::INTEGER_RANGE;
-  line[col].raw = "-1--2";
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::INTEGER_RANGE, true }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupIntegerRange(2);
 
-  tryToParseStream(0, true);
+  *_stream << "01234-56789|\n"
+              "98765-43210|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_result);
+  ASSERT_EQ(2, _parser->getNumberOfRows());
+  cleanCatalogEntry();
 }
 
-TEST_F(ParserTest, parse_IntegerRange_ThreeNumber)
+TEST_F(ParserDatabaseTest, ParseIntegerRange_TwoColumns_FirstRequred_Positive)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  std::size_t col = grb::type::INTEGER_RANGE;
-  line[col].raw = "0-1-2";
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::INTEGER_RANGE, true },
+    { grb::type::INTEGER_RANGE, false }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupIntegerRange(4);
 
-  tryToParseStream(0, true);
+  *_stream << "01234-56789|98765-43210|\n"
+              "01234-56789||";
+
+  tryToParse();
+
+  ASSERT_TRUE(_result);
+  ASSERT_EQ(2, _parser->getNumberOfRows());
+  cleanCatalogEntry();
 }
 
-}
-
-namespace typeindexlist
+TEST_F(ParserDatabaseTest, ParseIntegerRange_TwoColumns_SecondRequred_Positive)
 {
+  _columnDefs =
+  {
+    { grb::type::INTEGER_RANGE, false },
+    { grb::type::INTEGER_RANGE, true }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupIntegerRange(4);
 
-TEST_F(ParserTest, parse_IndexList)
+  *_stream << "01234-56789|98765-43210|\n"
+              "           |98765-43210|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_result);
+  ASSERT_EQ(2, _parser->getNumberOfRows());
+  cleanCatalogEntry();
+}
+
+TEST_F(ParserDatabaseTest, ParseIntegerRange_TwoColumns_BothRequred_Positive)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  std::size_t col = grb::type::INDEX_LIST;
-  line[col].raw = "NAME_LIST_FIRST,NAME_LIST_LAST,NAME_LIST_LAST,NAME_LIST_FIRST";
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::INTEGER_RANGE, true },
+    { grb::type::INTEGER_RANGE, true }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupIntegerRange(4);
 
-  tryToParseStream();
-  const grb::type::IndexList& list = getCatalogEntry().getIndexList();
-  ASSERT_EQ(4, list.size());
-  ASSERT_EQ(0, list[0]);
-  ASSERT_EQ(1, list[1]);
-  ASSERT_EQ(1, list[2]);
-  ASSERT_EQ(0, list[3]);
+  *_stream << "01234-56789|98765-43210|\n"
+              "01234-56789|98765-43210|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_result);
+  ASSERT_EQ(2, _parser->getNumberOfRows());
+  cleanCatalogEntry();
 }
 
-TEST_F(ParserTest, parse_IndexList_Invalid)
+/***************************************************************************************************
+ *
+ * PARSE INDEX LIST
+ *
+ **************************************************************************************************/
+TEST_F(ParserDatabaseTest, ParseIndexList_CatalogEntryGetMapperIsNull)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  std::size_t col = grb::type::INDEX_LIST;
-  line[col].raw = "INVALID";
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::INDEX_LIST, true }
+  };
+  setupFormat();
 
-  tryToParseStream(0, true);
+  _entry = new grb::CatalogEntryMock(grb::type::UNDEFINED_CATALOG);
+  EXPECT_CALL(*_catalog, createEntry())
+      .WillRepeatedly(Return(_entry));
+  EXPECT_CALL(*_entry, getIndexList(_))
+      .WillOnce(Invoke(&_dummy, &grb::CatalogEntryDummy::getIndexList));
+  EXPECT_CALL(*_entry, getMapper(_))
+      .WillOnce(Return(nullptr));
+
+  *_stream << "index0,index1|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_thrown);
 }
 
-TEST_F(ParserTest, parse_IndexList_Invalid_Last)
+TEST_F(ParserDatabaseTest, ParseIndexList_CatalogEntryGetIsNull)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  std::size_t col = grb::type::INDEX_LIST;
-  line[col].raw = "NAME_LIST_FIRST,NAME_LIST_LAST,NAME_LIST_LAST,INVALID";
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::INDEX_LIST, true }
+  };
+  setupFormat();
 
-  tryToParseStream(0, true);
+  _entry = new grb::CatalogEntryMock(grb::type::UNDEFINED_CATALOG);
+  _mapper = new grb::mapper::NameMapperMock(grb::type::UNDEFINED_COLUMN);
+  EXPECT_CALL(*_catalog, createEntry())
+      .WillRepeatedly(Return(_entry));
+  EXPECT_CALL(*_entry, getIndexList(_))
+      .WillOnce(Return(nullptr));
+  EXPECT_CALL(*_entry, getMapper(_))
+      .WillOnce(Return(_mapper));
+
+  *_stream << "index0,index1|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_thrown);
 }
 
-
-TEST_F(ParserTest, parse_IndexList_Invalid_Optional)
+TEST_F(ParserDatabaseTest, ParseIndexList_EmptyValues)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  std::size_t col = grb::type::INDEX_LIST;
-  line[col].raw = "INVALID";
-  line[col].required = false;
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::INDEX_LIST, true }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupIndexList(1);
 
-  tryToParseStream();
-  const grb::type::IndexList& list = getCatalogEntry().getIndexList();
-  ASSERT_EQ(0, list.size());
+  *_stream << ",|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_thrown);
+  cleanCatalogEntry();
 }
 
-TEST_F(ParserTest, parse_IndexList_Empty)
+TEST_F(ParserDatabaseTest, ParseIndexList_EmptyFirstValue)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  std::size_t col = grb::type::INDEX_LIST;
-  line[col].raw = "";
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::INDEX_LIST, true }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupIndexList(1);
 
-  tryToParseStream(0, true);
+  *_stream << ",index1|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_thrown);
+  cleanCatalogEntry();
 }
 
-}
-
-namespace typefloat
+TEST_F(ParserDatabaseTest, ParseIndexList_EmptySecondValue)
 {
+  _columnDefs =
+  {
+    { grb::type::INDEX_LIST, true }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupIndexList(1);
 
-TEST_F(ParserTest, parse_Float_Min)
+  *_stream << "index0,,|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_thrown);
+  cleanCatalogEntry();
+}
+
+
+TEST_F(ParserDatabaseTest, ParseIndexList_UnknownFirstValue)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  std::size_t col = grb::type::FLOAT;
-  line[col].raw = "-9876543210.0123456789";
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::INDEX_LIST, true }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupIndexList(1);
 
-  tryToParseStream();
-  ASSERT_FLOAT_EQ(-9876543210.0123456789, getCatalogEntry().getFloat());
+  *_stream << "undefined-index,index1|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_thrown);
+  cleanCatalogEntry();
 }
 
-TEST_F(ParserTest, parse_Float_Zero)
+TEST_F(ParserDatabaseTest, ParseIndexList_UnknownSecondValue)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  std::size_t col = grb::type::FLOAT;
-  line[col].raw = "0.0";
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::INDEX_LIST, true }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupIndexList(1);
 
-  tryToParseStream();
-  ASSERT_FLOAT_EQ(0.0, getCatalogEntry().getFloat());
+  *_stream << "index0,undefined-index|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_thrown);
+  cleanCatalogEntry();
 }
 
-TEST_F(ParserTest, parse_Float_Max)
+TEST_F(ParserDatabaseTest, ParseIndexList_OneColumn_Positive)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  std::size_t col = grb::type::FLOAT;
-  line[col].raw = "9876543210.0123456789";
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::INDEX_LIST, true }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupIndexList(2);
 
-  tryToParseStream();
-  ASSERT_FLOAT_EQ(9876543210.0123456789, getCatalogEntry().getFloat());
+  *_stream << "index0,index1|\n"
+              "index0,index1|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_result);
+  ASSERT_EQ(2, _parser->getNumberOfRows());
+  cleanCatalogEntry();
 }
 
-TEST_F(ParserTest, parse_Float_Invalid)
+TEST_F(ParserDatabaseTest, ParseIndexList_TwoColumns_FirstRequred_Positive)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  std::size_t col = grb::type::FLOAT;
-  line[col].raw = "INVALID";
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::INDEX_LIST, true },
+    { grb::type::INDEX_LIST, false }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupIndexList(4);
 
-  tryToParseStream(0, true);
+  *_stream << "index0,index1|index2,index3|\n"
+              "index0,index1|             |";
+
+  tryToParse();
+
+  ASSERT_TRUE(_result);
+  ASSERT_EQ(2, _parser->getNumberOfRows());
+  cleanCatalogEntry();
 }
 
-TEST_F(ParserTest, parse_Float_Invalid_Optional)
+TEST_F(ParserDatabaseTest, ParseIndexList_TwoColumns_SecondRequred_Positive)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  std::size_t col = grb::type::FLOAT;
-  line[col].raw = "INVALID";
-  line[col].required = false;
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::INDEX_LIST, false },
+    { grb::type::INDEX_LIST, true }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupIndexList(4);
 
-  tryToParseStream();
-  ASSERT_FLOAT_EQ(0.0, getCatalogEntry().getFloat());
+  *_stream << "index0,index1|index2,index3|\n"
+              "             |index2,index3|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_result);
+  ASSERT_EQ(2, _parser->getNumberOfRows());
+  cleanCatalogEntry();
 }
 
-TEST_F(ParserTest, parse_Float_Empty)
+TEST_F(ParserDatabaseTest, ParseIndexList_TwoColumns_BothRequred_Positive)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  std::size_t col = grb::type::FLOAT;
-  line[col].raw = "";
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::INDEX_LIST, true },
+    { grb::type::INDEX_LIST, true }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupIndexList(4);
 
-  tryToParseStream(0, true);
+  *_stream << "index0,index1|index2,index3|\n"
+              "index0,index1|index2,index3|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_result);
+  ASSERT_EQ(2, _parser->getNumberOfRows());
+  cleanCatalogEntry();
 }
 
-}
-
-namespace typestring
+/***************************************************************************************************
+ *
+ * PARSE FLOAT
+ *
+ **************************************************************************************************/
+TEST_F(ParserDatabaseTest, ParseFloat_CatalogEntryGetIsNull)
 {
+  _columnDefs =
+  {
+    { grb::type::FLOAT, true }
+  };
+  setupFormat();
 
-TEST_F(ParserTest, parse_String)
+  _entry = new grb::CatalogEntryMock(grb::type::UNDEFINED_CATALOG);
+  EXPECT_CALL(*_catalog, createEntry())
+      .WillRepeatedly(Return(_entry));
+  EXPECT_CALL(*_entry, getFloat(_))
+      .WillOnce(Return(nullptr));
+
+  *_stream << "0.1234567890|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_thrown);
+}
+
+TEST_F(ParserDatabaseTest, ParseFloat_UnknownValue)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  std::size_t col = grb::type::STRING;
-  line[col].raw = "JUST A STRING";
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::FLOAT, true }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupFloat(1);
 
-  tryToParseStream();
-  ASSERT_STREQ("JUST A STRING",  getCatalogEntry().getString().c_str());
+  *_stream << "-|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_thrown);
+  cleanCatalogEntry();
 }
 
-TEST_F(ParserTest, parse_String_Empty)
+TEST_F(ParserDatabaseTest, ParseFloat_OneColumn_Positive)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  std::size_t col = grb::type::STRING;
-  line[col].raw.clear();
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::FLOAT, true }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupFloat(2);
 
-  tryToParseStream(0, true);
+  *_stream << " 0.123456789|\n"
+              "-9.876543210|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_result);
+  ASSERT_EQ(2, _parser->getNumberOfRows());
+  cleanCatalogEntry();
 }
 
-TEST_F(ParserTest, parse_String_Empty_Optional)
+TEST_F(ParserDatabaseTest, ParseFloat_TwoColumns_FirstRequred_Positive)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  std::size_t col = grb::type::STRING;
-  line[col].raw.clear();
-  line[col].required = false;
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::FLOAT, true },
+    { grb::type::FLOAT, false }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupFloat(4);
 
-  tryToParseStream();
-  ASSERT_STREQ("",  getCatalogEntry().getString().c_str());
+  *_stream << "0.123456789|9.876543210|\n"
+              "0.123456789||";
+
+  tryToParse();
+
+  ASSERT_TRUE(_result);
+  ASSERT_EQ(2, _parser->getNumberOfRows());
+  cleanCatalogEntry();
 }
 
-}
-
-namespace typestringlist
+TEST_F(ParserDatabaseTest, ParseFloat_TwoColumns_SecondRequred_Positive)
 {
+  _columnDefs =
+  {
+    { grb::type::FLOAT, false },
+    { grb::type::FLOAT, true }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupFloat(4);
 
-TEST_F(ParserTest, parse_StringList_One)
+  *_stream << "0.123456789|9.876543210|\n"
+              "           |9.876543210|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_result);
+  ASSERT_EQ(2, _parser->getNumberOfRows());
+  cleanCatalogEntry();
+}
+
+TEST_F(ParserDatabaseTest, ParseFloat_TwoColumns_BothRequred_Positive)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  std::size_t col = grb::type::STRING_LIST;
-  line[col].raw = "JUST A STRING";
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::FLOAT, true },
+    { grb::type::FLOAT, true }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupFloat(4);
 
-  tryToParseStream();
-  const grb::type::StringList& list =  getCatalogEntry().getStringList();
-  ASSERT_EQ(1, list.size());
-  ASSERT_STREQ("JUST A STRING", list[0].c_str());
+  *_stream << "0.123456789|9.876543210|\n"
+              "0.123456789|9.876543210|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_result);
+  ASSERT_EQ(2, _parser->getNumberOfRows());
+  cleanCatalogEntry();
 }
 
-TEST_F(ParserTest, parse_StringList_Two)
+/***************************************************************************************************
+ *
+ * PARSE STRING
+ *
+ **************************************************************************************************/
+TEST_F(ParserDatabaseTest, ParseString_CatalogEntryGetIsNull)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  std::size_t col = grb::type::STRING_LIST;
-  line[col].raw = "One,Two";
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::STRING, true }
+  };
+  setupFormat();
 
-  tryToParseStream();
-  const grb::type::StringList& list =  getCatalogEntry().getStringList();
-  ASSERT_EQ(2, list.size());
-  ASSERT_STREQ("One", list[0].c_str());
-  ASSERT_STREQ("Two", list[1].c_str());
+  _entry = new grb::CatalogEntryMock(grb::type::UNDEFINED_CATALOG);
+  EXPECT_CALL(*_catalog, createEntry())
+      .WillRepeatedly(Return(_entry));
+  EXPECT_CALL(*_entry, getString(_))
+      .WillOnce(Return(nullptr));
+
+  *_stream << "string1|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_thrown);
 }
 
-TEST_F(ParserTest, parse_StringList_Two_FirstEmpty)
+TEST_F(ParserDatabaseTest, ParseString_OneColumn_Positive)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  std::size_t col = grb::type::STRING_LIST;
-  line[col].raw = ",Two";
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::STRING, true }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupString(2);
 
-  tryToParseStream(0, true);
+  *_stream << "string1|\n"
+              "string1|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_result);
+  ASSERT_EQ(2, _parser->getNumberOfRows());
+  cleanCatalogEntry();
 }
 
-TEST_F(ParserTest, parse_StringList_Two_SecondEmpty)
+TEST_F(ParserDatabaseTest, ParseString_TwoColumns_FirstRequred_Positive)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  std::size_t col = grb::type::STRING_LIST;
-  line[col].raw = "One,";
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::STRING, true },
+    { grb::type::STRING, false }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupString(4);
 
-  tryToParseStream();
-  const grb::type::StringList& list =  getCatalogEntry().getStringList();
-  ASSERT_EQ(1, list.size());
-  ASSERT_STREQ("One", list[0].c_str());
+  *_stream << "string1|string2|\n"
+              "string1|       |";
+
+  tryToParse();
+
+  ASSERT_TRUE(_result);
+  ASSERT_EQ(2, _parser->getNumberOfRows());
+  cleanCatalogEntry();
 }
 
-TEST_F(ParserTest, parse_StringList_Two_BothEmpty)
+TEST_F(ParserDatabaseTest, ParseString_TwoColumns_SecondRequred_Positive)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  std::size_t col = grb::type::STRING_LIST;
-  line[col].raw = ",";
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::STRING, false },
+    { grb::type::STRING, true }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupString(4);
 
-  tryToParseStream(0, true);
+  *_stream << "string1|string2|\n"
+              "       |string2|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_result);
+  ASSERT_EQ(2, _parser->getNumberOfRows());
+  cleanCatalogEntry();
 }
 
-
-TEST_F(ParserTest, parse_StringList_Empty)
+TEST_F(ParserDatabaseTest, ParseString_TwoColumns_BothRequred_Positive)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  std::size_t col = grb::type::STRING_LIST;
-  line[col].raw.clear();
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::STRING, true },
+    { grb::type::STRING, true }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupString(4);
 
-  tryToParseStream(0, true);
+  *_stream << "string1|string2|\n"
+              "string1|string2|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_result);
+  ASSERT_EQ(2, _parser->getNumberOfRows());
+  cleanCatalogEntry();
 }
 
-TEST_F(ParserTest, parse_StringList_Empty_Optional)
+/***************************************************************************************************
+ *
+ * PARSE STRING LIST
+ *
+ **************************************************************************************************/
+TEST_F(ParserDatabaseTest, ParseStringList_CatalogEntryGetIsNull)
 {
-  TypeValueVector line = DEFAULT_ROW;
-  std::size_t col = grb::type::STRING_LIST;
-  line[col].raw.clear();
-  line[col].required = false;
-  stringsToStream(line);
+  _columnDefs =
+  {
+    { grb::type::STRING_LIST, true }
+  };
+  setupFormat();
 
-  tryToParseStream();
-  const grb::type::StringList& list =  getCatalogEntry().getStringList();
-  ASSERT_EQ(0, list.size());
+  _entry = new grb::CatalogEntryMock(grb::type::UNDEFINED_CATALOG);
+  EXPECT_CALL(*_catalog, createEntry())
+      .WillRepeatedly(Return(_entry));
+  EXPECT_CALL(*_entry, getStringList(_))
+      .WillOnce(Return(nullptr));
+
+  *_stream << "string1,string2|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_thrown);
 }
 
+TEST_F(ParserDatabaseTest, ParseStringList_OneEmpty)
+{
+  _columnDefs =
+  {
+    { grb::type::STRING_LIST, true }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupStringList(1);
+
+  *_stream << "       |";
+
+  tryToParse();
+
+  ASSERT_TRUE(_thrown);
 }
+
+TEST_F(ParserDatabaseTest, ParseStringList_TwoEmpty)
+{
+  _columnDefs =
+  {
+    { grb::type::STRING_LIST, true }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupStringList(1);
+
+  *_stream << "   ,    |";
+
+  tryToParse();
+
+  ASSERT_TRUE(_thrown);
+}
+
+TEST_F(ParserDatabaseTest, ParseStringList_OneColumn_Positive)
+{
+  _columnDefs =
+  {
+    { grb::type::STRING_LIST, true }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupStringList(2);
+
+  *_stream << "string1,string2|\n"
+              "string1,string2|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_result);
+  ASSERT_EQ(2, _parser->getNumberOfRows());
+  cleanCatalogEntry();
+}
+
+TEST_F(ParserDatabaseTest, ParseStringList_TwoColumns_FirstRequred_Positive)
+{
+  _columnDefs =
+  {
+    { grb::type::STRING_LIST, true },
+    { grb::type::STRING_LIST, false }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupStringList(4);
+
+  *_stream << "string1,string2|string3,string4|\n"
+              "string1,string2|               |";
+
+  tryToParse();
+
+  ASSERT_TRUE(_result);
+  ASSERT_EQ(2, _parser->getNumberOfRows());
+  cleanCatalogEntry();
+}
+
+TEST_F(ParserDatabaseTest, ParseStringList_TwoColumns_SecondRequred_Positive)
+{
+  _columnDefs =
+  {
+    { grb::type::STRING_LIST, false },
+    { grb::type::STRING_LIST, true }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupStringList(4);
+
+  *_stream << "string1,string2|string3,string4|\n"
+              "               |string3,string4|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_result);
+  ASSERT_EQ(2, _parser->getNumberOfRows());
+  cleanCatalogEntry();
+}
+
+TEST_F(ParserDatabaseTest, ParseStringList_TwoColumns_BothRequred_Positive)
+{
+  _columnDefs =
+  {
+    { grb::type::STRING_LIST, true },
+    { grb::type::STRING_LIST, true }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupStringList(4);
+
+  *_stream << "string1,string2|string3,string4|\n"
+              "string1,string2|string3,string4|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_result);
+  ASSERT_EQ(2, _parser->getNumberOfRows());
+  cleanCatalogEntry();
+}
+
+/***************************************************************************************************
+ *
+ *
+ *
+ **************************************************************************************************/
+TEST_F(ParserDatabaseTest, Parse_LessDataThanExpected)
+{
+  _columnDefs =
+  {
+    { grb::type::STRING, true },
+    { grb::type::STRING, true }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupString(3);
+
+  *_stream << "string1|string2|\n"
+              "string1|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_thrown);
+  cleanCatalogEntry();
+}
+
+TEST_F(ParserDatabaseTest, Parse_MoreDataThanExpected)
+{
+  _columnDefs =
+  {
+    { grb::type::STRING, true },
+    { grb::type::STRING, true }
+  };
+  setupFormat();
+  setupCatalogEntry();
+  setupString(4);
+
+  *_stream << "string1|string2|\n"
+              "string1|string2|string3|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_thrown);
+  cleanCatalogEntry();
+}
+
+TEST_F(ParserDatabaseTest, Parse_CatalogEntryNotValid)
+{
+  _columnDefs =
+  {
+    { grb::type::STRING, true },
+    { grb::type::STRING, true }
+  };
+  setupFormat();
+  setupCatalogEntry(false);
+  setupString(2);
+
+  *_stream << "string1|string2|\n"
+              "string1|string2|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_thrown);
+  cleanCatalogEntry();
+}
+
+TEST_F(ParserDatabaseTest, Parse_UnsupportedValue)
+{
+  _columnDefs =
+  {
+    { grb::type::STRING, true },
+    { grb::type::UNDEFINED_VALUE, true }
+  };
+  setupFormat();
+  setupCatalogEntry(false);
+  setupString(1);
+
+  *_stream << "string1|string2|\n"
+              "string1|string2|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_thrown);
+  cleanCatalogEntry();
+}
+
+
+TEST_F(ParserDatabaseTest, Parse_CriticalException)
+{
+  _columnDefs =
+  {
+    { grb::type::STRING, true },
+    { grb::type::STRING, true }
+  };
+  setupFormat();
+  setupCatalogEntry(false);
+  EXPECT_CALL(*_entry, getString(_))
+      .Times(1)
+      .WillRepeatedly(Invoke(&_dummy, &grb::CatalogEntryDummy::getStringException));
+
+  *_stream << "string1|string2|\n"
+              "string1|string2|";
+
+  tryToParse();
+
+  ASSERT_TRUE(_thrown);
+  cleanCatalogEntry();
+}
+
 
 } // namespace testing

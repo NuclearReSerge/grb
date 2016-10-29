@@ -53,7 +53,7 @@ HEADERS += \
     Data/CatalogEntryFactory.h \
     Data/CatalogEntryGrbcat.h \
     Data/CatalogEntryMapper.h \
-    Data/CatalogEntryType.h \
+    Data/CatalogType.h \
     Data/ColumnMapper.h \
     Data/ColumnType.h \
     Data/Coordinates.h \
@@ -84,6 +84,7 @@ HEADERS += \
     Filter/FilterNone.h \
     Filter/FilterType.h \
     Main/AnalysisData.h \
+    Main/Init.h \
     Model/IsotropicBallModel.h \
     Model/IsotropicSphereModel.h \
     Model/Model.h \
@@ -94,7 +95,9 @@ HEADERS += \
     Model/ModelType.h \
     Tools/ConvertSpaceTime.h \
     Tools/NameMapper.h \
-    Tools/Parser.h
+    Tools/Parser.h \
+    Tools/ParserDatabase.h \
+    Tools/SyntaxVerifier.h
 
 SOURCES += \
     Analyzer/Analyzer.cpp \
@@ -151,4 +154,6 @@ SOURCES += \
     Model/ModelMapper.cpp \
     Tools/ConvertSpaceTime.cpp \
     Tools/NameMapper.cpp \
-    Tools/Parser.cpp
+    Tools/ParserDatabase.cpp \
+    Tools/SyntaxVerifier.cpp
+

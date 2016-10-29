@@ -50,6 +50,14 @@ public:
     return true;
   }
 
+  type::Float getXRange() const { return _xRange; }
+  std::size_t getXPoints() const { return _xPoints; }
+  type::Float getXDelta() const { return _xDelta; }
+
+  type::Float getYRange() const { return _yRange; }
+  std::size_t getYPoints() const { return _yPoints; }
+  type::Float getYDelta() const { return _yDelta; }
+
   virtual bool parse(std::list<std::string>& tokens) = 0;
   virtual bool build(Catalog& catalogData, Catalog& catalogModel) = 0;
   virtual bool save(const std::string& filePrefix) = 0;

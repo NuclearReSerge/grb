@@ -6,7 +6,7 @@ namespace testing
 {
 
 #ifdef TEST_PRINT_EXC
-void printWhat(grb::Exception& exc)
+void printWhat(const grb::Exception& exc)
 {
   std::cout << exc.what() << std::endl;
 }

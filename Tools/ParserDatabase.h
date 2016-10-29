@@ -4,7 +4,7 @@
 #include "Data/DataBaseColumn.h"
 #include "Tools/Parser.h"
 
-#include <istream>
+#include <iostream>
 #include <string>
 
 #pragma once
@@ -34,6 +34,7 @@ public:
 
 protected:
   void openFileStream(const std::string& filename);
+  void checkFormat();
 
   void parseLine(const std::string& line, CatalogEntry* entry);
   void checkColumns(const type::ColumnFlags& columnFlags);
@@ -52,15 +53,17 @@ protected:
   std::string getExceptionString(std::string cause);
 
 private:
-  bool _isSourceFile;
   std::istream* _stream;
-  std::size_t _column;
+  DataBaseFormat& _format;
+  Catalog& _catalog;
+  const type::ColumnFlags& _columnsRequired;
+
+
+  bool _isSourceFile;
+  std::size_t _columnIdx;
   type::ColumnType _columnType;
   type::ValueType _valueType;
 
-  DataBaseFormat& _format;
-  const type::ColumnFlags& _columnsRequired;
-  Catalog& _catalog;
 };
 
 } // namespace grb

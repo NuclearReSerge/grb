@@ -5,6 +5,6 @@
 namespace testing
 {
 
-void printWhat(grb::Exception& exc);
+void printWhat(const grb::Exception& exc);
 
 } // namespace testing

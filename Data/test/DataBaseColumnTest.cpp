@@ -30,7 +30,7 @@ TEST_F(DataBaseColumnTest, init_Custom)
   const grb::type::ValueType valueType = grb::type::FLAG;
   const grb::type::UnitType unitType = grb::type::NO_UNIT;
 
-  _dbColumn = new grb::DataBaseColumn(columnType, true, unitType, valueType);
+  _dbColumn = new grb::DataBaseColumn(columnType, unitType, valueType, true);
 
   ASSERT_EQ(columnType,_dbColumn->getColumnType());
   ASSERT_EQ(valueType,_dbColumn->getValueType());

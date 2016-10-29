@@ -20,14 +20,10 @@ typedef std::bitset<type::UNDEFINED_COLUMN> ColumnFlags;
 class DataBaseColumn
 {
 public:
-  DataBaseColumn()
-    : _columnType(type::UNDEFINED_COLUMN), _valueType(type::UNDEFINED_VALUE),
-      _unitType(type::UNDEFINED_UNIT), _isRequired(false)
-  {
-  }
-
-  DataBaseColumn(type::ColumnType columnType, bool isRequired, type::UnitType unitType,
-           type::ValueType valueType)
+  DataBaseColumn(type::ColumnType columnType = type::UNDEFINED_COLUMN,
+                 type::UnitType unitType = type::UNDEFINED_UNIT,
+                 type::ValueType valueType = type::UNDEFINED_VALUE,
+                 bool isRequired = false)
     : _columnType(columnType), _valueType(valueType), _unitType(unitType), _isRequired(isRequired)
   {
   }

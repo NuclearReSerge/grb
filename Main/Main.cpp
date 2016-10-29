@@ -2,6 +2,7 @@
 #include "CLI/CommandLine.h"
 #include "CLI/Cmd.h"
 #include "Main/AnalysisData.h"
+#include "Main/Init.h"
 
 #include <iostream>
 #include <memory>
@@ -27,20 +28,6 @@ enum ErrorLevelCode
 
 /** ************************************************************************************************
  *
- * Main/Init.cpp
- *
- **************************************************************************************************/
-
-namespace grb
-{
-
-extern void intro();
-extern void usage(const std::string& binaryName);
-
-} // namespace grb
-
-/** ************************************************************************************************
- *
  * MAIN
  *
  **************************************************************************************************/
@@ -55,7 +42,7 @@ char buff[buffSize];
 int
 main(int argc, char** argv)
 {
-  grb::intro();
+  grb::Init::intro();
   grb::CommandLine cli(argc, argv);
 
   while (!cli.quit())
@@ -89,7 +76,7 @@ main(int argc, char** argv)
       std::cerr << exc.what() << std::endl;
       if (exc.getLevel() == grb::type::EXCEPTION_CRITICAL)
       {
-        //grb::usage(cli.getBinaryName());
+        grb::Init::usage(cli.getBinaryName());
         return grb::type::COMMAND_LINE_PARSING_FAILED;
       }
     }

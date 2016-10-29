@@ -1,8 +1,6 @@
 #include "Common/Global.h"
 #include "Data/ColumnType.h"
 
-//#include "test/Mock/NameMapperMock.h"
-//#include "test/Mock/MapperTestFixtures.h"
 #include "test/Mock/MockHelper.h"
 
 #include <gmock/gmock.h>
@@ -73,7 +71,7 @@ protected:
   }
 
 
-  bool _thrown { false };
+  bool _thrown = false;
 
   grb::type::Index _validValue;
   grb::type::Index _invalidValue;
