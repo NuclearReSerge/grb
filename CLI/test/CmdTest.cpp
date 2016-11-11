@@ -102,7 +102,7 @@ TEST_F(CmdTest, newCommand)
 
 TEST_F(CmdTest, parseAllTrue)
 {
-  EXPECT_CALL(_cmd, doParse(_))
+  EXPECT_CALL(_cmd, parse(_))
       .Times(1)
       .WillOnce(Invoke(this, &CmdTest::doParseAllTrue));
 
@@ -113,7 +113,7 @@ TEST_F(CmdTest, parseAllTrue)
 
 TEST_F(CmdTest, parseAllFalse)
 {
-  EXPECT_CALL(_cmd, doParse(_))
+  EXPECT_CALL(_cmd, parse(_))
       .Times(1)
       .WillOnce(Invoke(this, &CmdTest::doParseAllFalse));
 
@@ -124,7 +124,7 @@ TEST_F(CmdTest, parseAllFalse)
 
 TEST_F(CmdTest, parseNoneFalse)
 {
-  EXPECT_CALL(_cmd, doParse(_))
+  EXPECT_CALL(_cmd, parse(_))
       .Times(1)
       .WillOnce(Invoke(this, &CmdTest::doParseNoneFalse));
 
@@ -135,7 +135,7 @@ TEST_F(CmdTest, parseNoneFalse)
 
 TEST_F(CmdTest, parseNoneTrue)
 {
-  EXPECT_CALL(_cmd, doParse(_))
+  EXPECT_CALL(_cmd, parse(_))
       .Times(1)
       .WillOnce(Invoke(this, &CmdTest::doParseNoneTrue));
 
@@ -146,7 +146,7 @@ TEST_F(CmdTest, parseNoneTrue)
 
 TEST_F(CmdTest, parseThrow)
 {
-  EXPECT_CALL(_cmd, doParse(_))
+  EXPECT_CALL(_cmd, parse(_))
       .Times(1)
       .WillOnce(Invoke(this, &CmdTest::doParseThrow));
 
@@ -157,7 +157,7 @@ TEST_F(CmdTest, parseThrow)
 
 TEST_F(CmdTest, executeNoThrow)
 {
-  EXPECT_CALL(_cmd, doExecute())
+  EXPECT_CALL(_cmd, execute())
       .Times(1)
       .WillOnce(Invoke(this, &CmdTest::doExecuteNoThrow));
 
@@ -169,7 +169,7 @@ TEST_F(CmdTest, executeNoThrow)
 
 TEST_F(CmdTest, executeThrow)
 {
-  EXPECT_CALL(_cmd, doExecute())
+  EXPECT_CALL(_cmd, execute())
       .Times(1)
       .WillOnce(Invoke(this, &CmdTest::doExecuteThrow));
 
@@ -181,11 +181,11 @@ TEST_F(CmdTest, executeThrow)
 
 TEST_F(CmdTest, helpShort)
 {
-  EXPECT_CALL(_cmd, doHelp(_))
+  EXPECT_CALL(_cmd, help(_))
       .Times(1)
       .WillOnce(Invoke(this, &CmdTest::doHelp));
 
-  ASSERT_NO_THROW(_cmd.help());
+  ASSERT_NO_THROW(_cmd.help(grb::type::HELP_SHORT));
 
   ASSERT_EQ(1, _helpShort);
   ASSERT_EQ(0, _helpLong);
@@ -193,7 +193,7 @@ TEST_F(CmdTest, helpShort)
 
 TEST_F(CmdTest, helpLong)
 {
-  EXPECT_CALL(_cmd, doHelp(_))
+  EXPECT_CALL(_cmd, help(_))
       .Times(1)
       .WillOnce(Invoke(this, &CmdTest::doHelp));
 
@@ -205,7 +205,7 @@ TEST_F(CmdTest, helpLong)
 
 TEST_F(CmdTest, helpFull)
 {
-  EXPECT_CALL(_cmd, doHelp(_))
+  EXPECT_CALL(_cmd, help(_))
       .Times(2)
       .WillRepeatedly(Invoke(this, &CmdTest::doHelp));
 

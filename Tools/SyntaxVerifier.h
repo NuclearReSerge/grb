@@ -1,8 +1,8 @@
+#pragma once
+
 #include <list>
 #include <string>
 #include <vector>
-
-#pragma once
 
 namespace grb
 {

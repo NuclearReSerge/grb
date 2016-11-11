@@ -1,33 +1,40 @@
-#include "CLI/Cmd.h"
-#include "Model/ModelType.h"
-#include "Model/ModelCmdType.h"
-
 #pragma once
+
+#include "CLI/Cmd.h"
+#include "Model/ModelCmdType.h"
+#include "Model/ModelType.h"
 
 namespace grb
 {
 
-class CmdModel : public Cmd
+typedef Cmd<type::ModelType, type::ModelCmdType> CmdModelBase;
+
+class CmdModel : public CmdModelBase
 {
 public:
-  CmdModel();
+  CmdModel()
+    : CmdModelBase(type::CMD_MODEL)
+  {
+  }
 
 protected:
-  bool doParse(std::list<std::string>& tokens);
-  void doExecute();
-  std::string doHelp(type::CommandHelpType type);
+  type::ModelType getMappedObjectVal(std::string& objStr) override;
+  type::ModelCmdType getMappedSubCmdVal(std::string& cmdStr) override;
+  std::string getMappedSubCmdStr(type::ModelCmdType cmdVal) override;
+  bool isObjectCreated() override;
+  std::string getCreatedObjectName() override;
+  bool doParse(std::list<std::string>& tokens) override;
+  void doExecute() override;
+  std::string doHelp(type::CommandHelpType type) override;
+  void executeCreate() override;
+  void executeHelp() override;
 
-  bool parseCreate(std::list<std::string>& tokens);
   bool parseGenerate(std::list<std::string>& tokens);
-  bool parseHelp(std::list<std::string>& tokens);
-
-  void executeCreate();
   void executeGenerate();
-  void executeHelp();
 
 private:
   type::ModelCmdType _subCmd;
-  type::ModelType _modelType;
+  type::ModelType _type;
 };
 
 } // namespace grb

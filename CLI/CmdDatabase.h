@@ -1,38 +1,57 @@
-#include "CLI/Cmd.h"
-#include "Data/CatalogType.h"
-#include "Data/DataBaseFormatType.h"
-
 #pragma once
+
+#include "CLI/Cmd.h"
+
+#include "Database/DatabaseCmdType.h"
+#include "Database/DatabaseType.h"
 
 namespace grb
 {
 
-class DataBaseFormat;
-class Catalog;
-class Parser;
+typedef Cmd<type::DatabaseType, type::DatabaseCmdType> CmdDatabaseBase;
 
-class CmdDatabase : public Cmd
+class CmdDatabase : public CmdDatabaseBase
 {
 public:
-  CmdDatabase();
-  ~CmdDatabase();
+  CmdDatabase()
+    : CmdDatabaseBase(type::CMD_DATABASE)
+  {
+  }
 
 protected:
-  bool doParse(std::list<std::string>& tokens);
-  void doExecute();
-  std::string doHelp(type::CommandHelpType type);
-
-  virtual DataBaseFormat* getDbFormat(const type::DataBaseFormatType& dbType);
-  virtual Catalog* getCatalog(type::DataBaseFormatType dbType);
-  virtual Parser* getParser(DataBaseFormat& dbFormat, Catalog& catalog);
-
-  bool filenameMapping(const std::string& filename);
-  type::CatalogType convertDataBaseFormat(type::DataBaseFormatType dbType);
+  type::DatabaseType getMappedObjectVal(std::string& objStr) override;
+  type::DatabaseCmdType getMappedSubCmdVal(std::string& cmdStr) override;
+  std::string getMappedSubCmdStr(type::DatabaseCmdType cmdVal) override;
+  bool isObjectCreated() override;
+  std::string getCreatedObjectName() override;
+  bool doParse(std::list<std::string>& tokens) override;
+  void doExecute() override;
+  std::string doHelp(type::CommandHelpType type) override;
+  void executeCreate() override;
+  void executeHelp() override;
 
 private:
-  std::string _dbFilename;
-  type::DataBaseFormatType _dbType;
-  DataBaseFormat* _format = nullptr;
+  type::DatabaseCmdType _subCmd;
+  type::DatabaseType _type;
 };
 
 } // namespace grb
+
+/*
+#include "Catalog/CatalogType.h"
+
+class Catalog;
+class Database;
+class Parser;
+~CmdDatabase();
+  virtual Database* getDatabase(const type::DatabaseType& dbType);
+  virtual Catalog* getCatalog(type::DatabaseType dbType);
+  virtual Parser* getParser(Database& database, Catalog& catalog);
+
+  bool filenameMapping(const std::string& filename);
+  type::CatalogType convertDatabase(type::DatabaseType dbType);
+  std::string _dbFilename;
+  Database* _format = nullptr;
+
+*/
+

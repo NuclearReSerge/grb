@@ -1,8 +1,8 @@
+#pragma once
+
 #include "Model/Model.h"
 
 #include <gmock/gmock.h>
-
-#pragma once
 
 namespace grb
 {

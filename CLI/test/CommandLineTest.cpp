@@ -45,14 +45,14 @@ public:
     return _cmd;
   }
 
-  Cmd* createCommandOriginal(const std::string& name)
+  CmdBase* createCommandOriginal(const std::string& name)
   {
     return CommandLine::createCommand(name);
   }
 
 
 protected:
-  Cmd* createCommand(const std::string& /*name*/) override
+  CmdBase* createCommand(const std::string& /*name*/) override
   {
     _created = true;
     return _cmd;
@@ -107,7 +107,7 @@ protected:
 
   bool _thrown { false };
   std::list<std::string> _tokens { "command-name" };
-  grb::Cmd* _cmd { nullptr };
+  grb::CmdBase* _cmd { nullptr };
   grb::CommandLineMock _cli { ARGC, ARGV };
 };
 
@@ -143,14 +143,14 @@ TEST_F(CommandLineTest, quit)
 
 TEST_F(CommandLineTest, parse_CmdParseAllTrue)
 {
-  EXPECT_CALL(*_cli.getCmdMock(), doParse(_))
+  EXPECT_CALL(*_cli.getCmdMock(), parse(_))
       .Times(1)
       .WillOnce(Invoke(this, &CommandLineTest::parseAllTrue));
 
   callParse();
 
   ASSERT_FALSE(_thrown);
-  ASSERT_NE((grb::Cmd*) nullptr, _cmd);
+  ASSERT_NE((grb::CmdBase*) nullptr, _cmd);
   ASSERT_EQ(&_cli, _cmd->getCLI());
 }
 
@@ -161,7 +161,7 @@ TEST_F(CommandLineTest, parse_NothingToParse)
   callParse();
 
   ASSERT_FALSE(_thrown);
-  ASSERT_EQ((grb::Cmd*) nullptr, _cmd);
+  ASSERT_EQ((grb::CmdBase*) nullptr, _cmd);
 }
 
 TEST_F(CommandLineTest, parse_CommandNotCreated)
@@ -172,50 +172,50 @@ TEST_F(CommandLineTest, parse_CommandNotCreated)
   callParse();
 
   ASSERT_FALSE(_thrown);
-  ASSERT_EQ((grb::Cmd*) nullptr, _cmd);
+  ASSERT_EQ((grb::CmdBase*) nullptr, _cmd);
 }
 
 TEST_F(CommandLineTest, parse_CmdParseFalse)
 {
-  EXPECT_CALL(*_cli.getCmdMock(), doParse(_))
+  EXPECT_CALL(*_cli.getCmdMock(), parse(_))
       .Times(1)
       .WillOnce(Invoke(this, &CommandLineTest::parseFalse));
 
   callParse();
 
   ASSERT_FALSE(_thrown);
-  ASSERT_EQ((grb::Cmd*) nullptr, _cmd);
+  ASSERT_EQ((grb::CmdBase*) nullptr, _cmd);
 }
 
 TEST_F(CommandLineTest, parse_CmdParseTrue_AgrumentsLeft)
 {
   _tokens.push_back("left-arg");
 
-  EXPECT_CALL(*_cli.getCmdMock(), doParse(_))
+  EXPECT_CALL(*_cli.getCmdMock(), parse(_))
       .Times(1)
       .WillOnce(Invoke(this, &CommandLineTest::parseTrue));
 
   callParse();
 
   ASSERT_TRUE(_thrown);
-  ASSERT_EQ((grb::Cmd*) nullptr, _cmd);
+  ASSERT_EQ((grb::CmdBase*) nullptr, _cmd);
 }
 
 TEST_F(CommandLineTest, parse_CmdParseThrow)
 {
-  EXPECT_CALL(*_cli.getCmdMock(), doParse(_))
+  EXPECT_CALL(*_cli.getCmdMock(), parse(_))
       .Times(1)
       .WillOnce(Invoke(this, &CommandLineTest::parseThrow));
 
   callParse();
 
   ASSERT_TRUE(_thrown);
-  ASSERT_EQ((grb::Cmd*) nullptr, _cmd);
+  ASSERT_EQ((grb::CmdBase*) nullptr, _cmd);
 }
 
 TEST_F(CommandLineTest, createCommand)
 {
-  grb::Cmd* cmd = _cli.createCommandOriginal("undefined-command");
+  grb::CmdBase* cmd = _cli.createCommandOriginal("undefined-command");
   ASSERT_EQ(nullptr, cmd);
 }
 

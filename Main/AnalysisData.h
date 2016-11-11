@@ -1,6 +1,6 @@
-#include "Common/Singleton.h"
-
 #pragma once
+
+#include "Common/Singleton.h"
 
 namespace grb
 {
@@ -8,6 +8,7 @@ namespace grb
 class Analyzer;
 class Correlation;
 class Catalog;
+class Database;
 class Filter;
 class Model;
 
@@ -24,6 +25,7 @@ public:
   Correlation* getCorrelation();
   Catalog* getCatalogData();
   Catalog* getCatalogModel();
+  Database* getDatabase();
   Filter* getFilter();
   Model* getModel();
 
@@ -31,6 +33,7 @@ public:
   void setCorrelation(Correlation* correlation);
   void setCatalogData(Catalog* catalog);
   void setCatalogModel(Catalog* catalog);
+  void setDatabase(Database* database);
   void setFilter(Filter* filter);
   void setModel(Model* model);
 
@@ -41,4 +44,4 @@ public:
 
 typedef Singleton<internal::AnalysisData> AnalysisData;
 
-}// namespace grb
+} // namespace grb

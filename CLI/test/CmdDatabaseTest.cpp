@@ -2,7 +2,7 @@
 #include "Main/AnalysisData.h"
 
 #include "test/Mock/CatalogMock.h"
-#include "test/Mock/DataBaseFormatMock.h"
+#include "test/Mock/DatabaseMock.h"
 #include "test/Mock/ParserMock.h"
 #include "test/Mock/MockHelper.h"
 
@@ -15,10 +15,11 @@ class CmdDatabaseMock : public CmdDatabase
 {
 public:
   CmdDatabaseMock() = default;
-
+/*
   MOCK_METHOD1(getDbFormat, DataBaseFormat* (const type::DataBaseFormatType& dbType));
   MOCK_METHOD1(getCatalog, Catalog* (type::DataBaseFormatType dbType));
   MOCK_METHOD2(getParser, Parser* (DataBaseFormat& dbFormat, Catalog& catalog));
+  */
 };
 
 } //namespace grb
@@ -116,7 +117,7 @@ TEST_F(CmdDatabaseTest, parse_wrongFilename)
 
   ASSERT_TRUE(_thrown);
 }
-
+/*
 TEST_F(CmdDatabaseTest, parse_wrongDbFormat)
 {
   EXPECT_CALL(_cmdMock, getDbFormat(_))
@@ -129,7 +130,7 @@ TEST_F(CmdDatabaseTest, parse_wrongDbFormat)
 
 TEST_F(CmdDatabaseTest, parse_extraToken)
 {
-  grb::DataBaseFormat* format = new grb::DataBaseFormatMock(grb::type::UNDEFINED_DATABASE_FORMAT);
+  grb::Database* format = new grb::DatabaseMock(grb::type::UNDEFINED_DATABASE);
 
   EXPECT_CALL(_cmdMock, getDbFormat(_))
       .WillOnce(Return(format));
@@ -142,7 +143,7 @@ TEST_F(CmdDatabaseTest, parse_extraToken)
 
 TEST_F(CmdDatabaseTest, parse_positive)
 {
-  grb::DataBaseFormat* format = new grb::DataBaseFormatMock(grb::type::UNDEFINED_DATABASE_FORMAT);
+  grb::Database* format = new grb::DatabaseMock(grb::type::UNDEFINED_DATABASE);
 
   EXPECT_CALL(_cmdMock, getDbFormat(_))
       .WillOnce(Return(format));
@@ -228,7 +229,7 @@ TEST_F(CmdDatabaseTest, execute_ParseTrue)
 
   ASSERT_EQ(catalog, grb::AnalysisData::instance()->getCatalogData());
 }
-
+*/
 TEST_F(CmdDatabaseTest, help_short)
 {
   _cmdMock.help(grb::type::HELP_SHORT);
@@ -241,6 +242,7 @@ TEST_F(CmdDatabaseTest, help_long)
 
 } // namespace testing
 
+/*
 namespace grb
 {
 
@@ -252,17 +254,17 @@ public:
   {
   }
 
-  DataBaseFormat* getDbFormatStub(const type::DataBaseFormatType& dbType)
+  Database* getDbFormatStub(const type::DatabaseType& dbType)
   {
     return getDbFormat(dbType);
   }
 
-  Catalog* getCatalogStub(type::DataBaseFormatType dbType)
+  Catalog* getCatalogStub(type::DatabaseType dbType)
   {
     return getCatalog(dbType);
   }
 
-  Parser* getParserStub(DataBaseFormat& dbFormat, Catalog& catalog)
+  Parser* getParserStub(Database& dbFormat, Catalog& catalog)
   {
     return getParser(dbFormat, catalog);
   }
@@ -367,3 +369,4 @@ TEST_F(CmdDatabaseStubTest, getParser_Positive)
 }
 
 } // namespace testing
+*/

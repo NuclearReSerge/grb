@@ -7,10 +7,11 @@ namespace type
 
 enum AnalyzerCmdType
 {
-  AC_CREATE,
-  AC_SET,
-  AC_BUILD,
-  AC_SAVE,
+  ANALYZER_CREATE,
+  ANALYZER_HELP,
+
+  ANALYZER_LIST,
+  //
 
   // LAST
   UNDEFINED_ANALYZER_CMD

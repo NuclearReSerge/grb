@@ -1,56 +1,47 @@
-#include "Analyzer/AnalyzerType.h"
-
-#include "Analyzer/AnalyzerCmdType.h"
-
-#include <list>
-#include <string>
-
 #pragma once
+
+#include "Analyzer/AnalyzerType.h"
+#include "Analyzer/AnalyzerCmdType.h"
+#include "Common/BaseObject.h"
 
 namespace grb
 {
 
-class Analyzer
+typedef BaseObject<type::AnalyzerType, type::AnalyzerCmdType> AnalyzerBase;
+
+class Analyzer : public AnalyzerBase
 {
 public:
+
   Analyzer(const type::AnalyzerType type = type::UNDEFINED_ANALYZER)
-    : _type(type), _configured(false), _cmdType(type::UNDEFINED_ANALYZER_CMD)
+    : AnalyzerBase(type)
   {
   }
 
-  virtual ~Analyzer() = default;
-
-  type::AnalyzerType getType() const
+  std::string list()
   {
-    return _type;
+    return doList();
   }
 
-  bool isConfigured() const
-  {
-    return _configured;
-  }
-
-  void setConfigured(const bool configured = true)
-  {
-    _configured = configured;
-  }
-
-  type::AnalyzerCmdType getCmdType() const
-  {
-    return _cmdType;
-  }
-
-  bool parse(std::list<std::string>& tokens);
-  void execute();
+  virtual bool isConfigurationValid() = 0;
 
 protected:
-  virtual bool doParse(std::list<std::string>& tokens) = 0;
-  virtual void doExecute() = 0;
+  bool isCommandValid(const type::AnalyzerCmdType cmd)
+  {
+    switch (cmd)
+    {
+      case type::ANALYZER_CREATE:
+      case type::ANALYZER_HELP:
+      case type::ANALYZER_LIST:
+      {
+        return false;
+      }
+      default:
+        return true;
+    }
+  }
+  virtual std::string doList() = 0;
 
-private:
-  const type::AnalyzerType _type;
-  bool _configured;
-  type::AnalyzerCmdType _cmdType;
 };
 
 } // namespace grb

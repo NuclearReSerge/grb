@@ -32,7 +32,7 @@ CommandLine::CommandLine(int argc, char** argv)
 CommandLine::~CommandLine()
 {
   _args.clear();
-  for (Cmd* cmd : _commands)
+  for (CmdBase* cmd : _commands)
   {
     delete cmd;
   }
@@ -61,13 +61,13 @@ CommandLine::getPrompt(bool counter) const
   return ss.str();
 }
 
-Cmd*
+CmdBase*
 CommandLine::parse(std::list<std::string>& tokens) throw(Exception)
 {
   if (tokens.empty())
     return nullptr;
 
-  Cmd* cmdObj = createCommand(tokens.front());
+  CmdBase* cmdObj = createCommand(tokens.front());
 
   if (!cmdObj)
     return nullptr;
@@ -124,7 +124,7 @@ CommandLine::tokenize(const std::string& input, std::list<std::string>& tokens, 
   }
 }
 
-Cmd*
+CmdBase*
 CommandLine::createCommand(const std::string& name)
 {
   return CommandFactory::instance()->createName(name);

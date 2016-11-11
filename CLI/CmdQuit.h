@@ -1,19 +1,21 @@
-#include "CLI/Cmd.h"
-
 #pragma once
+
+#include "CLI/Cmd.h"
 
 namespace grb
 {
 
-class CmdQuit : public Cmd
+class CmdQuit : public CmdBase
 {
 public:
-  CmdQuit(type::CommandType cmdType = type::CMD_QUIT);
+  CmdQuit(type::CommandType cmdType = type::CMD_QUIT)
+    : CmdBase(cmdType)
+  {
+  }
 
-protected:
-  bool doParse(std::list<std::string>& tokens);
-  void doExecute();
-  std::string doHelp(type::CommandHelpType type);
+  virtual bool parse(std::list<std::string>& tokens) override;
+  virtual void execute() override;
+  virtual std::string help(type::CommandHelpType type = type::HELP_SHORT) override;
 };
 
 } // namespace grb

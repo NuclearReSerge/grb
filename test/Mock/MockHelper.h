@@ -1,6 +1,6 @@
-#include "Common/Exception.h"
-
 #pragma once
+
+#include "Common/Exception.h"
 
 namespace testing
 {

@@ -6,7 +6,7 @@ namespace testing
 {
 
 class CommandFactoryTest :
-    public FactoryTestFixturesBase<grb::type::CommandType, grb::Cmd, grb::factory::CommandFactory>
+    public FactoryTestFixturesBase<grb::type::CommandType, grb::CmdBase, grb::factory::CommandFactory>
 {
 protected:
   void SetUp()

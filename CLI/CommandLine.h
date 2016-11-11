@@ -1,15 +1,15 @@
+#pragma once
+
 #include "Common/Exception.h"
 
 #include <list>
 #include <string>
 #include <vector>
 
-#pragma once
-
 namespace grb
 {
 
-class Cmd;
+class CmdBase;
 
 extern const std::string CMD_PROMPT;
 
@@ -22,7 +22,7 @@ public:
 
   std::string getBinaryName() const;
   std::string getPrompt(bool counter = true) const;
-  Cmd* parse(std::list<std::string>& tokens) throw(Exception);
+  CmdBase* parse(std::list<std::string>& tokens) throw(Exception);
   static void tokenize(const std::string& input, std::list<std::string>& tokens,
                        const char delim = ' ');
 
@@ -40,13 +40,13 @@ public:
   }
 
 protected:
-  virtual Cmd* createCommand(const std::string& name);
+  virtual CmdBase* createCommand(const std::string& name);
 
 private:
   bool _quit;
   std::size_t _cmdIndex;
   std::vector<std::string> _args;
-  std::list<Cmd*> _commands;
+  std::list<CmdBase*> _commands;
 };
 
 } // namespace grb

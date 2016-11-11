@@ -1,8 +1,8 @@
 #include "Model/IsotropicSphereModel.h"
 
-#include "Data/Catalog.h"
-#include "Data/CatalogEntryFactory.h"
-#include "Data/CatalogEntryGrbcat.h"
+#include "Catalog/Catalog.h"
+#include "Catalog/CatalogEntryFactory.h"
+#include "Catalog/CatalogEntryGrbcat.h"
 #include "Model/ModelCmdMapper.h"
 #include "Model/ModelMapper.h"
 #include "Tools/SyntaxVerifier.h"

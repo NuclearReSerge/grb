@@ -13,7 +13,7 @@ namespace grb
 namespace factory
 {
 
-Cmd*
+CmdBase*
 CommandFactory::createType(const type::CommandType& type)
 {
   switch (type)

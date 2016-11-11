@@ -1,8 +1,8 @@
+#pragma once
+
 #include "Common/Mapper.h"
 
 #include <gmock/gmock.h>
-
-#pragma once
 
 namespace grb
 {

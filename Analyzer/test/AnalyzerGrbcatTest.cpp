@@ -1,9 +1,10 @@
 #include "Analyzer/AnalyzerGrbcat.h"
 
 #include "Analyzer/AnalyzerCmdMapper.h"
+#include "Catalog/CatalogEntryGrbcat.h"
 #include "Correlation/CorrelationMapper.h"
-#include "Data/CatalogEntryGrbcat.h"
 #include "Main/AnalysisData.h"
+#include "Model/IsotropicSphereModel.h"
 
 #include "test/Mock/CatalogMock.h"
 #include "test/Mock/CorrelationMock.h"
@@ -27,8 +28,8 @@ protected:
   {
     grb::AnalysisData::instance()->setCatalogData(new grb::CatalogMock(grb::type::GRBCAT));
     grb::AnalysisData::instance()->setCatalogModel(new grb::CatalogMock(grb::type::GRBCAT));
-    grb::AnalysisData::instance()->setCorrelation(
-          new grb::CorrelationMock(grb::type::CORRELATION_GRBCAT_DTDARC));
+    grb::AnalysisData::instance()->setCorrelation(new grb::CorrelationMock(grb::type::CORRELATION_GRBCAT_DTDARC));
+    grb::AnalysisData::instance()->setModel(new grb::IsotropicSphereModel());
   }
 
   void TearDown()
@@ -40,8 +41,9 @@ protected:
   {
     try
     {
-      _result = _analyzer.parse(_tokens);
-      _analyzer.execute();
+      _result = _analyzer.parse(_cmd, _tokens);
+      if (_result)
+        _analyzer.execute(_cmd);
     }
     catch (grb::Exception& exc)
     {
@@ -51,16 +53,17 @@ protected:
   }
 
   std::list<std::string> _tokens;
-  bool _result { false };
-  bool _thrown { false };
-  std::string _filePrefix { "prefix" };
+  bool _result = false;
+  bool _thrown = false;
+  std::string _filePrefix;
   grb::AnalyzerGrbcat _analyzer;
+  grb::type::AnalyzerCmdType _cmd = grb::type::UNDEFINED_ANALYZER_CMD;
 };
 
 TEST_F(AnalyzerGrbcatTest, initial)
 {
   ASSERT_EQ(grb::type::GRBCAT_ANALYZER, _analyzer.getType());
-  ASSERT_FALSE(_analyzer.isConfigured());
+  ASSERT_FALSE(_analyzer.isConfigurationValid());
 }
 
 TEST_F(AnalyzerGrbcatTest, nothingToParse)
@@ -72,7 +75,7 @@ TEST_F(AnalyzerGrbcatTest, nothingToParse)
 
 TEST_F(AnalyzerGrbcatTest, unknownSubCmd)
 {
-  _tokens.push_back("command-name");
+  _cmd = grb::type::UNDEFINED_ANALYZER_CMD;
 
   callParseAndExecute();
 
@@ -90,7 +93,7 @@ TEST_F(AnalyzerGrbcatTest, unhandledSubCmd)
 
 TEST_F(AnalyzerGrbcatTest, create_noArgument)
 {
-  _tokens.push_back("create");
+  _cmd = grb::type::ANALYZER_CREATE;
 
   callParseAndExecute();
 
@@ -99,7 +102,7 @@ TEST_F(AnalyzerGrbcatTest, create_noArgument)
 
 TEST_F(AnalyzerGrbcatTest, create_unknownCorrelation)
 {
-  _tokens.push_back("create");
+  _cmd = grb::type::ANALYZER_CREATE;
   _tokens.push_back("correlation-name");
 
   callParseAndExecute();
@@ -197,7 +200,7 @@ TEST_F(AnalyzerGrbcatTest, set_CorrelationParseFalse)
   grb::CorrelationMock* corr = static_cast<grb::CorrelationMock*>(
         grb::AnalysisData::instance()->getCorrelation());
 
-  EXPECT_CALL(*corr, parse(_))
+  EXPECT_CALL(*corr, doParse(_,_))
           .WillOnce(Return(false));
 
   callParseAndExecute();
@@ -212,7 +215,7 @@ TEST_F(AnalyzerGrbcatTest, set_CorrelationParseTrue)
   grb::CorrelationMock* corr = static_cast<grb::CorrelationMock*>(
         grb::AnalysisData::instance()->getCorrelation());
 
-  EXPECT_CALL(*corr, parse(_))
+  EXPECT_CALL(*corr, doParse(_,_))
           .WillOnce(Return(true));
 
   callParseAndExecute();
@@ -228,85 +231,6 @@ TEST_F(AnalyzerGrbcatTest, build_notConfigured)
   callParseAndExecute();
 
   ASSERT_TRUE(_thrown);
-}
-
-TEST_F(AnalyzerGrbcatTest, build_CorrelationBuildFalse)
-{
-  _tokens.push_back("build");
-  _analyzer.setConfigured();
-  grb::CorrelationMock* corr = static_cast<grb::CorrelationMock*>(
-        grb::AnalysisData::instance()->getCorrelation());
-
-  EXPECT_CALL(*corr, build(_,_))
-          .WillOnce(Return(false));
-
-  callParseAndExecute();
-
-  ASSERT_TRUE(_thrown);
-}
-
-TEST_F(AnalyzerGrbcatTest, build_CorrelationBuildTrue)
-{
-  _tokens.push_back("build");
-  _analyzer.setConfigured();
-  grb::CorrelationMock* corr = static_cast<grb::CorrelationMock*>(
-        grb::AnalysisData::instance()->getCorrelation());
-
-  EXPECT_CALL(*corr, build(_,_))
-          .WillOnce(Return(true));
-
-  callParseAndExecute();
-
-  ASSERT_FALSE(_thrown);
-  ASSERT_TRUE(_result);
-}
-
-TEST_F(AnalyzerGrbcatTest, save_CorrelationSaveFalse)
-{
-  _tokens.push_back("save");
-  _analyzer.setConfigured();
-  grb::CorrelationMock* corr = static_cast<grb::CorrelationMock*>(
-        grb::AnalysisData::instance()->getCorrelation());
-
-  EXPECT_CALL(*corr, save(_))
-          .WillOnce(Return(false));
-
-  callParseAndExecute();
-
-  ASSERT_TRUE(_thrown);
-}
-
-TEST_F(AnalyzerGrbcatTest, save_CorrelationSaveTrue)
-{
-  _tokens.push_back("save");
-  _analyzer.setConfigured();
-  grb::CorrelationMock* corr = static_cast<grb::CorrelationMock*>(
-        grb::AnalysisData::instance()->getCorrelation());
-
-  EXPECT_CALL(*corr, save(_))
-          .WillOnce(Return(true));
-
-  callParseAndExecute();
-
-  ASSERT_FALSE(_thrown);
-  ASSERT_TRUE(_result);
-}
-
-TEST_F(AnalyzerGrbcatTest, save_customFilePrefix)
-{
-  _tokens.push_back("save");
-  _tokens.push_back(_filePrefix);
-  _analyzer.setConfigured();
-  grb::CorrelationMock* corr = static_cast<grb::CorrelationMock*>(
-        grb::AnalysisData::instance()->getCorrelation());
-
-  EXPECT_CALL(*corr, save(_))
-          .WillOnce(Invoke(this, &AnalyzerGrbcatTest::correlationSave));
-
-  callParseAndExecute();
-
-  ASSERT_FALSE(_thrown);
-  ASSERT_TRUE(_result);
 }
 
 } // namespace testing

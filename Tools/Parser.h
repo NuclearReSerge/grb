@@ -1,6 +1,6 @@
-#include <cstdlib>
-
 #pragma once
+
+#include <cstdlib>
 
 namespace grb
 {

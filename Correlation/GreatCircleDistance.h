@@ -1,7 +1,7 @@
+#pragma once
+
 #include "Common/Global.h"
 #include "Correlation/ArcFormulaType.h"
-
-#pragma once
 
 namespace grb
 {

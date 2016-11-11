@@ -12,7 +12,7 @@ namespace testing
 class AnalyzerTest : public Test
 {
 public:
-  void doExecuteWithThrow()
+  void doExecuteWithThrow(grb::type::AnalyzerCmdType)
   {
     grb::Exception exc(grb::type::EXCEPTION_CRITICAL, "doExecuteWithThrow");
     throw exc;
@@ -23,7 +23,7 @@ protected:
   {
     try
     {
-      _result = _analyzer.parse(_tokens);
+      _result = _analyzer.parse(_cmd, _tokens);
     }
     catch (grb::Exception& exc)
     {
@@ -34,6 +34,7 @@ protected:
 
   bool _result { false };
   bool _thrown { false };
+  grb::type::AnalyzerCmdType _cmd;
   std::list<std::string> _tokens;
   grb::AnalyzerMock _analyzer { grb::type::UNDEFINED_ANALYZER };
 };
@@ -41,14 +42,6 @@ protected:
 TEST_F(AnalyzerTest, initial)
 {
   ASSERT_EQ(grb::type::UNDEFINED_ANALYZER, _analyzer.getType());
-  ASSERT_FALSE(_analyzer.isConfigured());
-  ASSERT_EQ(grb::type::UNDEFINED_ANALYZER_CMD, _analyzer.getCmdType());
-}
-
-TEST_F(AnalyzerTest, setConfigured)
-{
-  _analyzer.setConfigured();
-  ASSERT_TRUE(_analyzer.isConfigured());
 }
 
 TEST_F(AnalyzerTest, parse_empty)
@@ -71,42 +64,40 @@ TEST_F(AnalyzerTest, parse_validCommand_doParseTrue)
 {
   _tokens.push_back(grb::AnalyzerCmdMapper::instance()->getKey(grb::type::UNDEFINED_ANALYZER_CMD));
 
-  EXPECT_CALL(_analyzer, doParse(_))
+  EXPECT_CALL(_analyzer, doParse(_,_))
       .WillOnce(Return(true));
 
   callParse();
 
   ASSERT_TRUE(_result);
-  ASSERT_EQ(grb::type::UNDEFINED_ANALYZER_CMD, _analyzer.getCmdType());
 }
 
 TEST_F(AnalyzerTest, parse_validCommand_doParseFalse)
 {
   _tokens.push_back(grb::AnalyzerCmdMapper::instance()->getKey(grb::type::UNDEFINED_ANALYZER_CMD));
 
-  EXPECT_CALL(_analyzer, doParse(_))
+  EXPECT_CALL(_analyzer, doParse(_,_))
       .WillOnce(Return(false));
 
   callParse();
 
   ASSERT_FALSE(_result);
-  ASSERT_EQ(grb::type::UNDEFINED_ANALYZER_CMD, _analyzer.getCmdType());
 }
 
 TEST_F(AnalyzerTest, execute_doExecute_noThrow)
 {
-  EXPECT_CALL(_analyzer, doExecute())
+  EXPECT_CALL(_analyzer, doExecute(_))
       .Times(1);
 
-  ASSERT_NO_THROW(_analyzer.execute());
+  ASSERT_NO_THROW(_analyzer.execute(_cmd));
 }
 
 TEST_F(AnalyzerTest, execute_doExecute_Throw)
 {
-  EXPECT_CALL(_analyzer, doExecute())
+  EXPECT_CALL(_analyzer, doExecute(_))
       .WillOnce(Invoke(this, &AnalyzerTest::doExecuteWithThrow));
 
-  ASSERT_THROW(_analyzer.execute(), grb::Exception);
+  ASSERT_THROW(_analyzer.execute(_cmd), grb::Exception);
 }
 
 } // namespace testing

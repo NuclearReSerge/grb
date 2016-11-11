@@ -1,7 +1,7 @@
+#pragma once
+
 #include "CLI/CommandType.h"
 #include "Common/Mapper.h"
-
-#pragma once
 
 MAPPER_CLASS_H(CommandMapper, type::CommandType)
 

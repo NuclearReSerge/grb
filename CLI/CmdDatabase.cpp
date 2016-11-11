@@ -1,19 +1,13 @@
 #include "CLI/CmdDatabase.h"
 
-#include "CLI/CommandMapper.h"
-#include "Data/Catalog.h"
-#include "Data/CatalogType.h"
-#include "Data/DataBaseFormatFactory.h"
+#include "Database/DatabaseCmdMapper.h"
+#include "Database/DatabaseMapper.h"
+#include "Database/DatabaseFactory.h"
 #include "Main/AnalysisData.h"
-#include "Tools/ParserDatabase.h"
-
-#include <iostream>
-#include <sstream>
 
 namespace
 {
 
-const char* TDAT_FILE_EXT = "tdat";
 const char* HELP_SHORT = "reads the database file and creates a catalog.";
 const char* HELP_LONG = "[<DB_FILE>]\n"
 "\n"
@@ -26,15 +20,138 @@ const char* HELP_LONG = "[<DB_FILE>]\n"
 namespace grb
 {
 
-CmdDatabase::CmdDatabase()
-  : Cmd(type::CMD_DATABASE)
+type::DatabaseType
+CmdDatabase::getMappedObjectVal(std::string& objStr)
 {
+  return DatabaseMapper::instance()->getValue(objStr);
 }
 
-CmdDatabase::~CmdDatabase()
+type::DatabaseCmdType
+CmdDatabase::getMappedSubCmdVal(std::string& cmdStr)
 {
-  delete _format;
+  return DatabaseCmdMapper::instance()->getValue(cmdStr);
 }
+
+std::string
+CmdDatabase::getMappedSubCmdStr(type::DatabaseCmdType cmdVal)
+{
+  return DatabaseCmdMapper::instance()->getKey(cmdVal);
+}
+
+bool
+CmdDatabase::isObjectCreated()
+{
+  return AnalysisData::instance()->getDatabase() != nullptr;
+}
+
+std::string
+CmdDatabase::getCreatedObjectName()
+{
+  if (!isObjectCreated())
+    return "not-created";
+  return DatabaseMapper::instance()->getKey(AnalysisData::instance()->getDatabase()->getType());
+}
+
+bool
+CmdDatabase::doParse(std::list<std::string>& tokens)
+{
+  switch (_subCmd)
+  {
+    default:
+      break;
+  }
+
+  if (isObjectCreated())
+  {
+    return AnalysisData::instance()->getDatabase()->parse(_subCmd, tokens);
+  }
+  return false;
+}
+
+void
+CmdDatabase::doExecute()
+{
+  switch (_subCmd)
+  {
+    default:
+      break;
+  }
+
+  if (isObjectCreated())
+  {
+    return AnalysisData::instance()->getDatabase()->execute(_subCmd);
+  }
+}
+
+std::string
+CmdDatabase::doHelp(type::CommandHelpType type)
+{
+  if (type == type::HELP_SHORT)
+    return HELP_SHORT;
+
+  std::stringstream ss;
+  ss << HELP_LONG;
+  for(int i = 0; i < type::UNDEFINED_DATABASE; ++i)
+  {
+    ss << "  "
+       << DatabaseMapper::instance()->getKey((type::DatabaseType) i)
+       << std::endl;
+  }
+
+  return ss.str();
+}
+
+void
+CmdDatabase::executeCreate()
+{
+  Database* object = DatabaseFactory::instance()->createType(_type);
+  if (!object)
+  {
+    std::stringstream ss;
+    errorHeader(ss);
+    ss << "Database '" << DatabaseMapper::instance()->getKey(_type)
+       << "' not created.";
+    Exception exc(type::EXCEPTION_WARNING + type::EXCEPTION_MOD_NO_PREFIX,
+                  ss.str(), PRETTY_FUNCTION);
+    throw exc;
+  }
+
+  AnalysisData::instance()->setDatabase(object);
+}
+
+void
+CmdDatabase::executeHelp()
+{
+  std::stringstream ss;
+
+  if (isObjectCreated())
+  {
+    ss << AnalysisData::instance()->getDatabase()->help();
+  }
+  else
+  {
+    Database* object = DatabaseFactory::instance()->createType(_type);
+    if (object)
+    {
+      ss << object->help();
+      delete object;
+    }
+    else
+    {
+      return;
+    }
+  }
+  Exception exc(type::EXCEPTION_LOW + type::EXCEPTION_MOD_NO_PREFIX,
+                ss.str(), PRETTY_FUNCTION);
+  throw exc;
+}
+
+/*
+#include "Catalog/Catalog.h"
+#include "Catalog/CatalogType.h"
+#include "Tools/ParserDatabase.h"
+
+const char* TDAT_FILE_EXT = "tdat";
 
 bool
 CmdDatabase::doParse(std::list<std::string>& tokens)
@@ -151,21 +268,21 @@ CmdDatabase::doHelp(type::CommandHelpType type)
   for(int i = 0; i < type::UNDEFINED_DATABASE_FORMAT; ++i)
   {
     ss << "  "
-       << DataBaseFormatMapper::instance()->getKey((type::DataBaseFormatType) i)
+       << DataBaseFormatMapper::instance()->getKey((type::DatabaseFormatType) i)
        << "."<< TDAT_FILE_EXT << std::endl;
   }
 
   return ss.str();
 }
 
-DataBaseFormat*
-CmdDatabase::getDbFormat(const type::DataBaseFormatType& dbType)
+Database*
+CmdDatabase::getDbFormat(const type::DatabaseFormatType& dbType)
 {
   return DataBaseFormatFactory::instance()->createType(dbType);
 }
 
 Catalog*
-CmdDatabase::getCatalog(type::DataBaseFormatType dbType)
+CmdDatabase::getCatalog(type::DatabaseFormatType dbType)
 {
   type::CatalogType catType = convertDataBaseFormat(dbType);
 
@@ -184,7 +301,7 @@ CmdDatabase::getCatalog(type::DataBaseFormatType dbType)
 }
 
 Parser*
-CmdDatabase::getParser(DataBaseFormat& dbFormat, Catalog& catalog)
+CmdDatabase::getParser(Database& dbFormat, Catalog& catalog)
 {
   return new ParserDatabase(_dbFilename, dbFormat, catalog);
 }
@@ -216,7 +333,7 @@ CmdDatabase::filenameMapping(const std::string& filename)
 }
 
 type::CatalogType
-CmdDatabase::convertDataBaseFormat(type::DataBaseFormatType dbType)
+CmdDatabase::convertDataBaseFormat(type::DatabaseFormatType dbType)
 {
   switch (dbType)
   {
@@ -237,5 +354,5 @@ CmdDatabase::convertDataBaseFormat(type::DataBaseFormatType dbType)
   }
   return type::UNDEFINED_CATALOG;
 }
-
+*/
 } // namespace grb

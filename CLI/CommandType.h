@@ -21,6 +21,12 @@ enum CommandType
   UNDEFINED_COMMAND
 };
 
+enum CmdSubCmdType
+{
+  CMD_SUBCMD_CREATE,
+  CMD_SUBCMD_HELP,
+};
+
 enum CommandHelpType
 {
   HELP_SHORT,

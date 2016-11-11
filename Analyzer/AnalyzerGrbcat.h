@@ -1,13 +1,12 @@
-#include "Analyzer/Analyzer.h"
-#include "Correlation/CorrelationType.h"
-#include "Data/CatalogType.h"
-#include "Common/Global.h"
+#pragma once
 
+#include "Analyzer/Analyzer.h"
+#include "Catalog/CatalogType.h"
+#include "Common/Global.h"
+#include "Correlation/CorrelationType.h"
 
 #include <string>
 #include <list>
-
-#pragma once
 
 namespace grb
 {
@@ -20,24 +19,17 @@ public:
   AnalyzerGrbcat();
   ~AnalyzerGrbcat() = default;
 
+  bool isConfigurationValid() override;
+
 protected:
-  bool doParse(std::list<std::string>& tokens) override;
-  void doExecute() override;
-
-  bool parseCreate(std::list<std::string>& tokens);
-  bool parseSet(std::list<std::string>& tokens);
-  bool parseBuild();
-
-  void executeCreate();
-  void executeSet();
-  void executeBuild();
-  void executeSave();
+  virtual bool doParse(type::AnalyzerCmdType cmd, std::list<std::string>& tokens) override;
+  virtual void doExecute(type::AnalyzerCmdType cmd) override;
+  virtual std::string doList() override;
+  virtual std::string doHelp() override;
 
   void checkAnalyzerDataIsValid();
 
 private:
-  type::CorrelationType _corrType;
-  std::string _filePrefix;
 
 };
 

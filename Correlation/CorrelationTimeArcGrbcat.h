@@ -1,10 +1,10 @@
+#pragma once
+
+#include "Correlation/ArcFormulaType.h"
 #include "Correlation/Correlation.h"
-#include "Correlation/GreatCircleDistance.h"
 #include "Common/Global.h"
 
 #include <vector>
-
-#pragma once
 
 namespace grb
 {
@@ -17,11 +17,12 @@ public:
   CorrelationTimeArcGrbcat();
   ~CorrelationTimeArcGrbcat();
 
-  bool parse(std::list<std::string>& tokens) override;
-  bool build(Catalog& catalogData, Catalog& catalogModel) override;
-  bool save(const std::string& filePrefix) override;
-
 protected:
+  bool doParse(type::CorrelationCmdType cmd, std::list<std::string>& tokens) override;
+  void doExecute(type::CorrelationCmdType cmd) override;
+  void doGenerate(Catalog& catalogData, Catalog& catalogModel) override;
+  std::string doHelp() override;
+
   bool checkCatalog(Catalog& catalog);
   void filterEntries(Catalog& catalog, std::vector<CatalogEntry*>& entries);
   void initiate();

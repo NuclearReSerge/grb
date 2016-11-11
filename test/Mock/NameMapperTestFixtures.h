@@ -1,11 +1,11 @@
+#pragma once
+
 #include "Common/Global.h"
 #include "Data/ColumnType.h"
 
 #include "test/Mock/MockHelper.h"
 
 #include <gmock/gmock.h>
-
-#pragma once
 
 namespace testing
 {

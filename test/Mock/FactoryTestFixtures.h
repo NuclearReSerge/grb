@@ -1,6 +1,6 @@
-#include <gtest/gtest.h>
-
 #pragma once
+
+#include <gtest/gtest.h>
 
 namespace testing
 {

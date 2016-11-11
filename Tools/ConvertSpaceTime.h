@@ -1,8 +1,8 @@
-#include "Common/Global.h"
-#include "Data/Coordinates.h"
-#include "Data/CoordinateSystemMapper.h"
-
 #pragma once
+
+#include "Common/Global.h"
+#include "Catalog/Coordinates.h"
+#include "Data/CoordinateSystemMapper.h"
 
 namespace grb
 {

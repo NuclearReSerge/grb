@@ -2,7 +2,7 @@
 
 #include "test/Mock/CatalogMock.h"
 #include "test/Mock/CatalogEntryMock.h"
-#include "test/Mock/DataBaseFormatMock.h"
+#include "test/Mock/DatabaseMock.h"
 #include "test/Mock/MockHelper.h"
 #include "test/Mock/NameMapperMock.h"
 
@@ -145,11 +145,11 @@ protected:
   void setupFormat()
   {
     int i = 0;
-    _format = new grb::DataBaseFormatMock(grb::type::UNDEFINED_DATABASE_FORMAT);
+    _format = new grb::DatabaseMock(grb::type::UNDEFINED_DATABASE);
 
     for (const ColumnDef& def : _columnDefs)
     {
-      _format->getDataTypes().push_back(new grb::DataBaseColumn(
+      _format->getDataTypes().push_back(new grb::DatabaseColumn(
             (grb::type::ColumnType) i++, def._unitType, def._valueType, def._isRequired));
     }
     _format->setColumnFlags();
@@ -241,7 +241,7 @@ protected:
   std::size_t _rows = 0;
   std::stringstream* _stream = nullptr;
   grb::Parser* _parser = nullptr;
-  grb::DataBaseFormatMock* _format = nullptr;
+  grb::DatabaseMock* _format = nullptr;
   grb::CatalogMock* _catalog = nullptr;
   grb::CatalogEntryMock* _entry = nullptr;
   grb::mapper::NameMapperMock* _mapper = nullptr;
@@ -265,7 +265,7 @@ TEST_F(ParserDatabaseTest, ConstructorFile_FileDoesNotExist)
 
 TEST_F(ParserDatabaseTest, ConstructorFile_DatabaseFormatIsEmpty)
 {
-  _format = new grb::DataBaseFormatMock(grb::type::UNDEFINED_DATABASE_FORMAT);
+  _format = new grb::DatabaseMock(grb::type::UNDEFINED_DATABASE);
 
   std::string filename = __FILE__;
 
@@ -276,8 +276,8 @@ TEST_F(ParserDatabaseTest, ConstructorFile_DatabaseFormatIsEmpty)
 
 TEST_F(ParserDatabaseTest, ConstructorFile_DatabaseFormatHasUndefinedColumn)
 {
-  _format = new grb::DataBaseFormatMock(grb::type::UNDEFINED_DATABASE_FORMAT);
-  _format->getDataTypes().push_back(new grb::DataBaseColumn(grb::type::UNDEFINED_COLUMN));
+  _format = new grb::DatabaseMock(grb::type::UNDEFINED_DATABASE);
+  _format->getDataTypes().push_back(new grb::DatabaseColumn(grb::type::UNDEFINED_COLUMN));
 
   std::string filename = __FILE__;
 

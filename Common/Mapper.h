@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Common/Exception.h"
 #include "Common/Singleton.h"
 
@@ -6,8 +8,6 @@
 #include <sstream>
 #include <string>
 #include <vector>
-
-#pragma once
 
 namespace grb
 {

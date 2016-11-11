@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Common/Factory.h"
 #include "Correlation/Correlation.h"
 #include "Correlation/CorrelationMapper.h"

@@ -21,13 +21,8 @@ const char* HELP_LONG = "[<COMMAND>]\n"
 namespace grb
 {
 
-CmdHelp::CmdHelp()
-  : Cmd(type::CMD_HELP), _showAll(true)
-{
-}
-
 bool
-CmdHelp::doParse(std::list<std::string>& tokens)
+CmdHelp::parse(std::list<std::string>& tokens)
 { 
   if (!tokens.empty())
   {
@@ -35,18 +30,19 @@ CmdHelp::doParse(std::list<std::string>& tokens)
     _showAll = false;
     tokens.pop_front();
   }
+
   return true;
 }
 
 void
-CmdHelp::doExecute()
+CmdHelp::execute()
 {
   if (_showAll)
   {
     std::cout << "Available commands:" << std::endl;
     for (int i = 0; i < type::UNDEFINED_COMMAND; ++i)
     {
-      Cmd* cmd = CommandFactory::instance()->createType((type::CommandType) i);
+      CmdBase* cmd = CommandFactory::instance()->createType((type::CommandType) i);
       if (!cmd)
       {
         std::cout << "# '"
@@ -60,7 +56,7 @@ CmdHelp::doExecute()
   }
   else
   {
-    Cmd* cmd = CommandFactory::instance()->createName(_specific);
+    CmdBase* cmd = CommandFactory::instance()->createName(_specific);
     if (!cmd)
     {
       std::cout << "No help for command '" << _specific << "', wrong command name." << std::endl;
@@ -73,7 +69,7 @@ CmdHelp::doExecute()
 }
 
 std::string
-CmdHelp::doHelp(type::CommandHelpType type)
+CmdHelp::help(type::CommandHelpType type)
 {
   if (type == type::HELP_SHORT)
     return HELP_SHORT;

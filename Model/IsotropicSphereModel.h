@@ -1,8 +1,7 @@
-#include "Data/CatalogType.h"
-
-#include "Model/Model.h"
-
 #pragma once
+
+#include "Catalog/CatalogType.h"
+#include "Model/Model.h"
 
 namespace grb
 {

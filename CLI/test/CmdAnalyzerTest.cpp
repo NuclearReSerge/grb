@@ -14,11 +14,12 @@ namespace grb
 class CmdAnalyzerMock : public CmdAnalyzer
 {
 public:
+/*
   Analyzer* createAnalyzerOriginal(const std::string& name)
   {
     return CmdAnalyzer::createAnalyzer(name);
   }
-
+*/
   void setAnalyzer(Analyzer* analyzer)
   {
     _analyzer = analyzer;
@@ -48,7 +49,6 @@ protected:
   void SetUp()
   {
     _analyzer = new grb::AnalyzerMock(grb::type::UNDEFINED_ANALYZER);
-    _analyzer->setConfigured();
     _catalogData = new grb::CatalogMock(grb::type::UNDEFINED_CATALOG);
     _catalogModel = new grb::CatalogMock(grb::type::UNDEFINED_CATALOG);
     grb::AnalysisData::instance()->setAnalyzer(_analyzer);
@@ -111,7 +111,7 @@ TEST_F(CmdAnalyzerTest, parse_emptyTokens)
 
 TEST_F(CmdAnalyzerTest, parse_AnalyzerParseTrue)
 {
-  EXPECT_CALL(*_analyzer, doParse(_))
+  EXPECT_CALL(*_analyzer, doParse(_,_))
       .WillOnce(Return(true));
 
   callParse();
@@ -121,7 +121,7 @@ TEST_F(CmdAnalyzerTest, parse_AnalyzerParseTrue)
 
 TEST_F(CmdAnalyzerTest, parse_AnalyzerParseFalse)
 {
-  EXPECT_CALL(*_analyzer, doParse(_))
+  EXPECT_CALL(*_analyzer, doParse(_,_))
       .WillOnce(Return(false));
 
   callParse();
@@ -165,7 +165,7 @@ TEST_F(CmdAnalyzerTest, parse_noAnalyzer)
   _analyzer = new grb::AnalyzerMock(grb::type::UNDEFINED_ANALYZER);
   _cmd.setAnalyzer(_analyzer);
 
-  EXPECT_CALL(*_analyzer, doParse(_))
+  EXPECT_CALL(*_analyzer, doParse(_,_))
       .WillOnce(Return(true));
 
   callParse();
@@ -175,8 +175,6 @@ TEST_F(CmdAnalyzerTest, parse_noAnalyzer)
 
 TEST_F(CmdAnalyzerTest, execute_AnalyzerNotConfigured)
 {
-  grb::AnalysisData::instance()->getAnalyzer()->setConfigured(false);
-
   callExecute();
 
   ASSERT_FALSE(_thrown);
@@ -193,7 +191,7 @@ TEST_F(CmdAnalyzerTest, execute_NoCatalogModel)
 
 TEST_F(CmdAnalyzerTest, execute)
 {
-  EXPECT_CALL(*_analyzer, doExecute())
+  EXPECT_CALL(*_analyzer, doExecute(_))
       .Times(1);
 
   callExecute();
@@ -210,10 +208,10 @@ TEST_F(CmdAnalyzerTest, help_long)
 {
   ASSERT_FALSE(_cmd.help(grb::type::HELP_LONG).empty());
 }
-
+/*
 TEST_F(CmdAnalyzerTest, createAnalyzer)
 {
   ASSERT_EQ(nullptr, _cmd.createAnalyzerOriginal("undefined-analyzer"));
 }
-
+*/
 } // namespace testing

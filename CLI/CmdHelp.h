@@ -1,14 +1,21 @@
-#include "CLI/Cmd.h"
-
 #pragma once
+
+#include "CLI/Cmd.h"
 
 namespace grb
 {
 
-class CmdHelp : public Cmd
+class CmdHelp : public CmdBase
 {
 public:
-  CmdHelp();
+  CmdHelp()
+    : CmdBase(type::CMD_HELP), _showAll(true)
+  {
+  }
+
+  virtual bool parse(std::list<std::string>& tokens) override;
+  virtual void execute() override;
+  virtual std::string help(type::CommandHelpType type = type::HELP_SHORT) override;
 
   bool showAll() const
   {
@@ -18,11 +25,6 @@ public:
   {
     return _specific;
   }
-
-protected:
-  bool doParse(std::list<std::string>& tokens);
-  void doExecute();
-  std::string doHelp(type::CommandHelpType type);
 
 private:
   bool _showAll;

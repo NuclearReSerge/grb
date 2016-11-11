@@ -1,8 +1,9 @@
 #include "Main/AnalysisData.h"
 
 #include "Analyzer/Analyzer.h"
+#include "Catalog/Catalog.h"
 #include "Correlation/Correlation.h"
-#include "Data/Catalog.h"
+#include "Database/Database.h"
 #include "Filter/Filter.h"
 #include "Model/Model.h"
 
@@ -18,6 +19,7 @@ std::unique_ptr<Analyzer> _analyzer;
 std::unique_ptr<Correlation> _correlation;
 std::unique_ptr<Catalog> _catalogData;
 std::unique_ptr<Catalog> _catalogModel;
+std::unique_ptr<Database> _database;
 std::unique_ptr<Filter> _filter;
 std::unique_ptr<Model> _model;
 
@@ -48,6 +50,12 @@ Catalog*
 AnalysisData::getCatalogModel()
 {
   return _catalogModel.get();
+}
+
+Database*
+AnalysisData::getDatabase()
+{
+  return _database.get();
 }
 
 Filter*
@@ -87,6 +95,12 @@ AnalysisData::setCatalogModel(Catalog* catalog)
 }
 
 void
+AnalysisData::setDatabase(Database* database)
+{
+  _database.reset(database);
+}
+
+void
 AnalysisData::setFilter(Filter* filter)
 {
   _filter.reset(filter);
@@ -105,6 +119,7 @@ AnalysisData::clear()
   _correlation.reset(nullptr);
   _catalogData.reset(nullptr);
   _catalogModel.reset(nullptr);
+  _database.reset(nullptr);
   _filter.reset(nullptr);
   _model.reset(nullptr);
 }

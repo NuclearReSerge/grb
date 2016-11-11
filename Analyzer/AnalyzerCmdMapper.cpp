@@ -6,9 +6,10 @@ namespace
 const std::vector<std::string> ANALYSER_CMD_NAMES
 {
   "create",
-  "set",
-  "build",
-  "save",
+  "help",
+
+  "list",
+  //
 
   // LAST
   "undefined-analyzer-cmd"

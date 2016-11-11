@@ -1,23 +1,23 @@
+#pragma once
+
 #include "CLI/Cmd.h"
 
 #include <gmock/gmock.h>
 
-#pragma once
-
 namespace grb
 {
 
-class CmdMock : public Cmd
+class CmdMock : public CmdBase
 {
 public:
   CmdMock(const type::CommandType type)
-    : Cmd(type)
+    : CmdBase(type)
   {
   }
 
-  MOCK_METHOD1(doParse, bool(std::list<std::string>& tokens));
-  MOCK_METHOD0(doExecute, void());
-  MOCK_METHOD1(doHelp, std::string(type::CommandHelpType type));
+  MOCK_METHOD1(parse, bool(std::list<std::string>& tokens));
+  MOCK_METHOD0(execute, void());
+  MOCK_METHOD1(help, std::string(type::CommandHelpType type));
 };
 
 } // namspace grb

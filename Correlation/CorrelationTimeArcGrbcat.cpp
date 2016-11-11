@@ -1,9 +1,10 @@
 #include "Correlation/CorrelationTimeArcGrbcat.h"
 
+#include "Catalog/Catalog.h"
+#include "Catalog/CatalogEntryGrbcat.h"
 #include "Common/Exception.h"
 #include "Common/Global.h"
-#include "Data/Catalog.h"
-#include "Data/CatalogEntryGrbcat.h"
+#include "Correlation/GreatCircleDistance.h"
 #include "Main/AnalysisData.h"
 #include "Model/IsotropicSphereModel.h"
 
@@ -68,10 +69,15 @@ CorrelationTimeArcGrbcat::~CorrelationTimeArcGrbcat()
 }
 
 bool
-CorrelationTimeArcGrbcat::parse(std::list<std::string>& tokens)
+CorrelationTimeArcGrbcat::doParse(type::CorrelationCmdType cmd, std::list<std::string>& tokens)
 {
-  if (!tokens.empty())
-    return false;
+  switch (cmd)
+  {
+    default:
+      break;
+  }
+
+  tokens.clear();
 
   const Catalog* catalog = AnalysisData::instance()->getCatalogData();
 
@@ -93,8 +99,24 @@ CorrelationTimeArcGrbcat::parse(std::list<std::string>& tokens)
   return true;
 }
 
-bool
-CorrelationTimeArcGrbcat::build(Catalog& catalogData, Catalog& catalogModel)
+void
+CorrelationTimeArcGrbcat::doExecute(type::CorrelationCmdType cmd)
+{
+  switch (cmd)
+  {
+    default:
+      break;
+  }
+}
+
+std::string
+CorrelationTimeArcGrbcat::doHelp()
+{
+  return "CorrelationTimeArcGrbcat::doHelp";
+}
+
+void
+CorrelationTimeArcGrbcat::doGenerate(Catalog& catalogData, Catalog& catalogModel)
 {
   initiate();
 
@@ -105,9 +127,9 @@ CorrelationTimeArcGrbcat::build(Catalog& catalogData, Catalog& catalogModel)
 
   TRACE("PAIRS: DATA = " << _pairsData << ", MODEL = " << _pairsModel);
 
-  for (std::size_t i = 0; i < _yPoints; ++i)
+  for (std::size_t i = 0; i < getYPoints(); ++i)
   {
-    for (std::size_t j = 0; j < _xPoints; ++j)
+    for (std::size_t j = 0; j < getXPoints(); ++j)
     {
       if (_histModel[i][j])
       {
@@ -117,10 +139,9 @@ CorrelationTimeArcGrbcat::build(Catalog& catalogData, Catalog& catalogModel)
     }
   }
   normalize(_cf, _pairsModel / _pairsData);
-
-  return true;
 }
 
+/*
 bool
 CorrelationTimeArcGrbcat::save(const std::string& filename)
 {
@@ -174,6 +195,8 @@ CorrelationTimeArcGrbcat::save(const std::string& filename)
   ofsPar.close();
   return true;
 }
+*/
+
 
 bool
 CorrelationTimeArcGrbcat::checkCatalog(Catalog& catalog)
@@ -219,11 +242,11 @@ CorrelationTimeArcGrbcat::filterEntries(Catalog& catalog,
 void
 CorrelationTimeArcGrbcat::initiate()
 {
-  TRACE("X: range = " << _xRange << ", points = " << _xPoints << ", delta = " << _xDelta);
-  TRACE("Y: range = " << _yRange << ", points = " << _yPoints << ", delta = " << _yDelta);
-  _histData.resize(_yPoints, std::vector<std::size_t>(_xPoints, 0));
-  _histModel.resize(_yPoints, std::vector<std::size_t>(_xPoints, 0));
-  _cf.resize(_yPoints, std::vector<type::Float>(_xPoints, 0.0));
+  TRACE("X: range = " << getXRange() << ", points = " << getXPoints() << ", delta = " << getXDelta());
+  TRACE("Y: range = " << getYRange() << ", points = " << getYPoints() << ", delta = " << getYDelta());
+  _histData.resize(getYPoints(), std::vector<std::size_t>(getXPoints(), 0));
+  _histModel.resize(getYPoints(), std::vector<std::size_t>(getXPoints(), 0));
+  _cf.resize(getYPoints(), std::vector<type::Float>(getXPoints(), 0.0));
 }
 
 std::size_t
@@ -253,10 +276,10 @@ CorrelationTimeArcGrbcat::generateCF(Catalog& catalog,
                                    iEntry->getCoodinates().getTimeMJD());
       type::Float dist = distance(jEntry->getCoodinates(), iEntry->getCoodinates());
 
-      std::size_t xIdx = std::floor(time * _xDelta);
-      std::size_t yIdx = std::floor(dist * _yDelta);
+      std::size_t xIdx = std::floor(time * getXDelta());
+      std::size_t yIdx = std::floor(dist * getYDelta());
 
-      if (xIdx < _xPoints && yIdx < _yPoints)
+      if (xIdx < getXPoints() && yIdx < getYPoints())
       {
         ++hist[yIdx][xIdx];
         ++pairs;
@@ -278,9 +301,9 @@ CorrelationTimeArcGrbcat::generateCF(Catalog& catalog,
 void
 CorrelationTimeArcGrbcat::normalize(std::vector< std::vector<type::Float>>& cf, type::Float norm)
 {
-  for (std::size_t i = 0; i < _yPoints; ++i)
+  for (std::size_t i = 0; i < getYPoints(); ++i)
   {
-    for (std::size_t j = 0; j < _xPoints; ++j)
+    for (std::size_t j = 0; j < getXPoints(); ++j)
     {
       cf[i][j] *= norm;
     }

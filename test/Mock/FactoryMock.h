@@ -1,10 +1,10 @@
+#pragma once
+
 #include "Common/Factory.h"
 
 #include "test/Mock/MapperMock.h"
 
 #include <gmock/gmock.h>
-
-#pragma once
 
 namespace grb
 {

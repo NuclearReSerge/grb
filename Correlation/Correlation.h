@@ -1,31 +1,70 @@
+#pragma once
+
+#include "Common/BaseObject.h"
 #include "Common/Global.h"
+#include "Correlation/CorrelationCmdType.h"
 #include "Correlation/CorrelationType.h"
 
 #include <cmath>
 #include <list>
 #include <string>
 
-#pragma once
-
 namespace grb
 {
 
+typedef BaseObject<type::CorrelationType, type::CorrelationCmdType> CorrelationBase;
+
 class Catalog;
 
-class Correlation
+class Correlation : public CorrelationBase
 {
 public:
   Correlation(type::CorrelationType type = type::UNDEFINED_CORRELATION)
-  : _xRange(1.0), _xPoints(0), _xDelta(0.0), _yRange(1.0), _yPoints(0), _yDelta(0.0),
-    _type(type)
+  : CorrelationBase(type), _configured(false),
+    _xRange(1.0), _xPoints(0), _xDelta(0.0),
+    _yRange(1.0), _yPoints(0), _yDelta(0.0)
   {
   }
 
-  virtual ~Correlation() = default;
-
-  type::CorrelationType getType() const
+  bool isConfigured() const
   {
-    return _type;
+    return _configured && _xPoints && _yPoints;
+  }
+
+  void setConfigured(const bool configured = true)
+  {
+    _configured = configured;
+  }
+
+  type::Float getXRange() const { return _xRange; }
+  std::size_t getXPoints() const { return _xPoints; }
+  type::Float getXDelta() const { return _xDelta; }
+
+  type::Float getYRange() const { return _yRange; }
+  std::size_t getYPoints() const { return _yPoints; }
+  type::Float getYDelta() const { return _yDelta; }
+
+  void generate(Catalog& catalogData, Catalog& catalogModel)
+  {
+    doGenerate(catalogData, catalogModel);
+  }
+
+protected:
+  virtual void doGenerate(Catalog& catalogData, Catalog& catalogModel) = 0;
+
+  bool isCommandValid(type::CorrelationCmdType cmd)
+  {
+    switch (cmd)
+    {
+      case type::CORRELATION_CREATE:
+      case type::CORRELATION_GENERATE:
+      case type::CORRELATION_HELP:
+      {
+        return false;
+      }
+      default:
+        return true;;
+    }
   }
 
   bool setXAxis(type::Float range, std::size_t points)
@@ -50,19 +89,9 @@ public:
     return true;
   }
 
-  type::Float getXRange() const { return _xRange; }
-  std::size_t getXPoints() const { return _xPoints; }
-  type::Float getXDelta() const { return _xDelta; }
+private:
+  bool _configured;
 
-  type::Float getYRange() const { return _yRange; }
-  std::size_t getYPoints() const { return _yPoints; }
-  type::Float getYDelta() const { return _yDelta; }
-
-  virtual bool parse(std::list<std::string>& tokens) = 0;
-  virtual bool build(Catalog& catalogData, Catalog& catalogModel) = 0;
-  virtual bool save(const std::string& filePrefix) = 0;
-
-protected:
   type::Float _xRange;
   std::size_t _xPoints;
   type::Float _xDelta;
@@ -70,9 +99,6 @@ protected:
   type::Float _yRange;
   std::size_t _yPoints;
   type::Float _yDelta;
-
-private:
-  type::CorrelationType _type;
 };
 
 } // namespace grb

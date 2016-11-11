@@ -1,12 +1,13 @@
 #include "Tools/ParserDatabase.h"
 
-#include "Data/Catalog.h"
-#include "Data/CatalogEntry.h"
-#include "Data/CatalogEntryMapper.h"
+#include "Catalog/Catalog.h"
+#include "Catalog/CatalogEntry.h"
+#include "Catalog/CatalogEntryMapper.h"
 #include "Data/ColumnMapper.h"
-#include "Data/DataBaseFormat.h"
-#include "Data/DataBaseColumn.h"
 #include "Data/ValueMapper.h"
+#include "Database/Database.h"
+#include "Database/DatabaseColumn.h"
+#include "Database/DatabaseMapper.h"
 #include "Tools/NameMapper.h"
 
 #include <sstream>
@@ -26,10 +27,10 @@ const char  DELIM_LIST   = ',';
 const char  DELIM_RANGE  = '-';
 }
 
-ParserDatabase::ParserDatabase(const std::string& filename, DataBaseFormat& format,
+ParserDatabase::ParserDatabase(const std::string& filename, Database& database,
                                Catalog& catalog)
-  : Parser(), _stream(nullptr), _format(format), _catalog(catalog),
-    _columnsRequired(_format.getRequiredColumns()), _isSourceFile(false),  _columnIdx(0),
+  : Parser(), _stream(nullptr), _database(database), _catalog(catalog),
+    _columnsRequired(_database.getRequiredColumns()), _isSourceFile(false),  _columnIdx(0),
     _columnType(type::UNDEFINED_COLUMN), _valueType(type::UNDEFINED_VALUE)
 
 {
@@ -37,9 +38,9 @@ ParserDatabase::ParserDatabase(const std::string& filename, DataBaseFormat& form
   checkFormat();
 }
 
-ParserDatabase::ParserDatabase(std::istream* stream, DataBaseFormat& format, Catalog& catalog)
-  : Parser(), _stream(stream), _format(format), _catalog(catalog),
-    _columnsRequired(_format.getRequiredColumns()), _isSourceFile(false),  _columnIdx(0),
+ParserDatabase::ParserDatabase(std::istream* stream, Database& database, Catalog& catalog)
+  : Parser(), _stream(stream), _database(database), _catalog(catalog),
+    _columnsRequired(_database.getRequiredColumns()), _isSourceFile(false),  _columnIdx(0),
     _columnType(type::UNDEFINED_COLUMN), _valueType(type::UNDEFINED_VALUE)
 {
   if (!_stream)
@@ -80,24 +81,24 @@ ParserDatabase::openFileStream(const std::string& filename)
 void
 ParserDatabase::checkFormat()
 {
-  if (_format.getDataTypes().empty())
+  if (_database.getDataTypes().empty())
   {
     std::stringstream ss;
     ss << "Parsing failed. Database format '"
-       << DataBaseFormatMapper::instance()->getKey(_format.getType())
+       << DatabaseMapper::instance()->getKey(_database.getType())
        << "' is undefined.";
 
     Exception exc(type::EXCEPTION_WARNING, ss.str(), PRETTY_FUNCTION);
     throw exc;
   }
 
-  for (const DataBaseColumn* dbCol : _format.getDataTypes())
+  for (const DatabaseColumn* dbCol : _database.getDataTypes())
   {
     if (dbCol->getColumnType() == type::UNDEFINED_COLUMN)
     {
       std::stringstream ss;
       ss << "Parsing failed. Database format '"
-         << DataBaseFormatMapper::instance()->getKey(_format.getType())
+         << DatabaseMapper::instance()->getKey(_database.getType())
          << "' has undefined column type.";
 
       Exception exc(type::EXCEPTION_WARNING, ss.str(), PRETTY_FUNCTION);
@@ -110,7 +111,7 @@ bool
 ParserDatabase::parse()
 {
 //  for (std::size_t column = 0; column < type::UNDEFINED_COLUMN; ++column)
-//    _catalog.setUnitType((type::ColumnType) _column, _format[_column].getUnitType());
+//    _catalog.setUnitType((type::ColumnType) _column, _database[_column].getUnitType());
   _rows = 0;
 
   for (std::string line; std::getline(*_stream, line);)
@@ -163,7 +164,7 @@ ParserDatabase::parseLine(const std::string& line, CatalogEntry* entry)
 
   for (std::string element; std::getline(ss, element, DELIM_COLUMN);)
   {
-    if (_columnIdx >= _format.getDataTypes().size())
+    if (_columnIdx >= _database.getDataTypes().size())
     {
       std::stringstream ss;
       ss << "Parsing failed. Row=" << _rows + 1 << ". Line has more columns than expected.";
@@ -178,7 +179,7 @@ ParserDatabase::parseLine(const std::string& line, CatalogEntry* entry)
     _columnType = type::UNDEFINED_COLUMN;
     try
     {
-      _columnType = _format.getDataTypes()[_columnIdx]->getColumnType();
+      _columnType = _database.getDataTypes()[_columnIdx]->getColumnType();
       result = parseMapper(element, entry);
     }
     catch (Exception& grbExc)
@@ -216,7 +217,7 @@ void
 ParserDatabase::checkColumns(const type::ColumnFlags& columnFlags)
 {
   const bool allRequired = ((columnFlags & _columnsRequired) ^ _columnsRequired).none();
-  const bool allProcessed = _columnIdx == _format.getDataTypes().size();
+  const bool allProcessed = _columnIdx == _database.getDataTypes().size();
 
   if (allProcessed && allRequired)
     return;
@@ -227,7 +228,7 @@ ParserDatabase::checkColumns(const type::ColumnFlags& columnFlags)
   if (!allProcessed)
   {
     std::size_t i = 0;
-    for (const DataBaseColumn* dataType : _format.getDataTypes())
+    for (const DatabaseColumn* dataType : _database.getDataTypes())
     {
       if (i++ < _columnIdx)
         continue;
@@ -239,7 +240,7 @@ ParserDatabase::checkColumns(const type::ColumnFlags& columnFlags)
   else
   {
     std::size_t i = 0;
-    for (const DataBaseColumn* dataType : _format.getDataTypes())
+    for (const DatabaseColumn* dataType : _database.getDataTypes())
     {
       if (!columnFlags[dataType->getColumnType()])
         ss << i << " [" << ColumnMapper::instance()->getKey(dataType->getColumnType()) << "] ";
@@ -255,7 +256,7 @@ bool
 ParserDatabase::parseMapper(const std::string& raw, CatalogEntry* entry)
 {
   bool result = false;
-  _valueType = _format.getDataTypes()[_columnIdx]->getValueType();
+  _valueType = _database.getDataTypes()[_columnIdx]->getValueType();
 
   switch (_valueType)
   {

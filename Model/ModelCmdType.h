@@ -10,8 +10,9 @@ enum ModelCmdType
 {
   // common
   MODEL_CREATE,
-  MODEL_GENERATE,
   MODEL_HELP,
+
+  MODEL_GENERATE,
 
   MODEL_SET_CATALOG_TYPE,
   // Isotropic

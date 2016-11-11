@@ -1,6 +1,6 @@
-#include <iostream>
-
 #pragma once
+
+#include <iostream>
 
 #define TRACE(_MSG_)\
   std::cout << "TRACE " << _MSG_ << std::endl;

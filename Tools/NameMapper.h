@@ -1,9 +1,9 @@
+#pragma once
+
 #include "Common/Exception.h"
 #include "Common/Global.h"
 #include "Common/Mapper.h"
 #include "Data/ColumnType.h"
-
-#pragma once
 
 namespace grb
 {

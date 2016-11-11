@@ -1,7 +1,7 @@
+#pragma once
+
 #include "Common/Exception.h"
 #include "Common/Mapper.h"
-
-#pragma once
 
 namespace grb
 {

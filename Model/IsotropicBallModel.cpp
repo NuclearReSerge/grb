@@ -1,6 +1,6 @@
 #include "Model/IsotropicBallModel.h"
 
-#include "Data/CatalogEntryMapper.h"
+#include "Catalog/CatalogEntryMapper.h"
 #include "Model/ModelCmdMapper.h"
 #include "Model/ModelMapper.h"
 #include "Tools/SyntaxVerifier.h"

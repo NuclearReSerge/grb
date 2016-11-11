@@ -1,8 +1,8 @@
-#include "Data/CatalogEntry.h"
+#pragma once
+
+#include "Catalog/CatalogEntry.h"
 
 #include <gmock/gmock.h>
-
-#pragma once
 
 namespace grb
 {

@@ -1,9 +1,9 @@
+#pragma once
+
 #include "Common/Exception.h"
 #include "test/Mock/MockHelper.h"
 
 #include <gtest/gtest.h>
-
-#pragma once
 
 namespace testing
 {

@@ -14,20 +14,15 @@ const char* HELP_LONG = "";
 namespace grb
 {
 
-CmdQuit::CmdQuit(type::CommandType cmdType)
-  : Cmd(cmdType)
-{
-}
-
 bool
-CmdQuit::doParse(std::list<std::string>& tokens)
+CmdQuit::parse(std::list<std::string>& tokens)
 {
   tokens.clear();
   return true;
 }
 
 void
-CmdQuit::doExecute()
+CmdQuit::execute()
 {
   if(getCLI())
     getCLI()->setQuit();
@@ -35,7 +30,7 @@ CmdQuit::doExecute()
 }
 
 std::string
-CmdQuit::doHelp(type::CommandHelpType type)
+CmdQuit::help(type::CommandHelpType type)
 {
   if (type == type::HELP_SHORT)
     return HELP_SHORT;

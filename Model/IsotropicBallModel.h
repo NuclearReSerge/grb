@@ -1,6 +1,6 @@
-#include "Model/IsotropicSphereModel.h"
-
 #pragma once
+
+#include "Model/IsotropicSphereModel.h"
 
 namespace grb
 {

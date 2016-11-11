@@ -6,8 +6,9 @@ namespace
 const std::vector<std::string> MODEL_CMD_NAMES
 {
   "create",
-  "generate",
   "help",
+
+  "generate",
 
   "set-catalog-type",
   // Isotropic

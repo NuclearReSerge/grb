@@ -1,27 +1,37 @@
-#include "Filter/FilterMapper.h"
-
 #pragma once
+
+#include "Common/BaseObject.h"
+#include "Filter/FilterCmdType.h"
+#include "Filter/FilterType.h"
 
 namespace grb
 {
 
-class Filter
+typedef BaseObject<type::FilterType, type::FilterCmdType> FilterBase;
+
+class Filter : public FilterBase
 {
 public:
   Filter(type::FilterType type = type::UNDEFINED_FILTER)
-    : _type(type)
+    : FilterBase(type)
   {
   }
 
-  virtual ~Filter() = default;
-
-  type::FilterType getType() const
+protected:
+  bool isCommandValid(type::FilterCmdType cmd)
   {
-    return _type;
+    switch (cmd)
+    {
+      case type::FILTER_CREATE:
+      case type::FILTER_HELP:
+      {
+        return false;
+      }
+      default:
+        return true;;
+    }
   }
 
-private:
-  type::FilterType _type;
 };
 
 } // namespace grb

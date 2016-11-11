@@ -1,8 +1,8 @@
+#pragma once
+
 #include "Tools/Parser.h"
 
 #include <gmock/gmock.h>
-
-#pragma once
 
 namespace grb
 {

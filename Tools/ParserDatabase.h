@@ -1,20 +1,20 @@
-﻿#include "Common/Exception.h"
+﻿#pragma once
+
+#include "Common/Exception.h"
 #include "Common/Global.h"
 #include "Data/ColumnType.h"
-#include "Data/DataBaseColumn.h"
+#include "Database/DatabaseColumn.h"
 #include "Tools/Parser.h"
 
 #include <iostream>
 #include <string>
-
-#pragma once
 
 namespace grb
 {
 
 class Catalog;
 class CatalogEntry;
-class DataBaseFormat;
+class Database;
 
 namespace mapper
 {
@@ -26,8 +26,8 @@ class ParserDatabase : public Parser
 {
 public:
   ParserDatabase() = delete;
-  ParserDatabase(const std::string& filename, DataBaseFormat& format, Catalog& catalog);
-  ParserDatabase(std::istream* stream, DataBaseFormat& format, Catalog& catalog);
+  ParserDatabase(const std::string& filename, Database& database, Catalog& catalog);
+  ParserDatabase(std::istream* stream, Database& database, Catalog& catalog);
   ~ParserDatabase();
 
   virtual bool parse() override;
@@ -54,10 +54,9 @@ protected:
 
 private:
   std::istream* _stream;
-  DataBaseFormat& _format;
+  Database& _database;
   Catalog& _catalog;
   const type::ColumnFlags& _columnsRequired;
-
 
   bool _isSourceFile;
   std::size_t _columnIdx;

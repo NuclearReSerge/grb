@@ -1,8 +1,8 @@
+#pragma once
+
 #include "Analyzer/Analyzer.h"
 
 #include <gmock/gmock.h>
-
-#pragma once
 
 namespace grb
 {
@@ -15,8 +15,13 @@ public:
   {
   }
 
-  MOCK_METHOD1(doParse, bool(std::list<std::string>& tokens));
-  MOCK_METHOD0(doExecute, void());
+  MOCK_METHOD2(doParse, bool(type::AnalyzerCmdType cmd, std::list<std::string>& tokens));
+  MOCK_METHOD1(doExecute, void(type::AnalyzerCmdType cmd));
+  MOCK_METHOD0(doList, std::string());
+  MOCK_METHOD0(doHelp, std::string());
+
+  MOCK_METHOD0(isConfigurationValid, bool());
+
 };
 
 } // namespace grb
